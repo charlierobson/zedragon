@@ -1,0 +1,100 @@
+;	vn.	106
+
+
+; filespec:	SCORE
+
+
+; Bump score by number in A * level
+
+bmpscor	stx	bmpxtmp
+	sta	bmpatmp
+
+	ldx	plrlvl
+	lda	#0
+bmps2	add	bmpatmp
+	dxpl	bmps2
+
+	ldx	player
+	add	plrscl,x
+	sta	plrscl,x
+	lda	#0
+	adc	plrsch,x
+	sta	plrsch,x
+
+	ldx	bmpxtmp
+	rts
+
+; Print current player's score to
+;   proper screen location
+
+prtscor
+
+; Move player's score to temp area
+	stx	bmpxtmp
+
+	ldx	player
+
+	lda	plrscl,x
+	sta	hldscor
+	lda	plrsch,x
+	sta	hldscor+1
+
+; Set SCORPTR => screen memory area
+	lda	sclocl,x
+	sta	scorptr
+	lda	scloch,x
+	sta	scorptr+1
+
+; Start with 10^4
+	ldx	#0
+
+; Stuff "0" (-1 for automatic INC)
+prts3	lda	#$10-1
+	sta	scorbuf,x
+
+; Bump digit and try to subtract this
+;   power of ten
+prts2	inc	scorbuf,x
+
+	lda	hldscor
+	sub	pwr10l,x
+	sta	hldscor
+	lda	hldscor+1
+	sbc	pwr10h,x
+	sta	hldscor+1
+
+; If not minus yet, repeat
+	bpl	prts2
+
+; Else, make positive again by adding
+;   power of 10 back to number
+	lda	hldscor
+	add	pwr10l,x
+	sta	hldscor
+	lda	hldscor+1
+	adc	pwr10h,x
+	sta	hldscor+1
+
+; Do until we reach 1's place
+	inx
+	cpx	#6
+	blt	prts3
+
+
+; Now, transfer to screen. 1st stuff
+;   "0" to 1's place since all points
+;   are multiplied by ten
+prts6	lda	#$10
+	ldy	#4
+	sta	(scorptr),y
+
+; Transfer rest of numbers (we don't
+;   show hundred-thousands even though
+;   we DO keep track of them) and exit
+	dey
+prts4	lda	scorbuf+1,y
+	sta	(scorptr),y
+	dypl	prts4
+
+	ldx	bmpxtmp
+	rts

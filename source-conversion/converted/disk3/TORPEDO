@@ -1,0 +1,182 @@
+;	vn.	115
+
+
+; filespec:	TORPEDO
+
+
+; Fire missile logic
+
+fire
+
+; If 2 missiles out, skip trigger check
+	lda	mslout
+	cmp	#2
+	beq	torpedo
+
+
+; Read proper trigger
+fire01	ldx	player
+	lda	onestk
+	bnz	fire1
+
+	ldx	#0
+
+; Save trigger status
+fire1	lda	strig0,x
+	sta	trigger
+
+; If trigger not down, con't
+	lda	lsttrg
+	bz	fire2
+
+; Else, wait on trigger up
+	lda	trigger
+	bz	torpedo
+
+	lda	#0
+	sta	lsttrg
+	bz	torpedo	;UNCONDITIONAL
+
+
+; Check for trigger
+fire2	lda	trigger
+	bnz	torpedo
+
+; If trigger, mark button pushed flag
+;   and bump # of missiles out
+	dec	lsttrg
+	inc	mslout
+
+; If missile 0 free, use it else use 1
+	ldx	#0
+	lda	mssl0
+	bz	fire3
+
+	inx
+
+; Mark missile as out
+fire3	dec	mssl0,x
+	stb	8,fircnt
+
+; Calculate missile XPOS and YPOS
+;   Missile YPOS = Sub YPOS + 9
+;   Missile XPOS = Sub XPOS + 12
+	lda	xpos
+	add	#12
+	sta	txpos,x
+	sta	hposm0,x
+	add	#2
+	sta	hposm2,x
+
+	lda	ypos
+	add	#9
+	sta	typos,x
+	jsr	setmsl
+
+; Initialize torpedo sound
+	stb	$ff,tsnd
+
+
+; Now, update torpedo positions
+
+torpedo	ldx	#1
+
+; If missile out, bump 1 position to
+;   the right
+torp1	lda	mssl0,x
+	bz	torp2
+
+	inc	txpos,x
+
+; If missile not off screen, continue
+	lda	txpos,x
+	cmp	#$d0
+	blt	torp2
+
+; Else, mark missile as free, mark one
+;   less out and clear
+	jsr	kilmsl
+
+	stb	0,txpos,x
+
+; 2 times
+torp2	dxpl	torp1
+
+
+; Update torpedo sound
+; If missiles out, go process
+	lda	mslout
+	bnz	torp4
+
+; Else, kill sound and continue
+torp3	stb	0,audf4
+	sta	audc4
+	sta	tsnd
+	bz	torp5	;UNCONDITIONAL
+
+; If sound expired, go kill it
+torp4	lda	tsnd
+	bz	torp3
+
+; Else back off count.
+;   Amplitude = TSND/64 (4 to 0)
+	dec	tsnd
+	lda	tsnd
+	rol a! rol a! rol a! and #$03
+	ora	#$80
+	sta	audc4
+
+; Frequency = (256-TSND)/8 (0 to 32)
+	lda	#0
+	sub	tsnd
+	div	8
+	sta	audf4
+
+
+; Substitute proper sub image for
+;   missile firing status
+torp5	lda	fircnt
+	div	2
+	tax
+	mvb	sub1.1,x,p1fig+8
+	mvb	sub1.2,x,p1fig+10
+
+	txa
+	beq	settorp
+
+	dec	fircnt
+
+; Set timer to 1 VBLANK (seems
+;   unnecessary, but sometimes gets
+;   flaky errors if this subroutine
+;   ends before TOPSCRN, so this
+;   guarantees that when this routine
+;   is over, VBLANK must occur before
+;   collision checks...)
+settorp	ldx	#0
+	ldy	#0
+	stb	setmr1,mytmr1
+	jmp	setmy
+
+
+
+
+; Support subroutines
+
+clrmsl	sty	cstmp
+	ldy	#0
+clrm2	lda	clrchr,x
+	and	m0,y
+	sta	m0,y
+	dynz	clrm2
+	ldy	cstmp
+	rts
+
+
+setmsl	sty	cstmp
+	tay
+	lda	mslchr,x
+	ora	m0,y
+	sta	m0,y
+	ldy	cstmp
+	rts

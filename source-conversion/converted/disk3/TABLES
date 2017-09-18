@@ -1,0 +1,175 @@
+;	vn.	157
+
+
+; filespec:	TABLES
+
+
+; Shooter character YPOS
+shty	db	2,3,4,5,6,7,8,2
+	db	3,4,5,2,3,4,4,5
+	db	6,7,2,3,4,2,3
+	db	4,5,6,7,8,9,2,3
+	db	4,5,6,7,8,2,3,4
+	db	5,6,7,8,2,3,4,5
+	db	6,7
+; Number of shooter character locations
+numsht	=	*-shty
+; Shooter counters
+shtcnt
+	db	44,40,36,32,28,24,20,16
+	db	12,8,4,0,44,40,36,32
+	db	28,24,20,16,12,8,4
+	db	0,44,40,36,32,28,24,20
+	db	16,12,8,4,0,44,40,36
+	db	32,28,24,20,16,12,8,4
+	db	0,44
+	assert	[*-shtcnt]=numsht
+; Shooter XPOS low bytes
+shtxlo	db	$83,$84,$85,$86,$90,$91,$92,$a4
+	db	$a5,$a6,$a7,$b1,$b2,$b3,$59,$5a
+	db	$5b,$5c,$61,$62,$63,$6d,$6e
+	db	$6f,$70,$71,$72,$73,$74,$77,$78
+	db	$79,$7a,$7b,$7c,$7d,$45,$46,$47
+	db	$48,$49,$4a,$4b,$49,$4a,$4b,$4c
+	db	$4d,$4e
+	assert	[*-shtxlo]=numsht
+; Shooter character queue (continues
+;   thru next table for total of 48
+;   characters...)
+shttbl	db	1,2,3,4,3,4,3,4
+	db	3,4,3,4,3,4,5,6
+	db	$ff,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0
+	db	0,0,0
+; Shooter XPOS hi bytes
+shtxhi	db	0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,1,1
+	db	1,1,1,1,1,1,1
+	db	1,1,1,1,1,1,1,1
+	db	1,1,1,1,1,2,2,2
+	db	2,2,2,2,2,2,2,2
+	db	2,2
+	assert	[*-shtxhi]=numsht
+
+; Laser XPOS lo bytes
+lasrxlo	db	$28,$30,$42,$71,$7b
+; Number of lasers
+numlasr	=	*-lasrxlo
+; Laser counters
+lasrcnt	db	0,4,8,12,16
+
+; Explosion screen pointers
+xplo	db	low p2,low[p2+24]
+	db	low[p2+48],low[p2+72]
+	db	low[p2+96],low[p2+120]
+	db	low[p2+144],low[p2+168]
+	db	low[p2+192],low[p2+216]
+xphi	db	high p2,high[p2+24]
+	db	high[p2+48],high[p2+72]
+	db	high[p2+96],high[p2+120]
+	db	high[p2+144],high[p2+168]
+	db	high[p2+192],high[p2+216]
+
+; End screen pointers
+ndlo	db	low[line0+lstpos-2],low[line1+lstpos-2]
+	db	low[line2+lstpos-2],low[line3+lstpos-2]
+	db	low[line4+lstpos-2],low[line5+lstpos-2]
+	db	low[line6+lstpos-2],low[line7+lstpos-2]
+	db	low[line8+lstpos-2],low[line9+lstpos-2]
+ndhi	db	high[line0+lstpos-2],high[line1+lstpos-2]
+	db	high[line2+lstpos-2],high[line3+lstpos-2]
+	db	high[line4+lstpos-2],high[line5+lstpos-2]
+	db	high[line6+lstpos-2],high[line7+lstpos-2]
+	db	high[line8+lstpos-2],high[line9+lstpos-2]
+
+; Pointers to player number lines
+pprmtl	db	low pprmt1,low pprmt2
+pprmth	db	high pprmt1,high pprmt2
+
+; Data for "GAME OVER" line
+gamovr	db	0,0
+	db	0,0,0,0,0
+	db	$e7,$e1,$ed,$e5,0
+	db	0,$ef,$f6,$e5,$f2
+; Data for "PLAYER 1" line
+pprmt1	db	0,0
+	db	0,0,0,0,0
+	db	0,$f0,$ec,$e1,$f9
+	db	$e5,$f2,0,$d1
+; Data for "PLAYER 2" line
+pprmt2	db	0,0
+	db	0,0,0,0,0
+	db	0,$f0,$ec,$e1,$f9
+	db	$e5,$f2,0,$d2
+; Data for "READY!" line
+ready	db	0,0
+	db	0,0,0,0,0
+	db	0,0,$f2,$e5,$e1
+	db	$e4,$f9,$c1
+; Data for "ABORT!" line
+dabort	db	0,0
+	db	0,0,0,0,0
+	db	0,0,$e1,$e2,$ef
+	db	$f2,$f4,$c1,0,0
+	db	0,0,0,0
+; Data for player/stick line
+optmsg	db	0,0,0
+pln	db	$d1,0,$b0,$ac,$a1,$b9,$a5,$b2
+pls	db	0,0
+stn	db	$d1,0,$b3,$b4,$a9,$a3,$ab
+sts	db	0
+; Data for copyright
+copy	db	0,0
+	db	0,$a3,$af,$b0,$b9
+	db	$b2,$a9,$a7,$a8,$b4
+	db	$c2,$d1,$d9,$d8,$d2
+	db	$a1,$8e,$a9,$8e,0
+; Data for "Yeoman" level
+yeo	db	0,0
+	db	0,0,$ac,$a5,$b6
+	db	$a5,$ac,0,$d1,$9a
+	db	0,$f9,$e5,$ef,$ed
+	db	$e1,$ee,0
+; Data for "Ensign" level
+ens	db	0,0
+	db	0,0,$ac,$a5,$b6
+	db	$a5,$ac,0,$d2,$9a
+	db	0,$e5,$ee,$f3,$e9
+	db	$e7,$ee,0
+; Data for "Captain" level
+cap	db	0,0
+	db	0,0,$ac,$a5,$b6
+	db	$a5,$ac,0,$d3,$9a
+	db	0,$e3,$e1,$f0,$f4
+	db	$e1,$e9,$ee
+; Data for "Admiral" level
+adm	db	0,0
+	db	0,0,$ac,$a5,$b6
+	db	$a5,$ac,0,$d4,$9a
+	db	0,$e1,$e4,$ed,$e9
+	db	$f2,$e1,$ec,0,0
+	db	0
+
+; Number of players and sticks per
+;   selected option
+optplr	db	0,1,1
+optstk	db	0,1
+
+; Top of screen color for current level
+selclr	db	0,$30,$50,$08
+
+; Message line pointers for level
+sell	db	low yeo,low ens,low cap,low adm
+selh	db	high yeo,high ens,high cap,high adm
+
+; Data to plug option message line per
+;   selected option
+nums	db	$d1,$d2
+nump	db	$d1,$d2,$d2
+sspc	db	0,$b3
+pspc	db	0,$b3,$b3
+
+
+
+
+	assert	*<[$1975+develop]

@@ -1,0 +1,367 @@
+;	vn.	148
+
+
+; filespec:	TABLES
+
+
+; Constants ***************************
+
+; Characters
+minech	=	$3f
+tethch	=	$22
+stalch	=	$38
+shtchr	=	$23
+xploch	=	$29
+dpthch	=	$2e
+lasrch	=	dpthch
+airch	=	$c6
+minbtm	=	$39
+mintop	=	$3c
+staltop	=	$32
+stalbtm	=	$35
+
+; Colors offsets
+col0	=	0
+col1	=	$40
+col2	=	$80
+col3	=	$c0
+
+; Character set data locations
+one	=	$3888+develop
+two	=	$3890+develop
+u	=	$39a8+develop
+p	=	$3980+develop
+
+; Scan line of base of laser players
+lbase	=	52
+
+; Number of mines
+nummin	=	$d8
+
+; XPOS of player walls
+plr3_1	=	$238
+plr2_1	=	$235
+
+; XPOS of last boat off screen
+lstboat	=	$10f
+
+
+; Variables ***************************
+
+; Temp word #1
+templo	db	0
+temphi	db	0
+; Temp word #2
+temp2lo	db	0
+temp2hi	db	0
+
+; My timers
+mytmr1	db	0
+mytmr2	db	0
+mytmr3	db	0
+
+mycnt1	dw	0
+mycnt2	dw	0
+mycnt3	dw	0
+
+mytmp	db	0
+
+; Color of current player's score
+dazzle	db	$8c
+
+; Land color
+lndcol	db	$f0
+; Water color
+wtrcol	db	$72
+
+; Player prompt overall counter
+cntdwn	db	0
+; Player prompt temp
+mvtmp	db	0
+; Player prompt count
+bytcnt	db	0
+; Player prompt character temps
+numtmp	db	0
+utmp	db	0
+ptmp	db	0
+
+; One or two stick flag
+onestk	db	0
+; Currently read stick value
+stkval	db	0
+
+; Player "wall" explosion mask
+plrmsk	db	0
+; Player beam counter
+pcnt	db	0
+
+; Sub vertical position
+ypos	db	47
+; Sub horizontal position
+xpos	db	48
+
+; Fine scroll value
+scrval	db	0
+; End of landscape position
+lstpos	dw	580
+
+; Indirect vector to O/S immediate
+;   VBLANK service routine
+vbivec	dw	0
+; Counter for VBLANK
+vblic	db	0
+; VCOUNT of top of screen
+topscrn	db	0
+
+; Air counter
+aircnt	db	0
+; Color of "AIR:" line background
+airclr	db	$c8
+
+; Explosion counter
+xplcnt	db	0
+; Sub explosion sound
+subsnd	db	0
+
+; Clear display memory counter
+clrcnt	dw	0
+; Clear display temp register
+clrtmp	db	0
+; Clear display temp YPOS
+clryp	db	0
+; Fix display pointers temp Y
+fixdsy	db	0
+
+; Update queue routine index
+updindx	db	0
+; Update character position counter
+updcnt	db	0
+; Update character YPOS
+updy	db	0
+; Missile/Playfield collision storage
+mpftmp	db	0
+; Missile/Player collision storage
+mpltmp	db	0
+; Clear/set missile temp Y
+cstmp	db	0
+
+; Shooter color offset
+shtcol	db	col2
+
+; Depth charge routine temp YPOS
+dpthy	db	0
+; Depth charge control counter
+dpthcnt	db	0
+
+; Collision temp mine number
+colmin	db	0
+; Collision temp YPOS
+colypos	db	0
+; 2nd temp YPOS
+caly	db	0
+
+; Relative Sub front XPOS & YPOS
+rxpos	dw	0
+rypos	db	0
+
+; Pointer to 1st mine on screen
+mptr	db	0
+; Counter for queue routines
+qcntr	db	0
+; X offset ratio between sub and mine
+deltax	db	0
+
+; Players scores, lo & hi bytes
+plrscl	db	0,0
+plrsch	db	0,0
+; Indirect vectors to players score
+;   screen memory locations
+sclocl	db	low score1,low score2
+scloch	db	high score1,high score2
+; Buffer for ASCII conversion
+scorbuf	db	0,0,0,0,0,0
+; Temp score binary
+hldscor	dw	0
+; Score temp holds
+bmpxtmp	db	0
+bmpatmp	db	0
+
+
+; These variables are bunched together
+;   because they need to be zeroed at
+;   the beginning of each round
+
+zerovar
+; Number of missiles out
+mslout	db	0
+; Current trigger status
+trigger	db	0
+; Trigger down status
+lsttrg	db	0
+; Individual missile out status
+mssl0	db	0,0
+; Missiles relative XPOS and YPOS
+txpos	db	0,0
+typos	db	0,0
+; Missile recently fired flag
+fircnt	db	0
+; Torpedo sound counter
+tsnd	db	0
+; Mine explosion counter
+xsnd	db	0
+; Scroll flag
+scrflg	db	0
+; Halt flag
+hltflg	db	0
+numzero	=	*-zerovar
+
+
+; Tables ******************************
+
+; Frequency of fine scroll
+spdtbl	db	5,4,3,2
+
+; Frequency for mine release
+freq	db	$f8,$f0,$e8,$e0
+
+; Sub data
+p0fig	db	0,0
+	db	$00,$00,$01,$01
+	db	$01,$3f,$3f,$3f
+	db	$3f,$3f,$1f,$0f
+p1fig	db	0,0
+	db	$20,$e0,$a0,$e0
+	db	$e0,$ff,$ff,$fb
+	db	$fe,$fc,$f8,$e0
+	db	0,0
+; Sub image masks
+sub1.1	db	$ff,$f5,$f5,$f5,$f5
+sub1.2	db	$fe,$f4,$f4,$f4,$f4
+; Sub colors per player
+subclr	db	$08,$d6
+
+; Display memory line pointers
+lptrlo	db	low line0,low line1,low line2,low line3
+	db	low line4,low line5,low line6,low line7
+	db	low line8,low line9
+
+lptrhi	db	high line0,high line1,high line2,high line3
+	db	high line4,high line5,high line6,high line7
+	db	high line8,high line9
+
+; Restart offsets from start of lines
+dofslo	db	$00,$48,$a8,$09,$7e,$18
+dofshi	db	$00,$00,$00,$01,$01,$02
+; Restart MPTRs
+mptrtbl	db	1,32,58,98,131,202
+; Restart sub XPOS and YPOS
+rstx	db	48,112,112,112,112,112
+rsty	db	62,62,84,62,62,62
+
+; Mine movement queue YPOS
+qypos	db	0,0,0,0,0,0,0,0
+; Mine queue mine #'s
+queue	db	0,0,0,0,0,0,0,0
+
+; Missile set character masks
+mslchr	db	%0001_0011,%0100_1100
+; Missile clear character masks
+clrchr	db	%1100_1100,%0011_0011
+
+; Powers of 10 for ASCII conversion
+pwr10l	db	low 10000,low 1000
+	db	low 100,low 10,low 1
+pwr10h	db	high 10000,high 1000
+	db	high 100,high 10,high 1
+
+; Shooter character YPOS
+shty	db	2,3,4,5,6,7,8,2
+	db	3,4,5,2,3,4,4,5
+	db	6,7,2,3,4,2,3
+	db	4,5,6,7,8,9,2,3
+	db	4,5,6,7,8,2,3,4
+	db	5,6,7,8,2,3,4,5
+	db	6,7
+; Number of shooter character locations
+numsht	=	*-shty
+; Shooter counters
+shtcnt
+	db	44,40,36,32,28,24,20,16
+	db	12,8,4,0,44,40,36,32
+	db	28,24,20,16,12,8,4
+	db	0,44,40,36,32,28,24,20
+	db	16,12,8,4,0,44,40,36
+	db	32,28,24,20,16,12,8,4
+	db	0,44
+	assert	[*-shtcnt]=numsht
+; Shooter XPOS low bytes
+shtxlo	db	$83,$84,$85,$86,$90,$91,$92,$a4
+	db	$a5,$a6,$a7,$b1,$b2,$b3,$59,$5a
+	db	$5b,$5c,$61,$62,$63,$6d,$6e
+	db	$6f,$70,$71,$72,$73,$74,$77,$78
+	db	$79,$7a,$7b,$7c,$7d,$45,$46,$47
+	db	$48,$49,$4a,$4b,$49,$4a,$4b,$4c
+	db	$4d,$4e
+	assert	[*-shtxlo]=numsht
+; Shooter character queue (continues
+;   thru next table for total of 48
+;   characters...)
+shttbl	db	1,2,3,4,3,4,3,4
+	db	3,4,3,4,3,4,5,6
+	db	$ff,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0
+	db	0,0,0
+; Shooter XPOS hi bytes
+shtxhi	db	0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,1,1
+	db	1,1,1,1,1,1,1
+	db	1,1,1,1,1,1,1,1
+	db	1,1,1,1,1,2,2,2
+	db	2,2,2,2,2,2,2,2
+	db	2,2
+	assert	[*-shtxhi]=numsht
+
+; Depth charge last lines
+dbypos	db	8,6,8,3
+; Depth charge XPOS hi and lo bytes
+dptxhi	db	$00,$00,$00,$01
+dptxlo	db	$c5,$df,$f7,$0e
+
+; Laser XPOS lo bytes
+lasrxlo	db	$28,$30,$42,$71,$7b
+; Number of lasers
+numlasr	=	*-lasrxlo
+; Laser counters
+lasrcnt	db	0,4,8,12,16
+
+; Player prompt move stuff
+; Player 1 and 2 horizontal positions
+mvupx1	db	144,138,132,126,120,114
+	db	108,102,96,90,84,78
+	db	128,123,118,113,108,103
+	db	98,93,88,83,78,73
+	db	104,100,97,93,89,86
+	db	82,78,75,71,67,64
+mvupx2	db	144,147,149,152,155,157
+	db	160,163,165,168,171,173
+	db	128,132,135,139,143,146
+	db	150,154,157,161,165,168
+	db	104,109,114,119,124,129
+	db	134,139,144,149,154,159
+; Vertical positions
+mvupy	db	112,105,99,92,85,79
+	db	72,65,59,52,45,39
+; Scan line resolution - 1
+mvupnum	db	3,3,2,2,1,1,1,1,0,0,0,0
+; Clear end pointers
+mvupto	db	144,137,123,116,101,95
+	db	88,81,67,60,53,47
+; Player widths
+mvwidth	db	3,3,3,1,1,1,1,0,0,0,0
+; Time in jiffies between changes
+mvwait	db	240,100,60,40,20,10,5,4,3,2,1,1
+; Last character image tables
+last1	db	$60,$e0,$60,$60,$f0,$f0,$f0,0
+last2	db	$60,$90,$20,$40,$f0,$f0,$f0,0
+lastu	db	$d0,$d0,$d0,$f0,$f0,$f0,$60,0
+lastp	db	$e0,$d0,$d0,$e0,$c0,$c0,$c0,0

@@ -1,0 +1,194 @@
+;	vn.	134
+
+	list	i,-m,-f
+
+
+; Filespec:	SEADRAG
+
+
+	incl	D:DATE
+
+;	incl	D:TITLE
+
+	title	'SEA DRAGON by Russ Wetmore'
+	subttl	'Control variables'
+
+
+; Long listing flag
+; Either ON or OFF
+
+longlst	=	off
+
+
+; Program-wide variables
+
+; ZERO-PAGE variables
+	org	$be
+poscnt	ds	2
+lposcnt	ds	2
+rposcnt	ds	2
+clrptr	ds	2
+scorptr	ds	2
+subchr	ds	2
+doptr	ds	2
+plrptr	ds	2
+
+; Data areas
+
+; Mine/Stalactite released table
+reltbl	=	$1a70+develop
+
+; Display memory lines
+line0	=	$1b50+develop
+line1	=	$1da8+develop
+line2	=	$2000+develop
+line3	=	$2258+develop
+line4	=	$24b0+develop
+line5	=	$2708+develop
+line6	=	$2960+develop
+line7	=	$2bb8+develop
+
+; Various heading data areas
+schead	=	$2e10+develop
+up1	=	$2e16+develop
+sleft1	=	$2e1f+develop
+up2	=	$2e30+develop
+sleft2	=	$2e39+develop
+score	=	$2e40+develop
+score1	=	$2e43+develop
+hiscore	=	$2e49+develop
+score2	=	$2e50+develop
+air	=	$2e58+develop
+airscr	=	$2e5f+develop
+
+; Mine/Stalactite table YPOS
+mtbly	=	$2f00+develop
+
+
+; Some variables - placed here so I
+;   always know where they are
+
+; Players restart location counters
+rstcnt	=	$2fe0+develop ;2 bytes
+; Current player number
+player	=	$2fe2+develop
+; Current player level
+plrlvl	=	$2fe3+develop
+; Each player's current level
+level	=	$2fe4+develop ;2 bytes
+; Scroll counter
+scrcnt	=	$2fe6+develop
+; Scroll speed for this level
+scrspd	=	$2fe7+develop
+
+
+; Display memory con't
+line8	=	$3000+develop
+line9	=	$3258+develop
+
+; Display list
+dlist	=	$34b4+develop
+ptr0	=	dlist+13
+
+; Set Vertical Blank vector routine
+setvbv	=	$34e6+develop
+
+; Mine/Stalactite table XPOS hi bytes
+mtblxh	=	$3500+develop
+; Depth charge character data
+dtbl	=	$35e0+develop
+
+; Graphics character set data
+chrst2	=	$3600+develop
+; Alphanumerics character set data
+chrset	=	$3800+develop
+
+; Mine/Stalactite table XPOS lo bytes
+mtblxl	=	$3a00+develop
+; Laser beam character data
+ltbl	=	$3ae0+develop
+
+; Player missile areas
+mypmbas	=	$3800+develop
+m0	=	$3b00+develop
+p0	=	$3c00+develop
+p1	=	$3d00+develop
+p2	=	$3e00+develop
+p3	=	$3f00+develop
+
+omega	=	$3fff+develop
+
+; Read in macros
+
+	list	-i
+	incl	D:MACROS.MAC
+	list	i
+
+	subttl	'Mainline'
+	page
+
+
+********
+	org	$600+offset
+	loc	$600+develop
+
+	incl	D:MAINLINE
+
+	subttl	'Interrupt routines'
+	page
+
+
+********
+	incl	D:INT
+
+	subttl	'Player/Missile routines'
+	page
+
+
+********
+	incl	D:PLR
+
+	subttl	'Mine release and update routines'
+	page
+
+
+********
+	incl	D:QUEUE
+
+	subttl	'Torpedo release and update routines'
+	page
+
+
+********
+	incl	D:TORPEDO
+
+	subttl	'Sub and torpedo collision routines'
+	page
+
+
+********
+	incl	D:COLL
+
+	subttl	'Scoring routines'
+	page
+
+
+********
+	incl	D:SCORE
+
+	subttl	'Variables and tables'
+	page
+
+
+********
+	incl	D:TABLES
+
+
+
+
+	IF	longlst=on
+	subttl	'Reference list'
+	page
+	ENDIF
+
+	end	mainln

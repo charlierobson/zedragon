@@ -1,0 +1,97 @@
+;	vn.	113
+
+
+; filespec:	PLR
+
+
+plr
+
+; If halt or scroll in progress, skip
+	lda	scrflg
+	ora	hltflg
+	jnz	setsub
+
+
+	ldx	player
+
+; If one stick, then read stick 1
+;   else, read same stick as player #
+	lda	onestk
+	bnz	plr1
+
+	ldx	#0
+
+plr1	lda	stick0,x
+	eor	#$0f
+	sta	stkval
+
+
+; Check for stick back (DOWN)
+	lda	#jyb
+	and	stkval
+	bz	plr2
+
+; If at bottom already, ignore
+	lda	ypos
+	cmp	#198
+	bge	plr3
+
+; If okay, bump vertical position
+	inc	ypos
+	inc	ypos
+	bnz	plr3	;UNCONDITIONAL
+
+
+; Check for stick forward (UP)
+
+plr2	lda	#jyf
+	and	stkval
+	bz	plr3
+
+; If at top already, ignore
+	lda	ypos
+	cmp	#62
+	ble	plr3
+
+; If okay, back off vertical position
+	dec	ypos
+	dec	ypos
+
+
+; Check for stick left (BACKWARD)
+
+plr3	lda	#jyl
+	and	stkval
+	bz	plr4
+
+; If at left already, ignore
+	lda	xpos
+	cmp	#48
+	ble	plrxt
+
+; If okay, back off horizontal position
+	dec	xpos
+	bnz	plrxt	;UNCONDITIONAL
+
+
+; Check for stick right (FORWARD)
+
+plr4	lda	#jyr
+	and	stkval
+	bz	plrxt
+
+; If at right already, ignore
+	lda	xpos
+	cmp	#112
+	bge	plrxt
+
+; If okay, bump horizontal position
+	inc	xpos
+
+
+plrxt
+setsub	ldx	#0
+	ldy	scrspd
+	stw	plr,cdtma2
+	lda	#setmr2
+	jmp	setvbv

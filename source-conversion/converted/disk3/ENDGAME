@@ -1,0 +1,221 @@
+;	vn.	109
+
+
+; Filespec:	ENDGAME
+
+
+; Player has shot last mine. Do screen
+;   explosion routine
+
+endgam
+
+	proc
+; Stop sub update and move non-sub
+;   players off screen
+	dec	scrflg
+	stb	0,hposp2
+	sta	hposp3
+
+; Transfer end screen to player 3 area
+;   for restoring later. Ignore any
+;   character that isn't land or
+;   shooter
+	ldx	#9
+	stw	[p3+239],hiptr
+
+:e11	mvb	ndlo,x,loptr
+	mvb	ndhi,x,loptr+1
+
+	ldy	#23
+
+:e10	lda	(loptr),y
+	sty	endty
+	ldy	#0
+	cmp	#$22+col1
+	blt	:e12
+	tya
+:e12	sta	(hiptr),y
+	ldy	endty
+	sta	(loptr),y
+	dew	hiptr
+	dypl	:e10
+
+	dxpl	:e11
+
+
+; Wait for clock tick then stuff PM
+;   memory pointers to display list
+;   for explosions
+	jsr	wtclk
+	stw	xplo,loptr
+	stw	xphi,hiptr
+	jsr	stufscr
+
+; Stuff random explosion characters to
+;   memory
+	ldx	#240
+:e2	lda	random
+	and	#$07
+	cmp	#$05
+	bge	:e2
+
+	add	#xploch+col3
+	sta	p2-1,x
+	stb	0,m0,x
+	dxnz	:e2
+
+
+; Do whole cycle 16 times 16 times
+	stb	$3f,ecnt
+:e9	ldx	#15
+
+; Update sound
+:e3	phx
+	lda	ecnt
+	div	8
+	tay
+	jsr	bigxplo
+	plx
+
+; Wait six clock ticks then update all
+;   explosions on screen.
+	ldx	#6
+	jsr	wtclks
+
+	ldy	#240
+
+; If water, skip
+:e8	lda	p2-1,y
+	bz	:e4
+
+; If not explosion character, skip
+	cmp	#xploch+col3
+	blt	:e4
+
+; Bump character. If past last,
+;   calculate chance of restarting
+	add	#1
+	cmp	#xploch+5+col3
+	bne	:e7
+
+	lda	random
+	and	#$0f
+	cmp	ecnt
+	bge	:e6
+
+	lda	#xploch+col3
+	bnz	:e7	;UNCONDITIONAL
+
+; Else, get character from end screen
+;   save area
+:e6	lda	p3-1,y
+
+:e7	sta	p2-1,y
+
+:e4	dynz	:e8
+
+; Shake screen and repeat 16 times
+	jsr	shake
+	dxpl	:e3
+
+; Repeat 16 times
+	dec	ecnt
+	bpl	:e9
+
+; Wait one clock tick then point back
+;   to old screen
+	jsr	wtclk
+	stw	ndlo,loptr
+	stw	ndhi,hiptr
+	jsr	stufscr
+
+; Do final exit sequence, then give
+;   5000 big ones * level!!!
+	stb	$70,dlist
+	sta	hitclr
+
+	ldy	#6
+:e5	ldx	#18
+	jsr	wtclks
+
+	stb	0,audc1,y
+	sta	audf1,y
+
+	dey
+	dypl	:e5
+
+	ldx	#60
+	jsr	wtclks
+
+	ldy	plrlvl
+:e13	ldx	player
+	lda	#250
+	add	plrscl,x
+	sta	plrscl,x
+	lda	#0
+	adc	plrsch,x
+	sta	plrsch,x
+	
+	dypl	:e13
+	jsr	prtscor
+
+	ldx	#60
+	jsr	wtclks
+
+; Bump player level and restart
+	ldx	player
+	stb	0,rstcnt,x
+
+	lda	level,x
+	cmp	#3
+	beq	:ext
+
+	inc	level,x
+	inc	plrlvl
+
+:ext	jmp	newrnd
+	eproc
+
+
+
+
+
+; Enable prompt screen
+enapro	stb	0,nmien
+	stb	14,color3
+	mvb	proclr,x,color4
+	stw	vbdxt,vvblkd
+	stb	high chrst2,chbase
+	stw	prodli,sdlstl
+	stb	$c0,nmien
+	rts
+
+
+; Kill prompt screen
+kilpro	stb	0,nmien
+	stw	vbldh,vvblkd
+	stw	dlist,sdlstl
+	stb	$c0,nmien
+	rts
+
+
+
+
+
+; Prompt display list
+	assert	[low *]<[$100-prolen]
+prodli	db	dlbl8,dlbl8,dlbl8
+	db	dlbl8,dlbl8,dlbl8,dlbl8
+	db	dlbl8,dlbl8,dlbl8,dlbl8
+
+	db	dlbm2+dllms
+ptr4	dw	*
+
+	db	dlbl8,dlbl8
+
+	db	dlbm1+dllms
+ptr6	dw	*
+
+	db	dljvb
+	dw	prodli
+prolen	=	*-prodli

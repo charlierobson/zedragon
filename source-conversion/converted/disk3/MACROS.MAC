@@ -1,0 +1,413 @@
+*	Macro library
+*	Version	5
+
+* 8-bit arithmetic
+
+ADD	MACRO 8con/loc [,index reg]
+%L	clc
+	IF	['[%2]'='[X]']OR['[%2]'='[Y]']
+	adc	%1,%2
+	ELSE
+	adc	%1
+	ENDIF
+	ENDM
+
+SUB	MACRO 8con/loc [,index reg]
+%L	sec
+	IF	['[%2]'='[X]']OR['[%2]'='[Y]']
+	sbc	%1,%2
+	ELSE
+	sbc	%1
+	ENDIF
+	ENDM
+
+DIV	MACRO pwrof2
+%L	lsr	a
+%MC	set	%1/2
+	IF	%MC>1
+	DIV	%MC
+	ELSE
+%MC	set	0
+	ENDIF
+	ENDM
+
+MUL	MACRO pwrof2
+%L	asl	a
+%MC	set	%1/2
+	IF	%MC>1
+	MUL	%MC
+	ELSE
+%MC	set	0
+	ENDIF
+	ENDM
+
+* 16-bit arithmetic
+
+ADW	MACRO word1,word2,dword
+%L	clc
+	lda	%1
+	adc	%2
+	sta	%3
+	lda	%1+1
+	adc	%2+1
+	sta	%3+1
+	ENDM
+
+SBW	MACRO word1,word2,dword
+%L	sec
+	lda	%1
+	sbc	%2
+	sta	%3
+	lda	%1+1
+	sbc	%2+1
+	sta	%3+1
+	ENDM
+
+DEW	MACRO word
+%L	lda	%1
+	bne	?%K
+	dec	%1+1
+?%K	dec	%1
+	ENDM
+
+INW	MACRO word
+%L	inc	%1
+	bne	?%K
+	inc	%1+1
+?%K	=	*
+	ENDM
+
+* Conditional branches
+
+BGE	MACRO loc
+%L	bcs	%1
+	ENDM
+
+BGT	MACRO loc
+%L	bcc	?%K
+	bne	%1
+?%K	=	*
+	ENDM
+
+BLE	MACRO loc
+%L	bcc	%1
+	beq	%1
+	ENDM
+
+BLT	MACRO loc
+%L	bcc	%1
+	ENDM
+
+BNZ	MACRO loc
+%L	bne	%1
+	ENDM
+
+BZ	MACRO loc
+%L	beq	%1
+	ENDM
+
+BT	MACRO loc
+%L	beq	%1
+	ENDM
+
+BF	MACRO loc
+%L	bne	%1
+	ENDM
+
+* Conditional jumps
+
+JMI	MACRO loc
+%L	bpl	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JPL	MACRO loc
+%L	bmi	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JCS	MACRO loc
+%L	bcc	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JCC	MACRO loc
+%L	bcs	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JGE	MACRO loc
+%L	blt	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JGT	MACRO loc
+%L	ble	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JLE	MACRO loc
+%L	bgt	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JLT	MACRO loc
+%L	bge	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JNE	MACRO loc
+%L	bz	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JNZ	MACRO loc
+%L	bz	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JEQ	MACRO loc
+%L	bnz	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JZ	MACRO loc
+%L	bnz	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JT	MACRO loc
+%L	bf	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+JF	MACRO loc
+%L	bt	?%K
+	jmp	%1
+?%K	=	*
+	ENDM
+
+* Conditional returns
+
+RMI	MACRO loc
+%L	bpl	?%K
+	rts
+?%K	=	*
+	ENDM
+
+RPL	MACRO loc
+%L	bmi	?%K
+	rts
+?%K	=	*
+	ENDM
+
+RCC	MACRO loc
+%L	bcs	?%K
+	rts
+?%K	=	*
+	ENDM
+
+RCS	MACRO loc
+%L	bcc	?%K
+	rts
+?%K	=	*
+	ENDM
+
+RGE	MACRO loc
+%L	blt	?%K
+	rts
+?%K	=	*
+	ENDM
+
+RGT	MACRO loc
+%L	ble	?%K
+	rts
+?%K	=	*
+	ENDM
+
+RLE	MACRO loc
+%L	bgt	?%K
+	rts
+?%K	=	*
+	ENDM
+
+RLT	MACRO loc
+%L	bge	?%K
+	rts
+?%K	=	*
+	ENDM
+
+RNE	MACRO loc
+%L	bz	?%K
+	rts
+?%K	=	*
+	ENDM
+
+RNZ	MACRO loc
+%L	bz	?%K
+	rts
+?%K	=	*
+	ENDM
+
+REQ	MACRO loc
+%L	bnz	?%K
+	rts
+?%K	=	*
+	ENDM
+
+RZ	MACRO loc
+%L	bnz	?%K
+	rts
+?%K	=	*
+	ENDM
+
+RT	MACRO loc
+%L	bnz	?%K
+	rts
+?%K	=	*
+	ENDM
+
+RF	MACRO loc
+%L	bz	?%K
+	rts
+?%K	=	*
+	ENDM
+
+* Auto decrement and branches
+
+DXPL	MACRO loc
+%L	dex
+	IF	[[*>%1]&[[*-%1]<127]]OR[[*<%1]&[[%1-*]<127]]
+	bpl	%1
+	ELSE
+	jpl	%1
+	ENDIF
+	ENDM
+
+DYPL	MACRO loc
+%L	dey
+	IF	[[*>%1]&[[*-%1]<127]]OR[[*<%1]&[[%1-*]<127]]
+	bpl	%1
+	ELSE
+	jpl	%1
+	ENDIF
+	ENDM
+
+DXNZ	MACRO loc
+%L	dex
+	IF	[[*>%1]&[[*-%1]<127]]OR[[*<%1]&[[%1-*]<127]]
+	bnz	%1
+	ELSe
+	jnz	%1
+	ENDIF
+	ENDM
+
+DYNZ	MACRO loc
+%L	dey
+	IF	[[*>%1]&[[*-%1]<127]]OR[[*<%1]&[[%1-*]<127]]
+	bnz	%1
+	ELSE
+	jnz	%1
+	ENDIF
+	ENDM
+
+* 16-bit comparison
+
+CPW	MACRO word1,word2
+%L	lda	%1+1
+	cmp	%2+1
+	bne	?%K
+	lda	%1
+	cmp	%2
+?%K	=	*
+	ENDM
+
+* Memory manipulation
+
+STB	MACRO 8con,loc [,index reg]
+%L	lda	#%1
+	IF	['[%3]'='[X]']OR['[%3]'='[Y]']
+	sta	%2,%3
+	ELSE
+	sta	%2
+	ENDIF
+	ENDM
+
+MVB	MACRO loc1 [,index reg] ,loc2 [,index reg]
+	IF	['[%2]'='[X]']OR['[%2]'='[Y]']
+%L	lda	%1,%2
+	sta	%3
+	ELSE
+%L	lda	%1
+	IF	['[%3]'='[X]']OR['[%3]'='[Y]']
+	sta	%2,%3
+	ELSE
+	sta	%2
+	ENDIF
+	ENDIF
+	ENDM
+
+MVW	MACRO word1,word2
+%L	lda	%1
+	sta	%2
+	lda	%1+1
+	sta	%2+1
+	ENDM
+
+STW	MACRO 16con,word
+%L	lda	#low %1
+	sta	%2
+	lda	#high %1
+	sta	%2+1
+	ENDM
+
+* Stack manipulation
+
+PHR	MACRO
+%L	pha
+	txa
+	pha
+	tya
+	pha
+	ENDM
+
+PLR	MACRO
+%L	pla
+	tay
+	pla
+	tax
+	pla
+	ENDM
+
+PHX	MACRO
+%L	txa
+	pha
+	ENDM
+
+PLX	MACRO
+%L	pla
+	tax
+	ENDM
+
+PHY	MACRO
+%L	tya
+	pha
+	ENDM
+
+PLY	MACRO
+%L	pla
+	tay
+	ENDM

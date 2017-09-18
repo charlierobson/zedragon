@@ -1,0 +1,757 @@
+;	vn.	133
+
+
+; Filespec:	QUEUE
+
+
+; Go through all mines/stalactites
+;   within striking distance and
+;   determine which to release, if any
+
+release
+
+	proc
+; Get sub relative X and Y positions
+	jsr	gtsbps
+
+; Start with 1st mine on screen
+	ldx	mptr
+
+; Check state of queue. If full, exit
+:r2	lda	qcntr
+	cmp	#7
+	rge
+
+; If mine has already been released,
+;   go to next mine
+	lda	reltbl,x
+	jnz	:r3
+
+; If mine is off screen on right, exit
+	lda	mtblxh,x
+	and	#$03
+	cmp	rposcnt+1
+	bne	:r2a
+	lda	mtblxl,x
+	cmp	rposcnt
+:r2a	rge
+
+; If mine doesn't move, go to next mine
+	lda	mtblxh,x
+	asl	a
+	bcc	:r3
+
+; Okay! This mine/stal is available.
+;   If mine, go process
+	asl	a
+	bcs	:r4
+
+; Is stalactite. Calculate delta X
+	lda	mtblxl,x
+	sub	rxpos
+	sta	deltax
+
+; Calculate delta Y
+	lda	rypos
+	sub	mtbly,x
+	jmp	:r5
+
+; Is mine. Calculate delta X
+:r4	lda	mtblxl,x
+	sub	rxpos
+	sta	deltax
+
+; Calculate delta Y
+	lda	mtbly,x
+	sub	rypos
+
+
+; If dX - 1 <> dY/2, then exit
+:r5	lsr	a
+	dec	deltax
+	cmp	deltax
+	beq	:r6
+	add	#1
+	cmp	deltax
+	bne	:r3
+
+; If RND < chance for this level, exit
+:r6	lda	random
+	ldy	plrlvl
+	cmp	freq,y
+	blt	:r3
+
+	dec	reltbl,x
+	inc	qcntr
+
+; Insert mine into update queue
+	ldy	#7
+:r7	lda	qypos,y
+	bnz	:r8
+	txa
+	sta	queue,y
+	lda	mtbly,x
+	sta	qypos,y
+
+:r3	inx
+	jnz	:r2	;UNCONDITIONAL
+
+:r8	dypl	:r7	;UNCONDITIONAL
+
+
+	rts
+	eproc
+
+
+
+
+
+; Update all entries in queue, start
+;   explosions if necessary, and then
+;   update explosions
+
+updatq
+
+	proc
+; 8 queue entries to check
+	stb	7,updindx
+
+; If no entry here, go on to next
+:a6	ldy	updindx
+	lda	qypos,y
+	jz	:a2a
+
+; Break up YPOS entry into count and
+;   working YPOS
+	pha
+	div	16
+	and	#$03
+	sta	updcnt
+
+	pla
+	and	#$0f
+	sta	updy
+
+; Using mine number and working YPOS,
+;   get => to memory and type flags
+	ldx	queue,y
+	ldy	updy
+	jsr	getptr
+
+; If set to explode go process, else
+;   bump counter and procede
+	ldy	updindx
+	lda	qypos,y
+	jmi	:a20
+
+	inc	updcnt
+	lda	updcnt
+	and	#$03
+	sta	updcnt
+
+; If stalactite, go process
+	lda	clrtmp
+	asl a! asl a
+	bcc	:a3
+
+; Else, is mine. Check for count of 0,
+;   which is a special case
+	lda	updcnt
+	bnz	:a4
+
+; If count = 0, clear out garbage from
+;   lower half of character
+	jsr	putat
+
+; Get => to memory location of next
+;   line up, and stuff mine
+	dec	updy
+	ldy	updy
+	jsr	getptr
+
+	lda	#minech+col1
+	jsr	putat
+
+; If there's no ceiling above and mine
+;   isn't at water surface, go on
+	ldy	updy
+	dey
+	bz	:a5
+
+	jsr	getptr
+	ldy	#0
+	lda	(clrptr),y
+	bz	:a2	;UNCONDITIONAL
+
+; Else, start explosion process and
+;   delete this mine from the queue
+:a5	ldy	updy
+	jsr	getptr
+	lda	#xploch+col3
+	jsr	putat
+	stb	24,xsnd
+	dec	qcntr
+	tya
+	bz	:a2b	;UNCONDITIONAL
+
+
+; Write count and YPOS back to queue
+:a2	lda	updcnt
+	mul	16
+	ora	updy
+:a2b	ldy	updindx
+	sta	qypos,y
+
+; Go on to next entry
+:a2a	dec	updindx
+	jpl	:a6
+	bmi	:a8	;UNCONDITIONAL
+
+
+; Use count as offset and stuff proper
+;   characters for this position
+:a4	pha
+	add	#minbtm-1+col1
+	jsr	putat
+	ldy	updy
+	dey
+	jsr	getptr
+	pla
+	add	#mintop-1+col1
+	jsr	putat
+	bz	:a2	;UNCONDITIONAL
+
+
+; Is stalactite. Check for count of 0,
+;   which is special case
+:a3	lda	updcnt
+	bnz	:a7
+
+
+; If count = 0, clear out garbage from
+;   top half of character
+	jsr	putat
+
+; Get => to memory location of next
+;   line down, and stuff stalactite
+	inc	updy
+	ldy	updy
+	jsr	getptr
+
+	lda	#stalch+col1
+	jsr	putat
+
+; If there isn't floor below and
+;   stalactite isn't at bottom of
+;   screen, go on
+	ldy	updy
+	iny
+	cpy	#10
+	beq	:a5
+	jsr	getptr
+	ldy	#0
+	lda	(clrptr),y
+	bz	:a2
+
+; Else, start explosion process and
+;   delete this entry from queue
+	bnz	:a5	;UNCONDITIONAL
+
+
+; Use count as offset and stuff proper
+;   characters for this position
+:a7	pha
+	add	#staltop-1+col1
+	jsr	putat
+	ldy	updy
+	iny
+	jsr	getptr
+	pla
+	add	#stalbtm-1+col1
+	jsr	putat
+	bz	:a2	;UNCONDITIONAL
+
+
+; After updating queue, update all
+;   explosion characters on screen
+:a8	jsr	updxpl
+
+; Update mine explosion sound
+; Amplitude = XSND/4 (5 to 0)
+	lda	xsnd
+	bz	:a8a
+
+	dec	xsnd
+	div	4
+	ora	#$80
+	sta	audc3
+
+; Frequency = RND(31)+200 (200 to 231)
+	lda	random
+	and	#$1f
+	add	#$e0
+	sta	audf3
+
+; Update score and exit
+:a8a	jmp	prtscor
+
+
+; Start explosion procedure. If
+;   stalactite, go process
+:a20	lda	clrtmp
+	asl a! asl a
+	bcc	:a21
+
+; Else is mine. Give 100 points * level
+	lda	#10
+	jsr	bmpscor
+
+; Go process on count of 2 or 3
+	lda	updcnt
+	cmp	#2
+	bge	:a22
+
+; Count is 0 or 1. Clear top character
+;   and start explosion in bottom
+	ldy	updy
+	dey
+	jsr	getptr
+	lda	#0
+	jsr	putat
+	jmp	:a5
+
+; Else, clear bottom character and
+;   start explosion in top
+:a22	lda	#0
+	jsr	putat
+	dec	updy
+	jmp	:a5
+
+
+; Is stalactite. Give 150 points *
+;   level
+:a21	lda	#15
+	jsr	bmpscor
+
+; Go process on count of 2 or 3
+	lda	updcnt
+	cmp	#2
+	bge	:a23
+
+; Count is 0 or 1. Clear bottom half
+;   and start explosion in top
+	ldy	updy
+	iny
+	jsr	getptr
+	lda	#0
+	jsr	putat
+	jmp	:a5
+
+; Else, clear top half and start
+;   explosion in bottom
+:a23	lda	#0
+	jsr	putat
+	inc	updy
+	jmp	:a5
+	eproc
+
+
+
+
+
+; Store accumulator => by CLRPTR
+putat	ldy	#0
+	sta	(clrptr),y
+	rts
+
+
+; Get relative position of sub
+
+; Relative XPOS =
+;   (XPOS - $30) / 8 + POSCNT
+gtsbps	lda	xpos
+	sub	#$30+2
+	sub	scrval
+	bpl	gtsb2
+
+	lda	#0
+gtsb2	div	8
+	add	poscnt
+	sta	rxpos
+	lda	#0
+	adc	poscnt+1
+	sta	rxpos+1
+
+; Relative YPOS = (YPOS - 44) / 16
+	lda	ypos
+	sub	#44-8
+	div	16
+	sta	rypos
+	rts
+
+
+
+
+
+; Update all explosions on screen
+updxpl
+
+	proc
+; Flip shooter color between colors
+;   2 and 3
+	lda	shtcol
+	eor	#col1
+	sta	shtcol
+
+; 10 lines to do
+	ldx	#9
+
+; 24 bytes per line
+:x2	ldy	#23
+
+; Start at LPOSCNT
+	lda	lptrlo,x
+	add	lposcnt
+	sta	clrptr
+	lda	lptrhi,x
+	adc	lposcnt+1
+	sta	clrptr+1
+
+; If explosion character, bump to next
+;   (if last, clear character to 0)
+:x3	lda	(clrptr),y
+	cmp	#xploch+4+col3
+	bgt	:x7
+	bne	:x4
+
+	lda	#0
+	bz	:x5	;UNCONDITIONAL
+
+:x4	cmp	#xploch+col3
+	blt	:x7
+
+	add	#1
+
+:x5	sta	(clrptr),y
+
+; Next byte
+:x6	dypl	:x3
+
+; Next line
+	dxpl	:x2
+
+	rts
+
+
+; If laser beam characters not down-
+;   loaded yet, skip
+:x7	lda	doptr+1
+	cmp	#high ltbl
+	bne	:x6
+
+; Else, if laser character shift color
+	lda	(clrptr),y
+	and	#$3f
+	cmp	#lasrch
+	blt	:x6
+
+	cmp	#lasrch+3
+	bge	:x6
+
+	ora	shtcol
+	bnz	:x5	;UNCONDITIONAL
+	eproc
+
+
+
+
+
+; Update all shooter characters
+
+updsht
+
+	proc
+; Number of shooter characters to
+;   update
+	ldx	#numsht-1
+
+; Get YPOS of this character
+:s3	ldy	shty,x
+
+; Add offset to start of line address
+;   to get memory location of this
+;   character
+	lda	lptrlo,y
+	add	shtxlo,x
+	sta	clrptr
+	lda	lptrhi,y
+	adc	shtxhi,x
+	sta	clrptr+1
+
+; Bump counter MOD 48
+	inc	shtcnt,x
+	lda	shtcnt,x
+	cmp	#48
+	bne	:s2
+
+	stb	0,shtcnt,x
+
+; Count is offset into character table.
+;   Get char number to make ASCII value
+;   (skip update if 0, clear on minus)
+:s2	tay
+	lda	shttbl,y
+	bz	:s4
+	bpl	:s5
+
+	lda	#0
+	bz	:s6	;UNCONDITIONAL
+
+:s5	add	#shtchr-1
+	ora	shtcol
+
+; Store proper character to memory
+:s6	ldy	#0
+	sta	(clrptr),y
+
+:s4	dxpl	:s3
+	rts
+	eproc
+
+
+
+
+
+; Update all depth charge characters
+
+upddpth
+
+	proc
+; Only do every 2nd call
+	inc	dpthcnt
+	lda	dpthcnt
+	lsr	a
+	jcs	:d7
+
+; 4 boats
+	ldx	#3
+
+; If boat off screen to right, next
+:d6	lda	dptxhi,x
+	cmp	rposcnt+1
+	bne	:d0a
+	lda	dptxlo,x
+	cmp	rposcnt
+:d0a	bge	:dxt
+
+; If off screen to left, ditto
+	lda	dptxhi,x
+	cmp	lposcnt+1
+	bne	:d0b
+	lda	dptxlo,x
+	cmp	lposcnt
+:d0b	blt	:dxt
+
+; Initialize line position counter
+	mvb	dbypos,x,dpthy
+
+; Point CLRPTR to memory location and
+;   get character there
+:d5	ldy	dpthy
+	jsr	fnddpth
+
+	ldy	#0
+	lda	(clrptr),y
+
+; If exploding or water, go on
+	bz	:d1
+	cmp	#dpthch+3+col1
+	bgt	:d1
+
+; If not last char, go update
+	bne	:d2
+
+; Else is last character. If not on
+;   last line, go process
+	lda	dpthy
+	cmp	dbypos,x
+	bne	:d3
+
+; Since no water below, it ends here.
+;   Start explosion and continue
+	stb	24,xsnd
+	lda	#xploch+col3
+	bnz	:d4	;UNCONDITIONAL
+
+
+; Clear out this character and stuff
+;   1st char of series to next line
+:d3	stb	0,(clrptr),y
+	ldy	dpthy
+	iny
+	jsr	fnddpth
+	ldy	#0
+	lda	#dpthch+col1
+	bnz	:d4	;UNCONDITIONAL
+
+
+; Character still in series. Bump it
+:d2	add	#1
+
+; Stuff character (whatever it is)
+:d4	sta	(clrptr),y
+
+; Keep going up a line at a time until
+;   the top
+:d1	dec	dpthy
+	bnz	:d5
+
+; Next boat
+:dxt	dxpl	:d6
+
+
+; If not time to start new depth charge
+;   return to caller
+	lda	dpthcnt
+	and	#$0f
+	bnz	:d7
+
+; Else, stuff 1st char in series to all
+;   lines just under boats
+	ldx	#3
+:d8	ldy	#1
+	jsr	fnddpth
+	ldy	#0
+	stb	dpthch+col1,(clrptr),y
+	dxpl	:d8
+
+:d7	rts
+	eproc
+
+
+; Derive memory location from boat # in
+;   X and line # in Y
+fnddpth	lda	lptrlo,y
+	add	dptxlo,x
+	sta	clrptr
+	lda	lptrhi,y
+	adc	dptxhi,x
+	sta	clrptr+1
+	rts
+
+
+
+
+
+; Update all laser characters
+
+updlasr
+
+	proc
+; Number to do
+	ldx	#numlasr-1
+
+; Bump counter
+:l7	inc	lasrcnt,x
+
+; If off screen to right, next
+	lda	#1
+	cmp	rposcnt+1
+	bne	:l1
+	lda	lasrxlo,x
+	cmp	rposcnt
+:l1	bge	:l2
+
+; If off screen to left, next
+	lda	#1
+	cmp	lposcnt+1
+	bne	:l3
+	lda	lasrxlo,x
+	cmp	lposcnt
+:l3	blt	:l2
+
+; On screen. Make count MOD 32
+	lda	lasrcnt,x
+	and	#$1f
+
+; If 0 to 15, go process
+	cmp	#16
+	blt	:l4
+
+; Else is 16 to 31. YPOS of character
+;   to update is (LASRCNT-16)/2+2
+	pha
+	sub	#16
+	div	2
+	add	#2
+	tay
+
+; Point CLRPTR to memory location
+	jsr	fndlasr
+
+; Clear character on LASRCNT MOD 1 = 1
+;   else update
+	pla
+	and	#$01
+	bz	:l5
+
+	lda	#0
+	bz	:l6	;UNCONDITIONAL
+
+:l5	lda	#lasrch+2+col3
+	bnz	:l6	;UNCONDITIONAL
+
+
+; Count is 0 to 15. YPOS of character
+;   to update is LASRCNT/2+2
+:l4	pha
+	div	2
+	add	#2
+	tay
+
+; Point CLRPTR to memory location
+	jsr	fndlasr
+
+; Character offset is LASRCNT MOD 1
+	pla
+	and	#$01
+	add	#lasrch+col3
+
+; Stuff character and do next beam
+:l6	ldy	#0
+	sta	(clrptr),y
+
+:l2	dxpl	:l7
+	rts
+	eproc
+
+
+; Derive memory location from beam # in
+;   X and line # in Y
+fndlasr	lda	lptrlo,y
+	add	lasrxlo,x
+	sta	clrptr
+	lda	lptrhi,y
+	adc	#1
+	sta	clrptr+1
+	rts
+
+
+; Stuff character set with either depth
+;   charge or laser character data
+;   (pointed to by DOPTR)
+dochr	ldy	#23
+doch2	lda	(doptr),y
+	sta	chrset+[$2e*8],y
+	dypl	doch2
+	rts
+
+
+
+
+
+; Set up update timer
+setupd	ldy	scrspd
+	dey
+	stb	setmr2,mytmr2
+	jmp	setmy

@@ -1,0 +1,747 @@
+;	vn.	162
+
+
+; Filespec:	INT
+
+
+; Set up display list and controls
+; Also stuff shadow registers for
+;   colors and character set
+
+enaint
+
+; Turn off interrupts and init
+;   horizontal scroll
+	stb	0,nmien
+	sta	hscrol
+
+; Initialize my timers
+	ldx	#3
+enai2	sta	mytmr1,x
+	dxpl	enai2
+
+; Initialize POKEY
+	sta	audctl
+	stb	3,skctl
+
+; Enable DMA, P/M, wide playfield
+	stb	$3f,sdmctl
+	sta	color1
+
+; => alphanumeric character set
+	stb	high chrst2,chbas
+
+; => display list
+	stw	dlist,sdlstl
+
+; => handler for DLI's
+	stw	dlih,vdslst
+
+; Transfer vector to O/S imm VBLANK
+	mvw	vvblki,vbivec
+
+; Reenable interrupts
+	stb	$c0,nmien
+
+
+
+; Set up imm VBLANK routine
+	lda	#setimm
+	ldx	#high vblih
+	ldy	#low vblih
+	jsr	setvbv
+
+; Set up def VBLANK routine
+	lda	#setdef
+	ldx	#high vbldh
+	ldy	#low vbldh
+	jsr	setvbv
+
+	rts
+
+
+
+
+
+; Set up player/missile stuff
+
+enaplr
+
+; => PM area
+	stb	high mypmbas,pmbase
+
+; All players 1 color clock wide
+	ldx	#3
+	lda	#0
+enap1	sta	sizep0,x
+	dxpl	enap1
+
+; Missiles 0 and 1, 2 color clocks wide
+; Missiles 2 and 3, 1 color clock
+	stb	$05,sizem
+
+; Clear out PM area
+	jsr	clrplr
+
+; Move PM's off screen
+	jsr	plroff
+
+; Enable PM display
+	stb	3,gractl
+
+; Set priority as: PF0-PF3 | P0-P3
+	stb	$04,gprior
+
+; Initialize colors
+	ldx	player
+	mvb	subclr,x,pcolr0
+	sta	pcolr1
+
+; Clear collisions
+	sta	hitclr
+
+	rts
+
+
+clrplr	phx
+	ldx	#0
+	lda	#0
+clrp1	sta	m0,x
+	sta	p0,x
+	sta	p1,x
+	sta	p2,x
+	sta	p3,x
+	dxnz	clrp1
+	plx
+	rts
+
+
+plroff	ldx	#7
+	lda	#0
+plro1	sta	hposp0,x
+	dxpl	plro1
+	rts
+
+
+
+
+
+; Display list interrupt handler
+
+attract	MACRO
+	eor	colrsh
+	and	drkmsk
+	ENDM
+
+
+dlih	pha
+	phx
+	ldx	lndcol
+	stb	0,wsync
+
+	attract
+	sta	colpf2
+	txa! attract
+	sta	colpf0
+	stb	high chrset,chbase
+
+; => next DLI routine
+	stw	dlih2,vdslst
+	plx
+	pla
+	rti
+
+dlih2	pha
+	phx
+	ldx	#0
+	stb	$8a,wsync
+	attract
+	sta	colbk
+	txa! attract
+	sta	colpf1
+
+	stw	dlih3,vdslst
+	plx
+	pla
+	rti
+
+dlih3	pha
+	phx
+	ldx	dazzle
+	mvb	wtrcol,wsync
+	attract
+	sta	colbk
+	txa! attract
+	sta	colpf3
+
+	stw	dlih4,vdslst
+	plx
+	pla
+	rti
+
+dlih4	pha
+	mvb	lndcol,wsync
+	attract
+	sta	colbk
+
+	stw	dlih42,vdslst
+	pla
+	rti
+
+dlih42	pha
+	phx
+	ldx	#0
+	mvb	airclr,wsync
+	attract
+	sta	colbk
+	txa! attract
+	sta	colpf2
+
+	stw	dlih5,vdslst
+	plx
+	pla
+	rti
+
+dlih5	pha
+	phx
+	ldx	#14
+	stb	high chrst2,wsync
+	sta	chbase
+	txa! attract
+	sta	colpf3
+
+	plx
+	pla
+	rti
+
+
+
+
+
+; Immediate VBLANK interrupt handler
+
+vblih
+
+	proc
+; Update my timers
+	ldx	#numtmr-1
+:vi9	lda	mycnt1,x
+	bnz	:vi7
+
+	sta	mytmr1,x
+	bz	:vi8	;UNCONDITIONAL
+
+:vi7	dec	mycnt1,x
+:vi8	dxpl	:vi9
+
+
+; If scroll turned off or halt in
+;   progress, skip this mess
+	lda	scrflg
+	ora	hltflg
+	jnz	:vi4
+
+; If position counter = limit then
+;   we're at the end. No scrolling.
+	lda	poscnt+1
+	cmp	#high lstpos
+	bne	:vi10
+	lda	poscnt
+	cmp	#low lstpos
+:vi10	beq	:vi4
+
+; Back off counter
+	dec	scrcnt
+
+; If counter >= 0, then don't scroll
+;   this time
+	bnz	:vi4
+
+; Else, reset counter and fine scroll
+;   to the left 1 color clock
+	mvb	scrspd,scrcnt
+	dec	scrval
+	lda	scrval
+
+; If fine scroll value > 0, then exit
+	bpl	:vi1
+
+; Else, reset scroll value to < 8
+;   (because basic mode 2 is 8 color
+;    clocks wide)
+	and	#$07
+	pha
+
+; Bump all display list LMS addresses
+	ldy	#9
+	ldx	#0
+:vi3	inc	ptr0,x
+	bnz	:vi2
+	inc	ptr0+1,x
+:vi2	inx! inx! inx
+	dypl	:vi3
+
+; Bump overall position counters
+	inw	poscnt
+	inw	lposcnt
+	inw	rposcnt
+
+; Adjust mine pointer if mine has
+;   scrolled off screen
+	ldx	mptr
+	lda	mtblxh,x
+	and	#$03
+	cmp	lposcnt+1
+	bne	:vi5
+	lda	mtblxl,x
+	cmp	lposcnt
+:vi5	bge	:vi6
+	inc	mptr
+:vi6	pla
+
+
+; In either case, accum holds proper
+;   scroll value - stuff it and exit
+:vi1	sta	scrval
+	sta	hscrol
+
+:vi4	jmp	(vbivec)
+	eproc
+
+
+
+
+
+; Deferred VBLANK interrupt handler
+
+vbldh
+
+	proc
+; If halt in progress, skip all but
+;   DLI vector reset
+	lda	hltflg
+	bz	:vd5
+
+	jsr	level0
+	jmp	:vd3
+
+; Check to see if time to bump present
+;   player color. If not, go on
+:vd5	inc	vblic
+	lda	#1
+	and	vblic
+	bz	:vd2
+
+	inc	dazzle
+
+; If DAZZLE luminescence < 12, continue
+	lda	dazzle
+	and	#$0f
+	cmp	#$0c
+	blt	:vd2
+	
+; Else, reset lum to 4, bump color
+	lda	#$f0
+	and	dazzle
+	add	#$14
+	sta	dazzle
+
+
+:vd2	mvb	dazzle,colpf0
+
+; Update character set data
+
+; Every 16th time, update boat flag
+	lda	vblic
+	and	#$0f
+	bnz	:vd10
+
+; Bits 4-5 represent figures 0 thru 3
+	lda	vblic
+	and	#$30
+	div	16
+	tax
+	mvb	flgtop,x,chrset+$f8
+	mvb	flg2nd,x,chrset+$f8+1
+	bnz	:vd13	;UNCONDITIONAL
+
+
+; Every 8th time, update shooter and
+;   laser beam character beacons
+:vd10	lda	vblic
+	and	#$07
+	cmp	#$03
+	bne	:vd11
+
+; Bump shooter counter, MOD 6 and use
+;   as figure
+	ldx	shc
+	dex
+	bpl	:vd12
+
+	ldx	#5
+:vd12	stx	shc
+	mvb	sht4th,x,chrset+$100+3
+	sta	chrset+$108+3
+	bnz	:vd13	;UNCONDITIONAL
+
+
+; Every other 8th time, update top of
+;   shooter and laser base characters
+:vd11	lda	vblic
+	and	#$07
+	cmp	#$06
+	bnz	:vd13
+
+; Flip characters
+	lda	chrset+$100+1
+	eor	#[$66 xor $7e]
+	sta	chrset+$100+1
+	and	#$3c
+	sta	chrset+$108+5
+
+	lda	chrset+$108+1
+	eor	#[$a7 xor $e5]
+	sta	chrset+$108+1
+
+
+:vd13
+
+; If scroll turned off, skip sub and
+;   torpedo updates
+	lda	scrflg
+	bnz	:vd3
+
+; Else, update sub screen positions
+; Stuff horizontal registers
+	mvb	xpos,hposp0
+	add	#8
+	sta	hposp1
+
+; Write player data to PM memory
+	ldx	#0
+	ldy	ypos
+
+:vd4	lda	p0fig,x
+	sta	p0,y
+
+	lda	p1fig,x
+	sta	p1,y
+
+	iny! inx
+	cpx	#16
+	blt	:vd4
+
+; Update torpedo positions
+; Horizontal only as vertical never
+;   changes
+	ldx	#1
+:vd7	lda	mssl0,x
+	bz	:vd8
+
+	lda	txpos,x
+	sta	hposm0,x
+	add	#2
+	sta	hposm2,x
+:vd8	dxpl	:vd7
+
+
+; Reset DLI handler vector and
+;   screen colors
+:vd3	stw	dlih,vdslst
+	mvb	lvlclr,colbk
+	sta	colpf2
+	stb	$76,colpf3
+
+; If time to, swap laser characters for
+;   depth charge characters
+	lda	poscnt
+	cmp	#low lstboat
+	bne	:vd9
+
+	lda	poscnt+1
+	cmp	#high lstboat
+	bne	:vd9
+
+	lda	scrval
+	bnz	:vd9
+
+	stw	ltbl,doptr
+	jsr	dochr
+
+; Set top of screen line counter and
+;   exit through OS
+:vd9	mvb	vcount,topscrn
+vbdxt	jmp	xitvbl
+	eproc
+
+
+
+
+
+; Turn all sound off
+level0	ldx	#7
+	lda	#0
+leve2	sta	audf1,x
+	dxpl	leve2
+	rts
+
+
+
+
+
+; Air control timer
+
+airtmr
+
+	proc
+; If scroll turned off or halt in
+;   progress, skip this but do reset
+;   timer
+	lda	scrflg
+	ora	hltflg
+	bnz	setair
+
+; If sub breaks water surface, fill air
+	lda	ypos
+	cmp	#62
+	ble	:at2
+
+; Else, back off air count and exit if
+;   = 0 to kill sub and end round
+	dec	aircnt
+	bnz	:at1
+
+	stb	0,airscr
+	jmp	kilsub
+
+:at1	jsr	dspair
+	jmp	:at3
+
+; Fill air (three times as fast as
+;   subtract air)
+:at2	jsr	incair
+	jsr	incair
+	jsr	incair
+
+; Determine color from count
+;   2/5 = yellow, 1/5 = red, else green
+:at3	lda	aircnt
+	cmp	#112 * 2/5
+	ble	:at4
+	stb	$c4,airclr
+	bnz	setair	;UNCONDITIONAL
+:at4	cmp	#112 * 1/5
+	ble	:at5
+	stb	$1a,airclr
+	bnz	setair	;UNCONDITIONAL
+:at5	stb	$42,airclr
+
+; Set up timer vector and count
+;   (2/3 second) and exit
+setair	ldy	#40
+	stb	setmr3,mytmr3
+; (falls through to SETMY)
+	eproc
+
+
+
+
+
+; Set my timers (I'm tired of screwing
+;   around with the OS ones not ever
+;   working!!!)
+setmy	ldx	#5
+	stx	wsync
+setm2	dxnz	setm2
+	tax! tya
+	sta	mycnt1-1,x
+	rts
+
+
+
+
+
+; If air count at limit, don't allow
+;   increment, else bump and display
+incair	lda	aircnt
+	cmp	#112
+	rge
+	inc	aircnt
+
+
+
+
+
+; Display air character based on count
+
+dspair
+
+; Back off count for 0-offset
+	ldx	aircnt
+	dex
+
+; Count / 8 = offset into display line
+	txa
+	lsr a! lsr a! lsr a
+	tay
+
+; Count MOD 8 = character offset
+	txa
+	and	#$07
+	tax
+	add	#airch
+	sta	airscr,y
+
+; If "full" character, blank out next
+;   space in case we just decremented
+;   from "1/8" character
+	cpx	#7
+	bne	dspa2
+	lda	#0
+	sta	airscr+1,y
+
+dspa2	rts
+
+
+
+
+
+; Reset air display line to full
+
+filair	ldx	#13
+	lda	#airch+7
+fila2	sta	airscr,x
+	dxpl	fila2
+	lda	#112
+	sta	aircnt
+	rts
+
+
+
+
+
+; Update player walls
+
+updplr
+
+	proc
+; Start with player 2 wall
+
+; If not time to do this update, skip
+;   ahead to player 3 wall
+	lda	poscnt+1
+	cmp	#high plr2_1
+	bne	:p11
+	lda	poscnt
+	cmp	#low plr2_1
+:p11	blt	:p4
+
+; If just starting this update,
+;   initialize player, else skip
+	bne	:p1
+
+	stw	p2,plrptr
+	jsr	initwal
+
+; Make player DAZZLE color
+:p1	mvb	dazzle,pcolr2
+
+; Set horizontal position
+	stb	low plr2_1,temp2lo
+	jsr	dethor
+	sta	hposp2
+
+; Only rotate front wall every 2nd time
+	inc	pc
+	lda	pc
+	and	#$01
+	bnz	:p4
+
+; Rotate all player bytes down
+	lda p2+60! pha
+
+	ldx	#61
+:p3	lda	p2,x
+	sta	p2-1,x
+
+	inx! cpx #196
+	bne	:p3
+
+	pla! sta p2+195
+
+
+***************************************
+
+; Next, do player 3 wall
+
+; If not time to do this update, skip
+;   ahead to laser beam updates
+:p4	lda	poscnt+1
+	cmp	#high plr3_1
+	bne	:p42
+	lda	poscnt
+	cmp	#low plr3_1
+:p42	blt	:pxt
+
+; If just starting this update,
+;   initialize player, else skip
+	bne	:p5
+
+	stw	p3,plrptr
+	jsr	initwal
+
+; Make player negative DAZZLE color and
+;   set player 3 status to #1
+:p5	lda	dazzle
+	eor	#$f0
+	sta	pcolr3
+
+; Set horizontal position
+	stb	low plr3_1,temp2lo
+	jsr	dethor
+	sta	hposp3
+
+; Rotate all player bytes up
+	lda p3+195! pha
+
+	ldx	#194
+:p7	lda	p3,x
+	sta	p3+1,x
+
+	dex
+	cpx	#59
+	bne	:p7
+
+	pla! sta p3+60
+
+:pxt	rts
+	eproc
+
+
+
+
+
+; Initialize wall player
+initwal	lda	#$ff
+	ldy	#195
+intw2	sta	(plrptr),y
+	dey
+	cpy	#59
+	bne	intw2
+	rts
+
+
+
+
+
+; Determine horizontal position
+dethor	lda	poscnt
+	sub	temp2lo
+	mul	8
+	sub	scrval
+	sta	temp2lo
+
+	lda	#$d8
+	sub	temp2lo
+	rts

@@ -1,0 +1,487 @@
+;	vn.	128
+
+
+; filespec:	COLL
+
+
+; Check collisions between sub and
+;   playfield, missiles and playfield
+
+coll
+
+; Wait until TV beam is at top of
+;   screen so: 1) VBLANK won't happen
+;   before we finish all calculations,
+;   and 2) collisions will be accurate
+	ldx	topscrn
+	inx! inx
+coll1	cpx	vcount
+	blt	coll1
+
+
+; If sub not touching any colors, go on
+	lda	p0pf
+	ora	p1pf
+	ora	p0pl
+	ora	p1pl
+	and	#$07
+	jz	coll2
+
+; Else, stop scrolling and clear sub
+kilsub	dec	scrflg
+	jsr	clrplr
+
+; Do sub explosion sequence
+	stw	[chrset+$148],subchr
+	stb	14,pcolr0
+	sta	pcolr1
+	stb	$01,gprior
+	stb	$ff,lndcol
+	stb	$7f,wtrcol
+
+	ldy	#14
+
+coll3	ldx	#16
+	jsr	wtjiff
+
+	jsr	shake
+
+; If count < 4, skip
+; If count = 4, clear player
+	cpy	#4
+	blt	coll3e
+	bne	coll3i
+
+	jsr	clrplr
+	bz	coll3e	;UNCONDITIONAL
+
+; Every other time, bump sub explosion
+coll3i	tya
+	lsr	a
+	bcs	coll3e
+
+
+	phy
+
+	ldx	ypos
+	ldy	#7
+
+coll3f	lda	(subchr),y
+	sta	p0,x
+	sta	p1,x
+	sta	p0+8,x
+	sta	p1+8,x
+
+	inx
+	dypl	coll3f
+
+	ply
+
+	lda	subchr
+	add	#8
+	sta	subchr
+	lda	subchr+1
+	adc	#0
+	sta	subchr+1
+
+
+coll3e	jsr	bigxplo
+
+	dec	lndcol
+	dec	wtrcol
+	dynz	coll3
+
+
+; Reset water color and display list
+;   and slowly turn off all sounds
+	stb	$72,wtrcol
+	stb	dlbl8,dlist
+	sta	hitclr
+
+	ldy	#6
+bx2	ldx	#18
+	jsr	wtjiff
+
+	stb	0,audc1,y
+	sta	audf1,y
+
+	dey
+	dypl	bx2
+
+; Wait a second then pull garbage RTS
+	ldx	#60
+	jsr	wtjiff
+
+	pla
+	pla
+
+; Set reset counter to new location if
+;   necessary
+	ldy	#5
+
+coll3c	lda	poscnt+1
+	cmp	dofshi,y
+	bne	coll3a
+	lda	poscnt
+	cmp	dofslo,y
+
+coll3a	bgt	coll3b
+	dynz	coll3c
+
+coll3b	ldx	player
+	sty	rstcnt,x
+
+
+; Try to do next player
+
+next
+
+; If this player not done, proceed
+	dec	menlft,x
+	bpl	next2
+
+; Else, mark player as finished, then
+;   do prompt screen that says
+;   "GAME OVER" for 2 seconds
+	dec	menlft,x
+	stw	gamovr,ptr4
+	mvb	pprmtl,x,ptr6
+	mvb	pprmth,x,ptr6+1
+	jsr	enapro
+
+	ldx	#120
+	jsr	wtjiff
+
+	ldx	player
+
+; Try to bump player if two
+next2	inx
+	cpx	numplr
+	beq	next3
+
+	ldx	#0
+next3	stx	player
+
+; Back to mainline
+	jmp	newrnd
+
+
+***************************************
+
+; Check missiles 2 and 3 for collision
+;   with color 1, skip if not
+coll2	ldx	#1
+
+coll12	mvb	m2pf,x,mpftmp
+	and	#$02
+	jz	coll4
+
+; Calculate relative X and Y positions
+;   of missile at impact
+	lda	txpos,x
+	sub	#$30-3
+	sub	scrval
+	div	8
+	add	poscnt
+	sta	templo
+	lda	#0
+	adc	poscnt+1
+	sta	temphi
+	lda	typos,x
+	sub	#52
+	div	16
+	sta	caly
+
+; Determine if depth charge was hit
+;   Check under 4 boats
+	ldy	#3
+
+; If missile XPOS <> boat XPOS then
+;   isn't depth charge, continue
+coll2c	lda	dptxhi,y
+	cmp	temphi
+	bne	coll2a
+	lda	dptxlo,y
+	cmp	templo
+coll2a	bne	coll2b
+
+; Is depth charge! Set CLRPTR => memory
+;   location of impact
+	ldy	caly
+	lda	lptrlo,y
+	add	templo
+	sta	clrptr
+	lda	lptrhi,y
+	adc	temphi
+	sta	clrptr+1
+
+; Start explosion process
+	stb	24,xsnd
+	ldy	#0
+	stb	xploch+col3,(clrptr),y
+
+; Give 200 points * level, kill missile
+;   and continue
+	lda	#20
+	jmp	pcola2
+
+
+coll2b	dypl	coll2c
+
+
+; Since not depth charge, must be mine.
+; Find which hit, looking starting with
+;   1st mine on screen
+	ldy	mptr
+coll7	lda	mtblxh,y
+	and	#$03
+	cmp	temphi
+	bne	coll5
+	lda	mtblxl,y
+	cmp	templo
+
+coll5	bgt	coll4
+	beq	coll6
+
+	iny
+	bnz	coll7
+
+	bz	coll4	;UNCONDITIONAL
+
+; Mine found. Mark missile as free,
+;   back number of torpedoes out and
+;   erase missile
+coll6	sty	colmin
+
+; If last mine, do end of round stuff
+	cpy	#nummin-1
+	jeq	endgam
+
+; Go process if already released
+	lda	reltbl,y
+	bnz	coll8
+
+; Else, mine stationary. Mark mine as
+;   "released" and get YPOS from table
+	lda	#$ff
+	sta	reltbl,y
+	phx
+
+	ldx	colmin
+	ldy	mtbly,x
+	jsr	getptr
+
+	sty	colypos
+	plx
+
+; Give 50 points * level
+	lda	#5
+	jsr	bmpscor
+
+; Kill missile and start explosion
+	jsr	kilmsl
+	stb	24,xsnd
+	lda	#xploch+col3
+	ldy	#0
+coll9	sta	(clrptr),y
+
+; Clear all positions below until no
+;   more tether characters found or at
+;   bottom of screen
+	inc	colypos
+	ldy	colypos
+	cpy	#10
+	jeq	collxt
+
+	phx
+	ldx	colmin
+	jsr	getptr
+	plx
+
+	ldy	#0
+	lda	(clrptr),y
+	cmp	#tethch+col2
+	jne	collxt
+
+	lda	#0
+	bz	coll9	;UNCONDITIONAL
+
+
+; Mine released, so find position in
+;   queue and set to explode on next
+;   update
+coll8	ldy	#7
+coll11	lda	queue,y
+	cmp	colmin
+	beq	coll10
+
+	dypl	coll11
+
+	bmi	coll4	;UNCONDITIONAL
+
+coll10	jsr	kilmsl
+	lda	qypos,y
+	ora	#$80
+	sta	qypos,y
+	jmp	collxt
+
+***************************************
+
+; If missile touching color 0, erase
+;   and start explosion sound
+coll4
+	lda	mpftmp
+	and	#$01
+	bz	pcol3
+
+	jmp	pcola
+
+***************************************
+
+; If missile not touching player 2/3,
+;   continue
+
+pcol3	mvb	m2pl,x,mpltmp
+	and	#$0c
+	jz	collxt
+
+; If POSCNT > $200, then player is wall
+	lda	poscnt+1
+	cmp	#2
+	beq	pcol1
+
+; Else, is laser beam or depth charge
+;   Go erase missile, start explosion
+;   sound and exit
+	jmp	pcola
+
+
+; Player hit is wall. Set up pointer to
+;   P/M memory and default player mask
+pcol1	stw	p2,plrptr
+	stb	$0f,plrmsk
+
+; If player 3, bump hi byte of pointer
+;   (which is now pointing to player 2)
+	lda	mpltmp
+	and	#$04
+	bnz	pcol4
+
+	inc	plrptr+1
+
+; Get byte of player at collision point
+pcol4	ldy	typos,x
+	lda	(plrptr),y
+
+; If high nybble intact mask is default
+;   else, mask will erase whole byte
+pcol6	asl	a
+	bcs	pcol5
+
+	stb	0,plrmsk
+
+
+; Now, reset bits not only at collision
+;   point, but also one byte above and
+;   below
+pcol5	phx
+	ldx	#3
+	dey
+pcol7	lda	(plrptr),y
+	and	plrmsk
+	sta	(plrptr),y
+
+	iny
+	dxnz	pcol7
+
+	plx
+
+
+; Lastly, erase missile, start
+;   explosion sound, give 10 * level
+;   points and exit
+	lda	#1
+pcola2	jsr	bmpscor
+
+pcola	stb	24,xsnd
+	jsr	kilmsl
+
+	jmp	collxt
+
+***************************************
+
+; Repeat 2 times
+collxt
+	dxpl	coll12
+
+; Clear collisions, update score & exit
+	stx	hitclr
+	jmp	prtscor
+
+
+
+
+
+; Kill torpedo in X
+kilmsl	inc	mssl0,x
+	dec	mslout
+	jsr	clrmsl
+	rts
+
+
+
+
+
+; Wait for X jiffies
+wtjiff	jsr	dump?
+	jsr	wtclk
+
+	lda	mytmr2
+	bnz	wtjifb
+
+	phx! phy
+	jsr	updatq
+	jsr	updsht
+	jsr	updlasr
+	jsr	upddpth
+	jsr	setupd
+	ply! plx
+
+wtjifb	dxnz	wtjiff
+	rts
+
+
+
+
+
+; Shake screen by picking random number
+;   of blank lines at top of screen
+shake	lda	random
+	and	#$70
+	sta	dlist
+	rts
+
+
+
+
+
+
+; Do BIG explosion sound
+bigxplo	tya
+	add	#2
+	div	2
+	ora	#$80
+	sta	subsnd
+
+	ldx	#6
+bi2	lda	subsnd
+	sta	audc1,x
+
+	lda	random
+	and	#$1f
+	add	#$e0
+	sta	audf1,x
+
+	dex
+	dxpl	bi2
+	rts

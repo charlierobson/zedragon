@@ -1,0 +1,142 @@
+;	vn.	107
+
+
+; filespec:	SCORE
+
+
+; Bump score by number in A * level
+
+bmpscor	stx	bmpxtmp
+	sta	bmpatmp
+
+	ldx	plrlvl
+	lda	#0
+bmps2	add	bmpatmp
+	dxpl	bmps2
+
+	ldx	player
+	add	plrscl,x
+	sta	plrscl,x
+	lda	#0
+	adc	plrsch,x
+	sta	plrsch,x
+
+	ldx	bmpxtmp
+	rts
+
+
+
+
+
+; Print current player's score to
+;   proper screen location
+
+prtscor
+
+; Move player's score to temp area
+	stx	bmpxtmp
+	ldx	player
+	mvb	plrscl,x,hldscor
+	mvb	plrsch,x,hldscor+1
+
+; Set SCORPTR => screen memory area
+	mvb	sclocl,x,scorptr
+	mvb	scloch,x,scorptr+1
+
+; Test to see if score > hi score and
+;   save results for later
+	cpw	hldscor,his
+	php
+
+; Convert score to ASCII
+	jsr	cnv2asc
+
+; 4 digits to display, point to proper
+;   screen location and move bytes
+	stw	[scorbuf+1],plrptr
+	ldy	#4
+	jsr	sco2scr
+
+; Retrieve hi score comparison results,
+;  and exit if player's score is less
+	plp
+	rlt
+
+; Else, make hi score = player's score
+	ldx	player
+	mvb	plrscl,x,his
+	mvb	plrsch,x,his+1
+
+; 5 digits to display, point to screen,
+;   move bytes and exit (falls through
+;   to SCO2SCR...)
+	dec	plrptr
+	stw	hiscore,scorptr
+	ldy	#5
+
+
+
+
+
+; Move score from SCORBUF to screen
+
+sco2scr
+
+; 1st stuff "0" to 1's place since all
+;   points are multiplied by ten
+	lda	#$10
+	sta	(scorptr),y
+
+; Transfer rest of numbers
+	dey
+sco22	lda	(plrptr),y
+	sta	(scorptr),y
+	dypl	sco22
+
+	ldx	bmpxtmp
+	rts
+
+
+
+
+
+; Convert binary score in HLDSCOR to
+;   5 ASCII digits in SCORBUF
+
+cnv2asc
+
+; Start with 10^4
+	ldx	#0
+
+; Stuff "0" (-1 for automatic INC)
+cnv22	lda	#$10-1
+	sta	scorbuf,x
+
+; Bump digit and try to subtract this
+;   power of ten
+cnv23	inc	scorbuf,x
+
+	lda	hldscor
+	sub	pwr10l,x
+	sta	hldscor
+	lda	hldscor+1
+	sbc	pwr10h,x
+	sta	hldscor+1
+
+; If not minus yet, repeat
+	bpl	cnv23
+
+; Else, make positive again by adding
+;   power of 10 back to number
+	lda	hldscor
+	add	pwr10l,x
+	sta	hldscor
+	lda	hldscor+1
+	adc	pwr10h,x
+	sta	hldscor+1
+
+; Do until we reach 1's place
+	inx
+	cpx	#6
+	blt	cnv22
+	rts

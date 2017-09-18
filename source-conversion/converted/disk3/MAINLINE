@@ -1,0 +1,800 @@
+;	vn.	154
+
+
+; filespec:	MAINLINE
+
+
+mainln
+start
+
+	proc
+; Enable interrupts
+	jsr	enaint
+
+; Initialize some variables
+	stb	0,sellvl
+	sta	selopt
+	sta	selrst
+	sta	numplr
+	sta	his
+	sta	his+1
+	stb	4,selmen
+
+; Read in high score from disk
+	jsr	rhis
+
+
+;**************************************
+; THIS IS WHERE WE RESTART EACH GAME  *
+;**************************************
+
+restrt
+
+; Init stack and some variables
+	ldx #$ff! txs
+	stx	ch
+	stx	scrflg
+	dex
+	stx	menlft
+	stx	menlft+1
+	jsr	level0
+	sta	hltflg
+
+; Starting colors
+	stb	$f0,lndcol
+	stb	$72,wtrcol
+	stb	$c4,airclr
+
+; Fix display list in case of restart
+	stb	dlbl8,dlist
+
+; Clear out players
+	jsr	clrplr
+
+; Init subs left
+	jsr	prtmen
+
+; In case prompt screen in place, kill
+	jsr	kilpro
+
+; Clean up score
+	jsr	clrsc
+
+; Initialize scroll and level color
+	stb	0,hscrol
+
+	ldy	sellvl
+	jsr	doselc
+
+; Do front screen stuff
+	jsr	front
+
+; Set up game control variables
+; Start with player 1 and no extra men
+	stb	0,player
+	sta	xtra
+	sta	xtra+1
+	sta	atract
+
+; Clear score to zeroes
+	ldx	#4
+:st1	stb	$d0,score1,x
+	sta	score2,x
+	stb	0,plrscl,x
+	dxpl	:st1
+
+; Put selected restart position
+	mvb	selrst,rstcnt
+	sta	rstcnt+1
+
+; Put selected starting level
+	mvb	sellvl,level
+	sta	level+1
+
+; Put selected starting number of men
+;   for player 1, and player 2 if need
+	mvb	selmen,menlft
+
+	ldx	numplr
+	bne	:st2
+
+	lda	#$fe
+:st2	sta	menlft+1
+
+
+;**************************************
+; THIS IS WHERE WE COME AT THE START  *
+;   OF EACH NEW ROUND                 *
+;**************************************
+
+newrnd
+
+; Shut off any sounds
+	jsr	level0
+
+; Anybody got any men left? If not,
+;   restart program after writing high
+;   score to disk
+	lda	menlft
+	add	menlft+1
+	cmp	#$fc
+	bne	:md
+
+	jsr	whis
+	jmp	restrt
+
+; If THIS player has no men left, try
+;   to do next player
+:md	ldx	player
+	lda	menlft,x
+	jmi	next2
+
+; Set up level and scroll speed
+	mvb	level,x,plrlvl
+	tay
+	mvb	spdtbl,y,scrspd
+	sta	scrcnt
+
+; Clear out players
+	jsr	clrplr
+
+; Do "READY!" prompt
+	stw	ready,ptr4
+	mvb	pprmtl,x,ptr6
+	mvb	pprmth,x,ptr6+1
+	jsr	enapro
+
+; Wait 2 seconds, then stock mines
+	ldx	#120
+:me	jsr	wtclk
+	dxnz	:me
+
+; Print number of men left (for both)
+	jsr	prtmen
+
+; Reset character set to depth charges
+	stw	dtbl,doptr
+	jsr	dochr
+
+	stb	0,scrval
+	sta	hscrol
+
+	ldx	#numzero-1
+:mb	sta	zerovar,x
+	dxpl	:mb
+
+; Clear out update queue
+	ldx	#7
+:mc	sta	queue,x
+	sta	qypos,x
+	dxpl	:mc
+
+	sta	qcntr
+
+; Clear out released mine table
+	ldx	#nummin-1
+:ma	sta	reltbl,x
+	dex
+	cpx	#$ff
+	bne	:ma
+
+	stb	col2,shtcol
+
+; Clean up scores and set level color
+	jsr	clrsc
+
+	ldy	plrlvl
+	jsr	doselc
+
+; Reset screen to proper point
+	ldx	player
+	ldy	rstcnt,x
+	mvb	rstx,y,xpos
+	mvb	rsty,y,ypos
+
+	jsr	fixdsp
+
+; Clear display memory of garbage and
+;   stock with mines/stalactites
+	jsr	clrdsp
+
+; Fill up the air
+	jsr	filair
+
+; Print score
+	jsr	prtscor
+
+; Enable player/missile stuff
+	jsr	enaplr
+
+; Enable update timer
+	jsr	setupd
+
+; Enable air control timer
+	jsr	setair
+
+; Enable sub update timer
+	jsr	setsub
+
+; Enable torpedo logic timer
+	jsr	settorp
+
+; Enable sonar sound
+	jsr	setson
+
+; Kill prompt screen
+	jsr	kilpro
+
+; Start scrolling
+	stb	0,scrflg
+
+***************************************
+
+; MAIN PROGRAM LOOP
+
+:m1
+
+; If time to, start update process
+	lda	mytmr2
+	bnz	:m2
+
+; Start some mines going
+	jsr	release
+; Update all characters and explosions
+	jsr	updatq
+; Update all shooter characters
+	jsr	updsht
+; Update all depth charges
+	jsr	upddpth
+; Update all laser characters
+	jsr	updlasr
+; Restart update timer
+	jsr	setupd
+
+; If [SPACE] typed, set up halt
+:m2	lda	ch
+	cmp	#$21
+	bne	:m4
+
+	jsr	click
+
+	stb	$ff,hltflg
+	sta	ch
+
+:m3a	jsr	dump?
+	lda	ch
+	cmp	#$21
+	bne	:m3a
+
+	jsr	click
+
+	stb	$ff,ch
+	stb	0,hltflg
+
+
+; If time to, check stick button,
+;   update missiles and non-sub players
+:m4	lda	mytmr1
+	bnz	:m3
+
+	jsr	fire
+	jsr	updplr
+
+; If time to, update air supply
+:m3	lda	mytmr3
+	bnz	:m5
+
+	jsr	airtmr
+
+; If time to, update sonar sound
+:m5	lda	mytmr4
+	bnz	:m6
+
+	jsr	sonar
+
+:m6
+
+; Check collisions every time around
+	jsr	coll
+	jsr	dump?
+	jmp	:m1
+	eproc
+
+
+
+
+
+; Mainline support subroutines
+
+
+; Get console button
+getcon	stb	8,consol
+	lda	consol
+init	rts
+
+; Wait for console button release
+nocon	jsr	getcon
+	cmp	#7
+	bne	nocon
+	rts
+
+; Wait on both console and joystick
+;   (falls through to NOTRIG)
+nothng	jsr	nocon
+	jsr	notrig
+	jsr	wtclk
+	jsr	nocon
+
+; Wait on all joystick buttons released
+notrig	lda	strig0
+	and	strig0+1
+	and	strig0+2
+	and	strig0+3
+	bz	notrig
+	rts
+
+
+
+
+
+; If user wants to dump out, restart
+dump?	jsr	getcon
+	cmp	#7
+	req
+
+	jsr	click
+	jsr	level0
+	jsr	clrplr
+	stw	dabort,ptr4
+	stw	gamovr,ptr6
+	ldx	#3
+	jsr	enapro
+	jsr	nothng
+	jsr	click
+	jmp	restrt
+
+
+
+
+
+; Wait for one clock tick
+wtclk	lda	rtclok+2
+wtc2	cmp	rtclok+2
+	beq	wtc2
+	rts
+
+
+; Wait for X clock ticks
+wtclks	jsr	dump?
+	jsr	wtclk
+	dxnz	wtclks
+	rts
+
+
+
+
+
+; Clear out score area
+clrsc	ldx	#1
+clrs2	lda	sclocl,x
+	sta	scorptr
+	lda	scloch,x
+	sta	scorptr+1
+
+	ldy	#4
+clrs1	lda	(scorptr),y
+	ora	#$c0
+	sta	(scorptr),y
+	dypl	clrs1
+
+	dxpl	clrs2
+	ldy	#5
+clrs3	lda	hiscore,y
+	ora	#$c0
+	sta	hiscore,y
+	dypl	clrs3
+
+	rts
+
+
+; Print number of men to screen
+prtmen	ldx	#1
+pr3	lda	menlft,x
+	cmp	#$fe
+	bne	pr2
+
+	lda	#$ff
+pr2	add	#$51
+	ldy	soff,x
+	sta	sleft1,y
+
+	dxpl	pr3
+	rts
+
+
+
+
+
+; Do front screen stuff
+; Wait for clock tick then => display
+;   list to front screen data
+	proc
+front	jsr	wtclk
+
+	stw	fslo,loptr
+	stw	fshi,hiptr
+	jsr	stufscr
+
+:fr3	stw	auth,ptrbtm
+
+; Wait 6 seconds or [START], whichever
+;   is first
+	jsr	frwt
+	jsr	frwt
+
+	stw	pst,ptrbtm
+	jsr	frwt
+
+	stw	copy,ptrbtm
+	jsr	frwt
+	jsr	frwt
+
+	stw	pst,ptrbtm
+	jsr	frwt
+
+	bz	:fr3	;UNCONDITIONAL
+
+
+; Wait on 3 seconds, console button,
+;   or either joystick button pressed
+frwt	ldx	#180
+
+:fr4	jsr	wtclk
+	jsr	getcon
+
+; If OPTION, process player/stick stuff
+	cmp	#3
+	bne	:fr6
+
+	ldy	selopt
+	iny
+	cpy	#3
+	blt	:fr7
+
+	ldy	#0
+:fr7	sty	selopt
+
+	mvb	nump,y,pln
+	mvb	pspc,y,pls
+	mvb	nums,y,stn
+	mvb	sspc,y,sts
+
+	stw	optmsg,ptrbtm
+
+	mvb	optplr,y,numplr
+	mvb	optstk,y,onestk
+
+:fr9	jsr	click
+	jsr	nothng
+	jsr	click
+	stb	0,atract
+	jmp	:fr4
+
+; If SELECT, process level change
+:fr6	cmp	#5
+	bne	:fr8
+
+	inc	sellvl
+	lda	sellvl
+	and	#$03
+	sta	sellvl
+
+	ldy	sellvl
+	jsr	doselc
+
+	mvb	sell,y,ptrbtm
+	mvb	selh,y,ptrbtm+1
+
+	bnz	:fr9	;UNCONDITIONAL
+
+; If START, dump out
+:fr8	cmp	#6
+	beq	:fr5
+
+; Likewise if either stick button hit
+	lda	strig0
+	eor	strig0+1
+	bnz	:fr5
+
+; If button 3 choose between 5 and 10
+;   subs to start
+	lda	strig0+2
+	bnz	:fr10
+
+	lda	selmen
+	eor	#[4 xor 9]
+	sta	selmen
+	add	#$51
+	sta	sleft1+28
+	jmp	:fr9
+
+; If button 4 bump selected reset
+;   starting point MOD 6
+:fr10	lda	strig0+3
+	bnz	:fr2
+
+	inc	selrst
+	lda	selrst
+	cmp	#6
+	bne	:fr2a
+	stb	0,selrst
+:fr2a	add	#$51
+	sta	sleft1-11
+	jmp	:fr9
+
+
+:fr2	dxnz	:fr4
+	rts
+
+; Pop garbage RTS and wait for console
+;   button release
+:fr5	pla! pla
+	jsr	nothng
+
+; Point bottom line back to air prompt
+	stw	air,ptrbtm
+	rts
+
+
+; Do current level color
+doselc	mvb	selclr,y,lvlclr
+	rts
+	eproc
+
+
+
+
+
+; Stuff display list LMS pointers
+stufscr	ldy	#0
+	ldx	#0
+st2	lda	(loptr),y
+	sta	ptr0,x
+	inx
+	lda	(hiptr),y
+	sta	ptr0,x
+	inx! inx
+	iny
+	cpy #10! bne st2
+	rts
+
+
+
+
+
+; Clear display memory of any garbage,
+;   and stock with mines/stalactites
+
+clrdsp
+
+	proc
+; 9 lines to do (line9 to line1)
+	ldx	#9
+
+; Set up indirect =>
+	ldy	#0
+
+; Initialize => to start of this line
+:c4	lda	lptrlo,x
+	sta	clrptr
+	lda	lptrhi,x
+	sta	clrptr+1
+
+; 600 bytes per line
+	stw	600,clrcnt
+
+; If current byte is terrain, special
+;   character, or water, continue
+:c3	lda	(clrptr),y
+	and	#$3f
+	cmp	#$22
+	blt	:c2
+
+; Else, clear out anything else
+	lda	#0
+	sta	(clrptr),y
+
+; Bump =>
+:c2	inw	clrptr
+
+; Back off count
+	dew	clrcnt
+
+; Do 600 times until end of line
+	lda	clrcnt
+	ora	clrcnt+1
+	bnz	:c3
+
+; Repeat 9 times
+	dxnz	:c4
+
+
+; Screen memory is now cleared. Get
+;    number of mines to put
+	ldx	#nummin-1
+
+; Get this mine's YPOS
+:c8	ldy	mtbly,x
+
+; Set CLRPTR = memory location
+	jsr	getptr
+
+; Set up indirect =>
+	ldy	#0
+
+; If not stalactite, continue
+	lda	#$80
+	cmp	clrtmp
+	bne	:c5
+
+; Else, stuff with color 0 stalactite
+;   and exit
+	lda	#stalch+col0
+	sta	(clrptr),y
+	bnz	:c6	;UNCONDITIONAL
+
+
+; In any case, it's a mine, so stuff it
+:c5	lda	#minech+col1
+	sta	(clrptr),y
+
+; If this mine isn't tethered, exit
+	lda	#$40
+	cmp	clrtmp
+	bne	:c6
+
+; Else, get YPOS again and save
+	lda	mtbly,x
+	sta	clryp
+
+; Bump YPOS. If at the bottom of the
+;   screen, exit
+:c7	inc	clryp
+	ldy	clryp
+	cpy	#10
+	beq	:c6
+
+; Else, get byte at this memory
+;   location. If not water, exit
+	jsr	getptr
+	ldy	#0
+	lda	(clrptr),y
+	bne	:c6
+
+; Else, stuff with color 2 tether
+;   character and repeat
+	lda	#tethch+col2
+	sta	(clrptr),y
+	bnz	:c7	;UNCONDITIONAL
+
+; Do until done with all mine entries
+:c6	dex
+	cpx	#$ff
+	bne	:c8
+	rts
+	eproc
+
+
+; Set CLRPTR = memory location of mine
+;   number X at YPOS Y
+
+; Add lo byte of offset to lo byte of
+;   base address
+getptr	lda	mtblxl,x
+	clc
+	adc	lptrlo,y
+	sta	clrptr
+
+; Save CY flag for ADC of hi bytes
+	php
+
+; Get hi byte of offset, mask out type
+;   bits and save to CLRTMP
+	lda	mtblxh,x
+	pha
+	and	#$c0
+	sta	clrtmp
+	pla
+	and	#$3f
+
+; Retrieve CY flag and add hi byte of
+;   offset to hi byte of base address
+	plp
+	adc	lptrhi,y
+	sta	clrptr+1
+	rts
+
+
+; Click keyboard speaker
+click	pha
+	phx
+
+	ldx	#$3f
+click1	stx	consol
+	lda	vcount
+
+click2	cmp	vcount
+	beq	click2
+
+	dxpl	click1
+	plx
+	pla
+	rts
+
+
+
+
+
+; Sonar sound update
+sonar	dec	sonndx
+	bpl	son2
+	stb	23,sonndx
+
+son2	ldx	sonndx
+	lda	sonvol,x
+	ora	#$a0
+	sta	audc1
+	stb	$3c,audf1
+
+setson	ldy	#6
+	stb	4,mytmr4
+	jmp	setmy
+
+
+
+
+
+; Fix display list to start of lines
+;   On entry, Y = reset count
+fixdsp	ldx	#0
+	sty	fixdsy
+	stw	ptr0,clrptr
+fixd2	lda	lptrlo,x
+	add	dofslo,y
+	ldy	#0
+	sta	(clrptr),y
+	inc	clrptr
+	ldy	fixdsy
+	lda	lptrhi,x
+	adc	dofshi,y
+	ldy	#0
+	sta	(clrptr),y
+	inc	clrptr
+	inc	clrptr
+	ldy	fixdsy
+	inx
+	cpx	#10
+	bne	fixd2
+
+; Reset position counters
+	lda	dofslo,y
+	sta	lposcnt
+	add	#2
+	sta	poscnt
+	lda	dofshi,y
+	sta	lposcnt+1
+	adc	#0
+	sta	poscnt+1
+
+	lda	poscnt
+	add	#22
+	sta	rposcnt
+	lda	poscnt+1
+	adc	#0
+	sta	rposcnt+1
+
+; Reset mine pointer
+	lda	mptrtbl,y
+	sta	mptr
+
+	rts

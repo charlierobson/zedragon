@@ -1,0 +1,549 @@
+;	vn.	147
+
+	list	i,-m,-f
+
+
+; Filespec:	SEADRAG
+
+
+cassette =	false
+disk	=	true
+
+
+VERSION	=	DISK
+
+
+
+
+
+	incl	D:DATE
+
+;	incl	D:TITLE
+
+	title	'SEA DRAGON by Russ Wetmore'
+	subttl	'Control variables'
+
+
+; Long listing flag
+; Either ON or OFF
+
+longlst	=	off
+
+
+; Program-wide variables
+
+
+; Constants ***************************
+
+; Characters
+minech	=	$3f
+tethch	=	$22
+stalch	=	$38
+shtchr	=	$23
+xploch	=	$29
+dpthch	=	$2e
+lasrch	=	dpthch
+airch	=	$c6
+minbtm	=	$39
+mintop	=	$3c
+staltop	=	$32
+stalbtm	=	$35
+
+; Colors offsets
+col0	=	0
+col1	=	$40
+col2	=	$80
+col3	=	$c0
+
+; Scan line of base of laser players
+lbase	=	52
+
+; Number of mines
+nummin	=	$d8
+
+; XPOS of player walls
+plr3_1	=	$239
+plr2_1	=	$235
+
+; XPOS of last boat off screen
+lstboat	=	$10f
+
+; End of landscape position
+lstpos	=	$244
+
+; Disk interface buffer
+buffer	=	$400
+
+
+	page
+; ZERO-PAGE variables
+
+	org	$80
+
+; Temp locations
+templo	ds	1
+temphi	ds	1
+temp2lo	ds	1
+
+; My timers
+mytmr1	ds	1
+mytmr2	ds	1
+mytmr3	ds	1
+mytmr4	ds	1
+
+numtmr	=	*-mytmr1
+
+mycnt1	ds	1
+mycnt2	ds	1
+mycnt3	ds	1
+mycnt4	ds	1
+
+; Color of current player's score
+dazzle	ds	1
+; Color of current level
+lvlclr	ds	1
+
+; Currently read stick value
+stkval	ds	1
+
+; Player "wall" explosion mask
+plrmsk	ds	1
+
+; Sub vertical position
+ypos	ds	1
+; Sub horizontal position
+xpos	ds	1
+
+; Fine scroll value
+scrval	ds	1
+
+; Counter for VBLANK
+vblic	ds	1
+
+; Air counter
+aircnt	ds	1
+
+; Clear display memory counter
+clrcnt	ds	2
+; Clear display temp register
+clrtmp	ds	1
+; Clear display temp YPOS
+clryp	ds	1
+; Fix display pointers temp Y
+fixdsy	ds	1
+
+; Update queue routine index
+updindx	ds	1
+; Update character position counter
+updcnt	ds	1
+; Update character YPOS
+updy	ds	1
+; Missile/Playfield collision storage
+mpftmp	ds	1
+; Missile/Player collision storage
+mpltmp	ds	1
+; Clear/set missile temp Y
+cstmp	ds	1
+
+; Shooter color offset
+shtcol	ds	1	;INITIALIZE!!!!
+
+; Depth charge routine temp YPOS
+dpthy	ds	1
+; Depth charge control counter
+dpthcnt	ds	1
+
+; End game temp Y
+endty	ds	1
+
+; Collision temp mine number
+colmin	ds	1
+; Collision temp YPOS
+colypos	ds	1
+; 2nd temp YPOS
+caly	ds	1
+
+; Relative Sub front XPOS & YPOS
+rxpos	ds	2
+rypos	ds	1
+
+; Pointer to 1st mine on screen
+mptr	ds	1
+; Counter for queue routines
+qcntr	ds	1
+; X offset ratio between sub and mine
+deltax	ds	1
+
+; Current hi score
+his	ds	2
+; Players scores, lo & hi bytes
+plrscl	ds	2
+plrsch	ds	2
+; Temp score binary
+hldscor	ds	2
+; Score temp holds
+bmpxtmp	ds	1
+bmpatmp	ds	1
+
+
+; These variables are bunched together
+;   because they need to be zeroed at
+;   the beginning of each round
+
+zerovar
+; Number of missiles out
+mslout	ds	1
+; Current trigger status
+trigger	ds	1
+; Trigger down status
+lsttrg	ds	1
+; Individual missile out status
+mssl0	ds	2
+; Missiles relative XPOS and YPOS
+txpos	ds	2
+typos	ds	2
+; Missile recently fired flag
+fircnt	ds	1
+; Sonar sound counter
+sonndx	ds	1
+; Torpedo sound counter
+tsnd	ds	1
+; Mine explosion counter
+xsnd	ds	1
+; Scroll flag
+scrflg	ds	1
+; Halt flag
+hltflg	ds	1
+numzero	=	*-zerovar
+
+
+; Overall position counter
+poscnt	ds	2
+; Left hand side of screen counter
+lposcnt	ds	2
+; Right hand side of screen counter
+rposcnt	ds	2
+
+; All-purpose memory pointer
+clrptr	ds	2
+; Indirect score memory location
+scorptr	ds	2
+; Indirect sub players memory pointer
+subchr	ds	2
+; Indirect character set memory pointer
+doptr	ds	2
+; Indirect players memory pointer
+plrptr	ds	2
+; Display list stuff lo byte pointer
+loptr	ds	2
+; Display list stuff hi byte pointer
+hiptr	ds	2
+
+; Players restart location counters
+rstcnt	ds	2
+; Number of players
+numplr	ds	1
+; Current player number
+player	ds	1
+; Current player level
+plrlvl	ds	1
+; Each player's current level
+level	ds	2
+; Players number of men left
+menlft	ds	2
+; Players extra man given flag
+xtra	ds	2
+; Selected "option"
+selopt	ds	1
+; Selected starting level
+sellvl	ds	1
+; Selected starting number of men
+selmen	ds	1
+; Selected restart position
+selrst	ds	1
+
+; Scroll counter
+scrcnt	ds	1
+; Scroll speed for this level
+scrspd	ds	1
+
+
+	page
+; Data areas
+
+	incl	D:EQUATES
+
+
+; Read in macros
+
+	list	-i
+	incl	D:MACROS.MAC
+	list	i
+
+	subttl	'Mainline'
+	page
+
+
+********
+	org	$480+offset
+	loc	$480+develop
+
+	incl	D:MAINLINE
+
+	subttl	'Interrupt routines'
+	page
+
+
+********
+	incl	D:INT
+
+	subttl	'Player/Missile routines'
+	page
+
+
+********
+	incl	D:PLR
+
+	subttl	'Mine release and update routines'
+	page
+
+
+********
+	incl	D:QUEUE
+
+	subttl	'Torpedo release and update routines'
+	page
+
+
+********
+	incl	D:TORPEDO
+
+	subttl	'Sub and torpedo collision routines'
+	page
+
+
+********
+	incl	D:COLL
+
+	subttl	'End game routines'
+	page
+
+
+********
+	incl	D:ENDGAME
+
+	subttl	'Scoring routines'
+	page
+
+
+********
+	incl	D:SCORE
+
+	subttl	'Variables and tables'
+	page
+
+
+********
+	incl	D:TABLES
+
+	IF	version=disk
+	subttl	'Hi score routines'
+	page
+
+
+********
+	org	$4000+offset
+	loc	$4000+develop
+
+; Write high score to disk
+whis	mvw	his,buffer
+	stb	$57,dcomnd	;'W'
+	jsr	iniths
+
+rdfix	jsr	dskinv
+	php
+	stb	3,skctl
+	sta	sskctl
+	stb	0,audctl
+	plp
+	rts
+
+; Read high score from disk
+rhis	stb	$52,dcomnd	;'R'
+	jsr	iniths
+	jsr	rdfix
+	bmi	rhisxt
+
+	mvb	buffer,his
+	sta	hldscor
+	mvb	buffer+1,his+1
+	sta	hldscor+1
+	jsr	cnv2asc
+
+	stw	hiscore,scorptr
+	stw	scorbuf,plrptr
+	ldy	#5
+	jsr	sco2scr
+
+rhisxt	rts
+
+
+iniths	stb	1,dunit
+	stw	198,daux1
+	stw	buffer,dbuflo
+	rts
+
+
+omega	=	*
+	ENDIF
+
+
+
+
+
+; BOOT INFORMATION
+
+	org	$3c00+offset
+	loc	$3c00+develop
+
+boot	db	0
+	db	[bootend-boot+127]/128
+	dw	boot
+	dw	init
+
+	stb	low omega,memlo
+	sta	appmhi
+	stb	high omega,memlo+1
+	sta	appmhi+1
+
+	lda	$bffc
+	bnz	ok1
+
+	dec	$bffc
+	cmp	$bffc
+	bne	ok2
+
+notok	stw	nocart,ldmsg
+	stw	lddli,sdlstl
+	jsr	clk
+	jmp	*
+
+ok1	lda	$9ffc
+	bnz	ok2
+
+	dec	$9ffc
+	cmp	$9ffc
+	beq	notok
+
+ok2	stw	lddli,sdlstl
+
+	jsr	clk
+
+	stb	0,soundr
+	stb	$80,daux1
+	stb	62,boot
+	stw	$6100,dbuflo
+	jsr	blokld
+
+	stb	38,color0
+	stb	134,color1
+	stb	0,color2
+	stb	10,color4
+
+	stw	$6100,sdlstl
+
+	jsr	clk
+
+	stb	6,daux1
+	stb	109,boot
+	stw	mainln,dbuflo
+	jsr	blokld
+
+	stb	3,txpos+1
+	ldx #7! ldy #0
+ok3	mvb	secvex,x,txpos
+	lda	seccmd,x
+	sta	(txpos),y
+	dxpl	ok3
+	jsr	indrct
+	tya! and #$80! sta boot
+
+	ldx	#$7f
+	dec	boot
+ok5	lda	boot
+	eor	initwal,x
+	sta	initwal,x
+	dxpl	ok5
+
+	stb	116,daux1
+	stb	1,boot
+	stw	whis,dbuflo
+	jsr	blokld
+
+	stw	mainln,dosvec
+	clc
+	rts
+
+
+blokld	jsr	dskinv
+	bmi	derr
+
+	lda	dbuflo
+	add	#$80
+	sta	dbuflo
+	lda	dbufhi
+	adc	#0
+	sta	dbufhi
+
+	inc	daux1
+	dec	boot
+	bnz	blokld
+	rts
+
+derr	pla! pla
+
+clk	lda	rtclok+2
+clk2	cmp	rtclok+2
+	beq	clk2
+
+	rts
+
+
+lddli	db	dlbl8,dlbl8,dlbl8
+	db	dlbl8,dlbl8,dlbl8
+	db	dlbm1+dllms
+ldmsg	dw	loding
+	db	dljvb
+	dw	lddli
+
+
+indrct	jmp	(dbytlo)
+
+
+loding	db	0,$ac,$af,$a1,$a4
+	db	$a9,$ae,$a7,0,$73
+	db	$65,$61,0,$64,$72
+	db	$61,$67,$6f,$6e
+nocart	db	0,$32,$25,$2d,$2f
+	db	$36,$25,0,$23,$21
+	db	$32,$34,$32,$29,$24
+	db	$27,$25,$81,$81,0
+
+
+secvex	db	9,2,11,4,1,8,5,10
+seccmd	db	high dskinv,'R',high 5,low initwal
+	db	1,low dskinv,high initwal,low 5
+
+
+bootend	=	*
+
+
+
+
+
+	IF	longlst=on
+	subttl	'Reference list'
+	page
+	ENDIF
+
+	end	mainln

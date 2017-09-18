@@ -1,0 +1,528 @@
+;	vn.	136
+
+
+; filespec:	MAINLINE
+
+
+mainln
+
+; *************************************
+; ****  TAKE THIS GARBAGE OUT LATER!! *
+; *************************************
+	STB	0,RSTCNT
+	STB	0,RSTCNT+1
+	STA	PLAYER
+	STB	1,PLRLVL
+	STA	LEVEL
+	STA	LEVEL+1
+
+	STB	4,SCRCNT
+	STA	SCRSPD
+; *************************************
+; *************************************
+
+; Clear out PM area
+	jsr	clrplr
+
+; Enable interrupts
+	jsr	enaint
+
+
+; Set up variables that are the same
+;   every round
+newrnd
+	ldx	player
+	ldy	rstcnt,x
+	mvb	rstx,y,xpos
+	mvb	rsty,y,ypos
+
+	jsr	fixdsp
+
+
+	stw	dtbl,doptr
+	cpy	#4
+	blt	newr2
+
+	stw	ltbl,doptr
+newr2	jsr	dochr
+
+
+	stb	$f0,lndcol
+	stb	$72,wtrcol
+	stb	$c4,airclr
+
+	stb	0,scrval
+	sta	hscrol
+
+	ldx	#numzero-1
+mainb	sta	zerovar,x
+	dxpl	mainb
+
+	dec	scrflg
+
+; Clear out update queue
+	ldx	#7
+mainc	sta	queue,x
+	sta	qypos,x
+	dxpl	mainc
+
+	sta	qcntr
+
+; Clear out released mine table
+	ldx	#nummin-1
+maina	sta	reltbl,x
+	dex
+	cpx	#$ff
+	bne	maina
+
+; Clear out score area
+	ldx	#1
+clrs2	lda	sclocl,x
+	sta	scorptr
+	lda	scloch,x
+	sta	scorptr+1
+
+	ldy	#4
+clrs1	lda	(scorptr),y
+	ora	#$c0
+	sta	(scorptr),y
+	dypl	clrs1
+
+	dxpl	clrs2
+
+; Fill up the air
+	jsr	filair
+
+; Print score
+	jsr	prtscor
+
+; Do fancy player prompt move
+	jsr	mv
+
+; Enable player/missile stuff
+	jsr	enaplr
+
+; Clear display memory of garbage and
+;   stock mines and stalactites
+	jsr	clrdsp
+
+; Enable update timer
+	jsr	setupd
+
+; Enable air control timer
+	jsr	setair
+
+; Enable sub update timer
+	jsr	setsub
+
+; Enable torpedo logic timer
+	jsr	settorp
+
+; Start scrolling
+	inc	scrflg
+
+***************************************
+
+; MAIN PROGRAM LOOP
+
+; If time to, check stick button,
+;   update missiles and non-sub players
+main1
+; If time to, start update process
+	lda	mytmr2
+	bnz	main2
+
+; Start some mines going
+	jsr	release
+; Update all characters and explosions
+	jsr	updatq
+; Update all shooter characters
+	jsr	updsht
+; Update all depth charges
+	jsr	upddpth
+; Update all laser characters
+	jsr	updlasr
+; Restart update timer
+	jsr	setupd
+
+; If [SPACE] typed, set up halt
+main2	lda	ch
+	cmp	#$21
+	bne	main4
+
+	jsr	click
+
+	stb	$ff,hltflg
+	sta	ch
+
+main3a	lda	ch
+	cmp	#$21
+	bne	main3a
+
+	jsr	click
+
+	stb	$ff,ch
+	stb	0,hltflg
+
+
+main4	lda	mytmr1
+	bnz	main3
+
+	jsr	fire
+	jsr	updplr
+
+main3	lda	mytmr3
+	bnz	main5
+
+	jsr	airtmr
+
+main5
+	jsr	coll
+	jmp	main1
+
+
+; Mainline support subroutines
+
+; Do fancy player prompt move
+
+mv
+
+; If not already, start up PM stuff
+	stb	high mypmbas,pmbase
+	stb	3,gractl
+	sta	hitclr
+
+; All players priority over foreground
+	stb	$01,gprior
+
+; All players white
+	stb	14,pcolr0
+	sta	pcolr1
+	sta	pcolr2
+
+; Default pointers for player 1
+	stw	mvupx1,clrptr
+	stw	one,subchr
+
+	lda	player
+	beq	mv2
+
+; Else, stuff player 2 pointers
+	stw	mvupx2,clrptr
+	stw	two,subchr
+
+; Initialize countdown (12 images)
+mv2	ldy	#0
+	sty	cntdwn
+
+; Main loop
+; Stuff width and horizontal positions
+mv8	ldx	#2
+mv3	lda	(clrptr),y
+	sta	hposp0,x
+	tya! add #12! tay
+	dxpl	mv3
+
+	ldy	cntdwn
+	ldx	#2
+	lda	mvwidth,y
+mv1	sta	sizep0,x
+	dxpl	mv1
+
+; If count at 0, skip erase
+	cpy	#0
+	beq	mv4
+
+; Else, back off pointer to get
+;   previous YPOS and limit and clear
+	dey
+	mvb	mvupto,y,mvtmp
+
+	ldx	mvupy,y
+	lda	#0
+mv5	sta p0,x! sta p1,x! sta p2,x
+	inx! cpx mvtmp
+	bne	mv5
+
+; Get YPOS to start stuff at
+mv4	ldy	cntdwn
+	ldx	mvupy,y
+
+; If last two counts, go get data from
+;   table instead of character set
+	cpy	#10
+	bge	mv11
+
+; Else, get number of scan lines per
+;   stuff and initialize counter
+	mvb	mvupnum,y,mvtmp
+	stb	0,bytcnt
+
+; Secondary loop
+; Get bytes from character set and
+;   stuff to players
+	ldy	bytcnt
+mv7	mvb	(subchr),y,numtmp
+	mvb	u,y,utmp
+	mvb	p,y,ptmp
+
+	ldy	mvtmp
+mv6	mvb	numtmp,p0,x
+	mvb	utmp,p1,x
+	mvb	ptmp,p2,x
+	inx
+	dypl	mv6
+
+; Continue until 8 bytes transferred
+	inc	bytcnt
+	ldy	bytcnt
+	cpy	#8
+	bne	mv7
+
+; Wait prescribed number of jiffies
+mv13	ldy	cntdwn
+	ldx	mvwait,y
+mv10	lda	rtclok+2
+mv9	cmp	rtclok+2
+	beq	mv9
+	dxnz	mv10
+
+; Do all this 12 times
+	inc	cntdwn
+	ldy	cntdwn
+	cpy	#12
+	jne	mv8
+
+	rts
+
+
+; Get data from tables for last images
+mv11	ldy	#0
+	lda	player
+	bnz	mv12
+	lda	last1,y
+	jmp	mv15
+
+mv12	lda	last2,y
+mv15	sta	p0,x
+	lda	lastu,y
+	sta	p1,x
+	lda	lastp,y
+	sta	p2,x
+	inx! iny
+	cpy	#8
+	bne	mv12
+
+	beq	mv13	;UNCONDITIONAL
+
+
+
+
+
+; Clear display memory of any garbage,
+;   and stock with mines/stalactites
+
+clrdsp
+
+; 9 lines to do (line9 to line1)
+	ldx	#9
+
+; Set up indirect =>
+	ldy	#0
+
+; Initialize => to start of this line
+clrd4	lda	lptrlo,x
+	sta	clrptr
+	lda	lptrhi,x
+	sta	clrptr+1
+
+; 600 bytes per line
+	stw	600,clrcnt
+
+; If current byte is terrain, special
+;   character, or water, continue
+clrd3	lda	(clrptr),y
+	and	#$3f
+	cmp	#$22
+	blt	clrd2
+
+; Else, clear out anything else
+	lda	#0
+	sta	(clrptr),y
+
+; Bump =>
+clrd2	inw	clrptr
+
+; Back off count
+	dew	clrcnt
+
+; Do 600 times until end of line
+	lda	clrcnt
+	ora	clrcnt+1
+	bnz	clrd3
+
+; Repeat 9 times
+	dxnz	clrd4
+
+
+; Screen memory is now cleared. Now,
+;   stock with mines/stalactites
+
+; Get number of mines to put
+	ldx	#nummin-1
+
+; Get this mine's YPOS
+clrd8	ldy	mtbly,x
+
+; Set CLRPTR = memory location
+	jsr	getptr
+
+; Set up indirect =>
+	ldy	#0
+
+; If not stalactite, continue
+	lda	#$80
+	cmp	clrtmp
+	bne	clrd5
+
+; Else, stuff with color 0 stalactite
+;   and exit
+	lda	#stalch+col0
+	sta	(clrptr),y
+	bnz	clrd6	;UNCONDITIONAL
+
+
+; In any case, it's a mine, so stuff it
+clrd5	lda	#minech+col1
+	sta	(clrptr),y
+
+; If this mine isn't tethered, exit
+	lda	#$40
+	cmp	clrtmp
+	bne	clrd6
+
+; Else, get YPOS again and save
+	lda	mtbly,x
+	sta	clryp
+
+; Bump YPOS. If at the bottom of the
+;   screen, exit
+clrd7	inc	clryp
+	ldy	clryp
+	cpy	#10
+	beq	clrd6
+
+; Else, get byte at this memory
+;   location. If not water, exit
+	jsr	getptr
+	ldy	#0
+	lda	(clrptr),y
+	bne	clrd6
+
+; Else, stuff with color 2 tether
+;   character and repeat
+	lda	#tethch+col2
+	sta	(clrptr),y
+	bnz	clrd7	;UNCONDITIONAL
+
+; Do until done with all mine entries
+clrd6	dex
+	cpx	#$ff
+	bne	clrd8
+	rts
+
+
+; Set CLRPTR = memory location of mine
+;   number X at YPOS Y
+
+; Add lo byte of offset to lo byte of
+;   base address
+getptr	lda	mtblxl,x
+	clc
+	adc	lptrlo,y
+	sta	clrptr
+
+; Save CY flag for ADC of hi bytes
+	php
+
+; Get hi byte of offset, mask out type
+;   bits and save to CLRTMP
+	lda	mtblxh,x
+	pha
+	and	#$c0
+	sta	clrtmp
+	pla
+	and	#$3f
+
+; Retrieve CY flag and add hi byte of
+;   offset to hi byte of base address
+	plp
+	adc	lptrhi,y
+	sta	clrptr+1
+	rts
+
+
+; Click keyboard speaker
+click	pha
+	phx
+
+	ldx	#$3f
+click1	stx	consol
+	lda	vcount
+
+click2	cmp	vcount
+	beq	click2
+
+	dxpl	click1
+	plx
+	pla
+	rts
+
+
+
+
+
+; Fix display list to start of lines
+;   On entry, Y = reset count
+fixdsp	ldx	#0
+	sty	fixdsy
+	stw	ptr0,clrptr
+fixd2	lda	lptrlo,x
+	add	dofslo,y
+	ldy	#0
+	sta	(clrptr),y
+	inc	clrptr
+	ldy	fixdsy
+	lda	lptrhi,x
+	adc	dofshi,y
+	ldy	#0
+	sta	(clrptr),y
+	inc	clrptr
+	inc	clrptr
+	ldy	fixdsy
+	inx
+	cpx	#10
+	bne	fixd2
+
+; Reset position counters
+	lda	dofslo,y
+	sta	lposcnt
+	add	#2
+	sta	poscnt
+	lda	dofshi,y
+	sta	lposcnt+1
+	adc	#0
+	sta	poscnt+1
+
+	lda	poscnt
+	add	#22
+	sta	rposcnt
+	lda	poscnt+1
+	adc	#0
+	sta	rposcnt+1
+
+; Reset mine pointer
+	lda	mptrtbl,y
+	sta	mptr
+
+	rts

@@ -1,0 +1,125 @@
+;	vn.	105
+
+
+; Filespec:	EQUATES
+
+
+; Display data area equate file
+; Variables transferred from DISPDATA
+
+
+auth	=	$1975+develop
+pst	=	$1989+develop
+
+
+	org	$1a70+develop
+
+reltbl	ds	$d8
+
+lndcol	ds	1
+wtrcol	ds	1
+onestk	ds	1
+vbivec	ds	2
+topscrn	ds	1
+airclr	ds	1
+subsnd	ds	1
+	assert	*=[$1b50+develop]
+
+
+line0	=	$1b50+develop
+line1	=	$1da8+develop
+line2	=	$2000+develop
+line3	=	$2258+develop
+line4	=	$24b0+develop
+line5	=	$2708+develop
+line6	=	$2960+develop
+line7	=	$2bb8+develop
+
+sleft1	=	$2e1f+develop
+score1	=	$2e43+develop
+hiscore	=	$2e49+develop
+score2	=	$2e50+develop
+air	=	$2e58+develop
+airscr	=	$2e5f+develop
+
+
+	org	$2e70+develop
+
+spdtbl	ds	4
+freq	ds	4
+sub1.1	ds	5
+sub1.2	ds	5
+subclr	ds	2
+fslo	ds	10
+fshi	ds	10
+lptrlo	ds	10
+lptrhi	ds	10
+dofslo	ds	6
+dofshi	ds	6
+mptrtbl	ds	6
+rstx	ds	6
+rsty	ds	6
+qypos	ds	8
+queue	ds	8
+mslchr	ds	2
+clrchr	ds	2
+pwr10l	ds	5
+pwr10h	ds	5
+sonvol	ds	24
+	assert	*=[$2f00+develop]
+
+
+mtbly	=	$2f00+develop
+
+
+	org	$2fd8+develop
+
+sclocl	ds	2
+scloch	ds	2
+scorbuf	ds	6
+p0fig	ds	14
+p1fig	ds	16
+	assert	*=[$3000+develop]
+
+line8	=	$3000+develop
+line9	=	$3258+develop
+
+dlist	=	$34b4+develop
+ptr0	=	$34c1+develop
+ptrbtm	=	$34e1+develop
+setvbv	=	$34e6+develop
+proclr	=	$34fe+develop
+
+mtblxh	=	$3500+develop
+dtbl	=	$35d8+develop
+
+	org	$35f0+develop
+ecnt	ds	1
+pc	ds	1
+shc	ds	1
+dbypos	ds	4
+dptxhi	ds	4
+dptxlo	ds	4
+
+chrst2	=	$3600+develop
+chrset	=	$3800+develop
+
+mtblxl	=	$3a00+develop
+ltbl	=	$3ad8+develop
+flgtop	=	$3af0+develop
+flg2nd	=	$3af4+develop
+sht4th	=	$3af8+develop
+soff	=	$3afe+develop
+
+
+; Player missile areas
+mypmbas	=	$3800+develop
+m0	=	$3b00+develop
+p0	=	$3c00+develop
+p1	=	$3d00+develop
+p2	=	$3e00+develop
+p3	=	$3f00+develop
+
+	IF	version=cassette
+omega	=	m0
+	ENDIF

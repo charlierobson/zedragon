@@ -1,0 +1,635 @@
+;	vn.	130
+
+
+	list	-i
+
+
+; Filespec:	DISPDATA
+
+
+; Front screen data
+
+
+	org	$1975+offset
+	loc	$1975+develop
+
+; "    BY: RUSS WETMORE    "
+auth	db	0,0
+	db	0,0,$a2,$b9,$9a
+	db	0,$f2,$f5,$f3,$f3
+	db	0,$f7,$e5,$f4,$ed
+	db	$ef,$f2,$e5
+
+; "     PRESS START...     "
+pst	db	0,0
+	db	0,0,0,$f0,$f2
+	db	$e5,$f3,$f3,0,$f3
+	db	$f4,$e1,$f2,$f4,$ce
+	db	$ce,$ce
+
+; Front screen character data
+fr0	db	0,0
+	db	0,0,0,0,0
+	db	0,0,0,0,0
+	db	0,0,0,$5e,$5f
+	db	0,$0a,$11,1,1
+	db	1,1
+fr1	db	0,0
+	db	0,$47,$41,$41,$47
+	db	$41,$49,$4f,$41,$55
+	db	0,0,0,0,0
+	db	0,$0f,1,1,1
+	db	1,1
+fr2	db	0,0
+	db	0,$41,$5a,0,$41
+	db	$58,$41,$41,$58,$41
+	db	0,0,0,0,0
+	db	0,$1d,$60,$0d,1
+	db	1,1
+fr3	db	0,0
+	db	0,$52,$5b,$49,$41
+	db	$59,$50,$41,$59,$41
+	db	0,0,0,0,0
+	db	0,0,0,0,$05
+	db	1,1
+fr4	db	0,0
+	db	0,$41,$41,$4b,$4d
+	db	$41,$41,$41,0,$41
+	db	0,0,0,0,0
+	db	0,0,0,0,0
+	db	$12,$1b
+fr5	db	0,0
+	db	0,$41,$41,$49,$41
+	db	$41,$49,$4f,$41,$55
+	db	$47,$41,$41,$47,$41
+	db	$49,$41,$5c,$41,0
+fr6	db	0,0
+	db	0,$41,$48,$41,$41
+	db	$58,$41,$41,$58,$41
+	db	$41,$46,0,$41,$46
+	db	$41,$41,$55,$41,0
+fr7	db	0,0
+	db	0,$41,$4a,$41,$41
+	db	$41,$59,$41,$59,$41
+	db	$41,$4c,$41,$41,$4a
+	db	$41,$41,$5d,$41,0
+	db	0,3
+fr8	db	$11,$13
+	db	$1a,$41,$41,$4b,$41
+	db	$45,$49,$41,0,$41
+	db	$4d,$41,$4b,$4d,$41
+	db	$4b,$41,$54,$41,$18
+	db	$11,1
+fr9	=	$3258+develop
+
+
+
+
+
+; Leave room for mine released table
+
+	assert	*=[$1a70+develop]
+
+reltbl	ds	$d8
+
+
+
+
+
+	assert	*=[$1b48+develop]
+
+; Land color
+lndcol	db	$f0
+; Water color
+wtrcol	db	$72
+
+; One or two stick flag
+onestk	db	0
+
+; Indirect vector to O/S immediate
+;   VBLANK service routine
+vbivec	dw	0
+
+; VCOUNT of top of screen
+topscrn	db	0
+
+; Color of "AIR:" line background
+airclr	db	$c8
+
+; Sub explosion sound
+subsnd	db	0
+
+
+
+
+
+; Include data for display lines 0 to 4
+
+scrlen	=	600
+
+	assert	*=[$1b50+develop]
+
+	incl	D2:LINES04
+
+; Include data for display lines 5 to 9
+
+	incl	D2:LINES59
+
+
+
+
+
+; Display list for main screen
+
+	assert	*=$34b0+develop
+
+	db	0,0,0,0
+
+dlist	db	dlbl8,dlbl8,dlbl8
+
+	db	dlbm0+dllms
+	dw	schead
+                
+	db	dlbl1
+	db	dlbm1+dlint+dllms
+	dw	score
+
+	db	dlbl1
+	db	dlbl2+dlint
+	db	dlbm2+dlhscr+dlint+dllms
+ptr0	dw	line0
+	db	dlbm2+dlhscr+dllms
+	dw	line1
+	db	dlbm2+dlhscr+dllms
+	dw	line2
+	db	dlbm2+dlhscr+dllms
+	dw	line3
+	db	dlbm2+dlhscr+dllms
+	dw	line4
+	db	dlbm2+dlhscr+dllms
+	dw	line5
+	db	dlbm2+dlhscr+dllms
+	dw	line6
+	db	dlbm2+dlhscr+dllms
+	dw	line7
+	db	dlbm2+dlhscr+dllms
+	dw	line8
+	db	dlbm2+dlhscr+dlint+dllms
+	dw	line9
+	db	dlbl3+dlint
+	db	dlbl3+dlint
+
+	db	dlbm1+dllms
+ptrbtm	dw	air
+
+	db	dljvb
+	dw	dlist
+
+
+
+
+
+; My own "SETVBV" routine
+; Seems that old O/S routine screws up
+;   screen sometimes, so this assures
+;   it'll be right for all machines
+
+	assert	*=$34e6+develop
+
+setvbv
+
+; Timer # * 2 for word offset
+	asl	a
+; Save it (INTEMP in O/S listing)
+	sta	cdtmf4+1
+; Save high byte of vector/count
+	txa
+
+; Wait till a little after WSYNC occurs
+;   which means we can't have a VBLANK
+;   any time soon
+	ldx	#5
+	sta	wsync
+setvb2	dex
+	bne	setvb2
+
+; Retrieve index and stuff vector/count
+	ldx	cdtmf4+1
+	sta	cdtmv1-1,x
+	tya
+	sta	cdtmv1-2,x
+
+	rts
+
+
+; Colors for prompt screens
+proclr	db	$90,$d0
+
+
+
+
+
+; XPOS of Mines/Stalactites high bytes
+; Fits between line 9 of display memory
+;   and bottom of character set area
+
+	assert	*=[$3500+develop]
+
+mtblxh
+
+t	set	$40
+s	set	$80
+m	set	$c0
+
+	db	0,t,m,m,m,t,t,m,m,m,t,t,m,m,m,m
+	db	0,t,t,m,m,m,m,t,m,m,m,m,t,m,m,t
+	db	m,m,0,t,m,m,t,m,t,m,m,m,m,t
+	db	m,m,m,t,m,m,m,t,t,m,m,m,m,m,m,t
+
+	db	m,m,t,m,m,m,m,m,m,0,t,t,m,m
+	db	t,m,m,m,t,m,t,m,m,0,t,t,m,m,m
+	db	t,m
+
+t	set	$41
+s	set	$81
+m	set	$c1
+
+	db	t,m,m,t,m,1,1,1,m,1,1,1
+	db	1,1,1,1,m,m,1,1,1,1,1,1,1,1,1,m
+
+	db	m,m,m,m,m,m,m,m,m,m,1,1,1,1,1,1
+	db	m,t,t,m,m,m,t,m,t,m,m,t,m,m,t,1
+	db	1,m,t,m,t,m,m,t,m,m,t,m,m,m,m,m
+	db	m,m,m,m,m,s,s,m,s,s,s,m,s,s,m,t
+
+t	set	$42
+s	set	$82
+m	set	$c2
+
+	db	s,m,s,t,t,s,s,m,s,m,t,s,m,s,m,s
+	db	m,m,m,t,m,m,t,m,m,t,m,m,t,m,2
+
+
+
+
+
+; Depth charge characters data
+dtbl	db	60,60,0,0,0,0,0,0
+	db	0,0,60,60,0,0,0,0
+	db	0,0,0,0,60,60,0,0
+
+
+; End game counter
+ecnt	db	0
+; Wall players cyclic counter
+pc	db	0
+; Shooter character change counter
+shc	db	0
+; Depth charge last lines
+dbypos	db	8,6,8,3
+; Depth charge XPOS hi and lo bytes
+dptxhi	db	$00,$00,$00,$01
+dptxlo	db	$c5,$df,$f7,$0e
+
+
+	db	0		;FILLER
+
+
+
+
+
+; Character sets data
+
+	assert	*=[$3600+develop]
+
+; Playfield character set #2
+
+
+chrst2
+;  
+	db	 0,0,0,0,0,0,0,0
+; !
+	db	 124,124,124,56,0,56,56,0
+; "
+	db	 124,130,186,162,186,130,124,0
+; #
+	db	 0,0,0,0,0,0,0,0
+; $
+	db	 0,0,0,0,0,0,0,0
+; %
+	db	 0,230,236,24,48,110,206,0
+; &
+	db	 128,128,128,128,128,128,128,0
+; '
+	db	 192,192,192,192,192,192,192,0
+; (
+	db	 224,224,224,224,224,224,224,0
+; )
+	db	 240,240,240,240,240,240,240,0
+; *
+	db	 248,248,248,248,248,248,248,0
+; +
+	db	 252,252,252,252,252,252,252,0
+; ,
+	db	 254,254,254,254,254,254,254,0
+; -
+	db	 255,255,255,255,255,255,255,0
+; .
+	db	 0,0,0,0,56,56,56,0
+; /
+	db	 0,6,12,24,48,96,64,0
+; 0
+	db	 124,238,238,254,254,254,124,0
+; 1
+	db	 56,248,56,56,254,254,254,0
+; 2
+	db	 124,198,28,112,254,254,254,0
+; 3
+	db	 254,28,120,28,222,254,124,0
+; 4
+	db	 28,220,220,220,254,60,60,0
+; 5
+	db	 254,224,252,14,238,254,124,0
+; 6
+	db	 126,224,252,238,254,254,124,0
+; 7
+	db	 254,14,14,28,60,120,120,0
+; 8
+	db	 124,238,124,238,254,254,124,0
+; 9
+	db	 124,238,126,14,238,254,124,0
+; :
+	db	 0,56,56,0,56,56,56,0
+; ;
+	db	 0,0,0,0,0,0,0,0
+; <
+	db	 0,0,0,0,0,0,0,0
+; =
+	db	 0,0,0,0,0,0,0,0
+; >
+	db	 0,0,0,0,0,0,0,0
+; ?
+	db	 124,238,28,56,0,56,56,0
+; @
+	db	 124,230,238,224,254,254,126,0
+; A
+	db	 56,124,246,254,246,246,246,0
+; B
+	db	 252,238,252,238,254,254,252,0
+; C
+	db	 126,224,224,224,254,254,126,0
+; D
+	db	 248,236,238,254,254,252,248,0
+; E
+	db	 254,224,248,224,254,254,254,0
+; F
+	db	 254,224,252,240,240,240,240,0
+; G
+	db	 126,224,238,230,254,254,126,0
+; H
+	db	 246,246,254,246,246,246,246,0
+; I
+	db	 124,124,0,124,124,124,124,0
+; J
+	db	 62,12,12,204,252,252,120,0
+; K
+	db	 206,220,248,252,222,222,222,0
+; L
+	db	 224,224,224,224,254,254,254,0
+; M
+	db	 198,238,254,254,238,238,238,0
+; N
+	db	 230,246,254,254,254,238,238,0
+; O
+	db	 124,238,238,254,254,254,124,0
+; P
+	db	 252,238,238,252,240,240,240,0
+; Q
+	db	 124,238,238,254,254,252,118,0
+; R
+	db	 252,238,238,252,222,222,222,0
+; S
+	db	 126,224,120,12,254,254,252,0
+; T
+	db	 254,124,124,124,124,124,124,0
+; U
+	db	 246,246,246,254,254,254,124,0
+; V
+	db	 246,246,246,254,252,120,48,0
+; W
+	db	 238,238,254,254,254,238,198,0
+; X
+	db	 246,246,124,254,222,222,222,0
+; Y
+	db	 238,238,124,56,124,124,124,0
+; Z
+	db	 254,28,56,112,254,254,254,0
+; [
+	db	 248,224,224,224,248,248,248,0
+; \
+	db	 0,0,0,0,0,0,0,0
+; ]
+	db	 31,7,7,7,31,31,31,0
+; ^
+	db	 0,3,3,127,127,127,63,31
+; _
+	db	 48,240,48,255,247,254,248,224
+
+
+
+
+; Playfield character set #1
+
+
+chrset
+;  
+	db	 0,0,0,0,0,0,0,0
+; !
+	db	 255,255,255,255,255,255,255,255
+; "
+	db	 128,224,224,248,252,252,255,255
+; #
+	db	 1,7,7,31,63,63,255,255
+; $
+	db	255,255,252,252,248,224,224,128
+; %
+	db	 255,255,63,63,31,7,7,1
+; &
+	db	 224,192,128,0,0,0,0,0
+; '
+	db	 15,31,63,127,255,255,255,255
+; (
+	db	 7,3,1,0,0,0,0,0
+; )
+	db	 240,248,252,254,255,255,255,255
+; *
+	db	 0,0,0,0,0,1,3,7
+; +
+	db	 255,255,255,255,254,252,248,240
+; ,
+	db	 0,0,0,0,0,128,192,224
+; -
+	db	 255,255,255,255,127,63,31,15
+; .
+	db	 240,240,224,224,224,192,192,128
+; /
+	db	 15,15,31,31,31,63,63,127
+; 0
+	db	 255,254,248,192,0,0,0,0
+; 1
+	db	 0,1,7,63,255,255,255,255
+; 2
+	db	 255,127,31,3,0,0,0,0
+; 3
+	db	 0,128,224,252,255,255,255,255
+; 4
+	db	 15,15,7,7,7,3,3,1
+; 5
+	db	 240,240,248,248,248,252,252,254
+; 6
+	db	 1,3,3,7,7,7,15,15
+; 7
+	db	 254,252,252,248,248,248,240,240
+; 8
+	db	 0,0,0,0,3,31,127,255
+; 9
+	db	 255,255,255,255,252,224,128,0
+; :
+	db	 0,0,0,0,192,248,254,255
+; ;
+	db	 255,255,255,255,63,7,1,0
+; <
+	db	 128,192,192,224,224,224,240,240
+; =
+	db	 127,63,63,31,31,31,15,15
+; >
+	db	 0,7,5,247,127,63,31,15
+; ?
+	db	 30,222,80,211,254,252,248,240
+; @
+	db	 60,102,255,90,60,4,2,1
+; A
+	db	 255,167,255,90,126,36,60,24
+; B
+	db	 8,8,8,8,8,8,8,8
+; C
+	db	 128,64,0,0,0,0,0,0
+; D
+	db	 0,0,16,32,0,0,0,0
+; E
+	db	 128,64,0,0,8,4,0,0
+; F
+	db	 0,0,16,32,0,0,1,2
+; G
+	db	 0,0,0,0,8,4,0,0
+; H
+	db	 0,0,0,0,0,0,1,2
+; I
+	db	 0,0,0,24,24,0,0,0
+; J
+	db	 0,0,44,56,28,52,0,0
+; K
+	db	 0,74,44,96,6,52,82,0
+; L
+	db	 137,74,0,192,3,0,82,145
+; M
+	db	 137,0,0,128,1,0,0,145
+; N
+	db	 60,60,0,0,0,0,0,0
+; O
+	db	 0,0,60,60,0,0,0,0
+; P
+	db	 0,0,0,0,60,60,0,0
+; Q
+	db	 0,0,0,0,0,0,60,60
+; R
+	db	 0,0,255,255,254,126,122,88
+; S
+	db	 0,0,0,0,255,255,254,126
+; T
+	db	 0,0,0,0,0,0,255,255
+; U
+	db	 24,16,0,0,0,0,0,0
+; V
+	db	 122,88,24,16,0,0,0,0
+; W
+	db	 254,126,122,88,24,16,0,0
+; X
+	db	 255,255,254,126,122,88,24,16
+; Y
+	db	 62,62,127,62,62,73,0,0
+; Z
+	db	 127,62,62,73,0,0,0,0
+; [
+	db	 62,73,0,0,0,0,0,0
+; \
+	db	 0,0,0,0,0,0,0,73
+; ]
+	db	 0,0,0,0,0,73,62,62
+; ^
+	db	 0,0,0,73,62,62,127,62
+; _
+	db	 0,73,62,62,127,62,62,73
+
+
+
+
+
+; XPOS of Mines/Stalactites low bytes
+; Fits between top of character set
+;   area and bottom of p/m area
+
+	assert	*=[$3a00+develop]
+
+mtblxl
+	db	8,10,11,13,14,17,19,22
+	db	24,25,27,29,31,33,35,38
+	db	42,45,47,49,51,52,56,57
+	db	59,62,63,64,66,67,72,73
+	db	75,78,81,87,90,92
+	db	93,95,97,98,100,103,106,107
+	db	109,110,113,114,118,126,140,156
+	db	157,162,167,170,174,177,183,185
+
+	db	187,188,190,192,194,195,199
+	db	206,209,212,214,215,218,221
+	db	225,226,228,230,232,233,234,237
+	db	238,241,244,246,248,252,253
+	db	254,255,0,3,5,6,10
+	db	17,27,28,32,33,34,35
+	db	36,42,43,44,51,53,61,62
+	db	63,70,71,84,85,94,103,106
+
+	db	109,110,111,112,115,118,119,120
+	db	121,124,128,129,131,132,134,135
+	db	140,141,142,145,148,149,150,155
+	db	157,161,162,166,167,169,170,172
+	db	173,176,177,179,180,181,182,183
+	db	188,192,200,203,204,213,215,217
+	db	219,221,223,225,236,237,239,240
+	db	241,245,246,248,251,252,253,254
+
+	db	0,1,3,4,6,8,9,10
+	db	11,13,14,16,17,20,21,22
+	db	33,37,40,41,42,43,47,50
+	db	54,55,57,58,61,64,85
+
+
+
+
+
+; Laser characters data
+ltbl	db	24,48,24,12,0,0,0,0
+	db	24,48,24,12,24,48,24,12
+	db	0,0,0,0,24,48,24,12
+
+
+; Sub flag data
+flgtop	db	$1e,$1e,$1c,$1c
+flg2nd	db	$de,$dc,$dc,$de
+; Shooter and laser base beacon data
+sht4th	db	$5a,$4e,$46,$42,$62,$72
+; Subs left screen position offset
+soff	db	0,26
+
+	assert	*=[$3b00+develop]

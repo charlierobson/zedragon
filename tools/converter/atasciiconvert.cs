@@ -1,5 +1,5 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System;
+using System.IO;
 
 namespace converter
 {
@@ -7,19 +7,15 @@ namespace converter
     {
         static void Main(string[] args)
         {
-            var crlf = new byte[]{0x0d,0x0a};
-
-            foreach (var file in args)
+            foreach(var b in File.ReadAllBytes(args[0]))
             {
-                var content = File.ReadAllBytes(file);
-                var converted = new List<byte>();
-                foreach(var b in content)
+                if (b == 0x7f) Console.Write((char)9);
+                else if (b == 0x9b)
                 {
-                    if (b == 0x7f) converted.Add(9);
-                    else if (b == 0x9b) converted.AddRange(crlf);
-                    else converted.Add(b);
+                    Console.Write((char)0x0d);
+                    Console.Write((char)0x0a);
                 }
-                File.WriteAllBytes(Path.ChangeExtension(file, ".txt"), converted.ToArray());
+                else Console.Write((char)b);
             }
         }
     }
