@@ -1,0 +1,359 @@
+    BUFFER_HEIGHT   .equ 10
+    BUFFER_WIDTH    .equ 600
+    NUMBER_OF_ROWS  .equ 10
+
+setupDisplay:
+;NOW WE PREPARE TO PATCH THE D_FILE WITH A JP(IY) AFTER THE INITIAL HALT
+	LD	HL , (D_FILE)
+	INC	HL
+
+;DISABLE NMI, JUST TO BE SURE WE DONT CRASH
+	OUT	($FD) , A
+;2 BYTES FOR JP (IY)
+	LD	(HL) , $FD
+	INC	HL
+	LD	(HL) , $E9
+;DISPLAY PATCHED
+;NOW PATCH $4000 
+;SAVE THE BYTES TO REPLACE THEM SHOULD WE WISH TO RETURN TO BASIC
+	LD	HL , 16384
+	LD	DE , STORE3BYTES
+	LDI
+	LDI
+	LDI
+;PLACE JP OUR_DISPLAY_ROUTINE AT $4000   
+	LD	HL , 16384
+	LD	(HL) , $C3
+	LD	HL , OUR_DISPLAY_ROUTINE
+	LD	(16385) , HL
+;START NMI'S 
+	OUT	($FE) , A
+    RET
+
+
+restoreDisplay:
+	LD	HL , (D_FILE)
+	INC	HL
+
+;DISABLE NMI, JUST TO BE SURE WE DONT CRASH
+	OUT	($FD) , A
+	LD	(HL) , $00
+	INC	HL
+	LD	(HL) , $00
+;DISPLAY UN-PATCHED
+;NOW UN-PATCH $4000
+	LD	DE , 16384
+	LD	HL , STORE3BYTES
+	LDI
+	LDI
+	LDI
+;START NMI'S 
+	OUT	($FE) , A
+	RET
+
+
+
+OUR_DISPLAY_ROUTINE:
+;HERE WE DO THE TOP LINE FIRST, WE ARE COUNTING CYCLE TILL THE FIRST PIXEL OF THE NEXT SCAN LINE
+;AND WE NEED TO RESET THE LINECOUNTER IT HAS TO BE DONE AT PRECISELY THE RIGHT TIME
+
+	DI							;4	22
+
+;@CHARLIE
+;THIS IS THE OFFSET FOR THE WINDOW YOU WANT TO DISPLAY
+;IT IS THE TOP LEFT OF A RECTANGLE 32 CHARS WIDE BY YOU NUMBER OF ROWS
+
+BUFF_OFFSET =  $+1
+	LD	HL , $0000				;10	32
+;ADD BUFFER ADDRESS AND SET BIT 15                                            
+	LD	DE , D_BUFFER + $8000		;10	42
+	ADD	HL , DE 				;11	53
+	LD	(HLST) , HL				;16	69
+;NOW ADD 32 AND CLEAR BIT 15 ( THIS IS THE BYTE THAT WILL GET A RET INSTRUCTION )       
+	LD	DE , $8000 + 32 		;10	79
+	ADD	HL , DE 				;11	90
+	LD	(ALTHL) , HL				;16	106
+
+;WE ARE GOING TO USE ALL REGISTERS SO NEED TO SAVE ALT REGS
+	EXX							;4	110
+	PUSH	BC						;11	121
+	PUSH	DE						;11	132
+	LD	B , 8					;7	139
+	;NONSENSE TIMING
+	NOP							;4	143
+	LD	A,R						;9	152
+
+;RESET ULA LINE COUNTER
+	IN	A , ($FE)					;11	163
+	OUT	($FF) , A					;11	174
+;MORE TIMING
+	NOP							;4	178
+	JR	TOP_DO_SCAN_LINE			;12	190
+
+;DISPLAY THE TOP LINE
+
+TOP_MORE_LINES: 				;13	151 (FROM THE DJNZ BELOW)
+	PUSH	IY						;15	166
+	POP	IY						;14	180
+	JP	TOP_DO_SCAN_LINE			;10	190
+
+TOP_DO_SCAN_LINE:
+	CALL	TOP_LINE + $8000			;17	207
+TOP_AFTER_LINE:
+;WHEN WE LAND HERE WE HAVE USED 32 CHARS (4T EACH) + RET = 128 + 10
+								;138	138
+	DJNZ	TOP_MORE_LINES		;13 if jump
+
+;ELSE 8 THIS WAY                                        ;8      146
+;NOW PREP FOR MOVING WINDOW
+;WE ARE GOING TO HAVE 1 BLANK SCAN LINE BETWEEN TOP LINE AND MOVING WINDOW
+
+	PUSH	HL						;11	157	
+
+; STILL ON ALT REGS WHEN WE ARRIVE HERE
+
+	LD	(SP_STORE) , SP 			;20	177
+	
+; i have a 3 value mini stack set up already, since as nothing is 'pushed' during video generation the bytes never change
+
+	LD	SP , VID_STACK+2			;10	187
+	
+;the values are :-
+;FINAL_RET (at the top)
+;NXT_SCANL (in the middle)
+;NXT_ROW         (at the bottom)
+
+;we start with SP pointing to
+;the middle value
+
+;now get alt regs for LIVE video
+
+
+ALTHL =  $+1
+	LD	HL , D_BUFFER + 32			;10	197
+	LD	DE , BUFFER_WIDTH			;10	207
+	
+; WELL WE MISSED THAT BY A MILE HENCE THE BLANK SCAN LINE
+	
+	LD	BC , NUMBER_OF_ROWS * 256 + $C9 ;10 10
+
+	EXX							;4	14
+	; AND THE MAIN REGS
+HLST =	$+1
+	Ld	HL , D_BUFFER + $8000		;10	24
+	LD	DE , BUFFER_WIDTH			;10	34
+	LD	BC , 7 * 256 + 7			;10	44
+
+	LD	(JUST_TWO_BYTES),IY		;20	64
+	LD	(JUST_TWO_BYTES),IY		;20	84
+	LD	(JUST_TWO_BYTES),IY		;20	104
+	LD	(JUST_TWO_BYTES),IY		;20	124
+	LD	(JUST_TWO_BYTES),IY		;20	144
+	NOP							;4	148
+	NOP							;4	152
+
+
+;RESET LINE COUNTER
+	IN	A , ($FE)					;11	163
+	OUT	($FF),A 				;11	174
+	LD	A , 0					;7	181
+
+	EXX							;4	185
+	LD  A , (HL)					;7	192
+	LD  (HL) , C					;7	199
+	EXX							;4	203
+	JP	(HL)		;lets do it baby	;4	207
+
+;NOW IT GETS A BIT HAIRY... HANG ON TO YOUR SEAT IF YOU TRY TO FOLLOW THE EXECUTION PATH !      
+;after the first scanline is genrated
+;a RET instruction occurs and we start the
+;video loop for real.
+
+
+NXT_ROW:
+;we end up here after the 8th scanline of each row
+;restore the byte that was replaced with a RET
+	EXX				;4		(4)
+	LD	(HL),A		;7		(11)
+;and move to next row, save the new byte and replace with a RET
+	ADD	HL,DE		;11		(22)
+	LD	A,(HL)		;7		(29)
+	LD	(HL),C		;7		(36)
+	EXX				;4		(40)
+;reload the scanline counter and make video ptr to next row
+	LD	B,C			;4		(44)
+	ADD	HL,DE		;11		(55)
+JUMP_HL1:
+	JP	JUMP_HL 	;10		(65)
+JUMP_HL:
+	JP	(HL)			;4		(69)
+
+;=============================================================
+
+NXT_SCANL:
+
+;we get here on every scan line except the 1ST of each row
+
+	;test if it's the last scanline in row
+	DJNZ	NOT_LAST_LINE	;13 OR 8
+
+					;8	(8)
+	;THIS ROUTE IS TOOK WHEN WE ARE ON THE LAST
+	;SCANLINE OF A ROW, WE NOW CHECK TO SEE IF IT
+	;IS THE LAST ROW, OTHERWISE SP IS DECREMENTED
+	;4 TIMES (2 NEW VALUES ON STACK)
+
+
+
+	EXX				;4	(12)
+;THIS B' IS COUNTING ROWS
+	DEC	B			;4	(16)
+	JR	Z,NO_MORE_ROWS	;12 or 7
+
+MORE_ROWS:
+
+	;when there are more rows to display
+	;we decrement the SP 4 times
+	;so the next RET will 'return to NXT_ROW
+
+					;7	(23)
+	EXX				;4	(27)
+	DEC	SP			;6	(33)
+	DEC	SP			;6	(39)
+	DEC	SP			;6	(45)
+	DEC	SP			;6	(51)
+
+	NOP				;4	(55) FOR TIMING
+;AND EXCUTE THE LIVE VIDEO
+	JP	JUMP_HL 	;10	(65)
+
+
+
+NO_MORE_ROWS:
+	;NO MORE ROWS AND THIS IS THE LAST SCANLINE
+	;SO DON'T RESTORE THE SP...LEFT POINTING AT FINAL_RET
+
+
+					;16+12	(28)
+	EXX				;4		(32)
+
+	;WASTE SOME CYCLES
+	LD	($0000),A		;13		(45)
+
+	JP   JUMP_HL1		;10		(55)
+
+
+
+
+NOT_LAST_LINE:
+	;NOT THE LAST SCAN LINE ON THIS ROW
+	;SO WE ONLY RESTORE 1 VALUE ON STACK
+	;and the next ret will 'return' to NXT_SCANL
+
+	;			TOTAL SO FAR		(13)
+
+	DEC	SP			;6		(19)
+	DEC	SP			;6		(25)
+
+	;AND WASTE A FEW CYCLES
+	JP	WASTE1		;10		(35)
+WASTE1:
+	JP	WASTE2		;10		(45)
+WASTE2:
+
+	JP	JUMP_HL1		;10		(55)
+
+
+
+;====================
+; and finnally ends up here....
+FINAL_RET:
+
+;RESTORE ORIGINAL SP
+
+SP_STORE = $+1
+	LD	SP,$0000			
+	
+	
+;SAME KIND OF LOOP FOR BOTTOM LINE AS TOP LINE
+
+	LD	B,8
+	LD	(JUST_TWO_BYTES),HL
+	LD	B,8
+	JR	BOTTOM_DO_SCAN_LINE		;12    190
+
+BOTTOM_MORE_LINES:			   ;13	   151
+	PUSH IY 			   ;15	   166
+	POP  IY 			   ;14	   180
+	JP   BOTTOM_DO_SCAN_LINE	   ;10	   190
+
+BOTTOM_DO_SCAN_LINE:
+	CALL	BOTTOM_LINE + $8000	   ;17	   207
+BOTTOM_AFTER_LINE:
+;EXECUTE 32 CHARS + RET = 128 + 10      ;138    138
+	DJNZ BOTTOM_MORE_LINES		   ;13 if jump
+
+
+	EXX				;SWITCH TO ALT REGISTERS
+	LD	(HL),A		;RESTORE LAST BYTE in buffer
+
+
+	; RESTORE ALT REGS FROM STACK
+	POP	HL
+	POP	DE
+	POP	BC
+	EXX				;SWITCH BACK TO MAIN REGS
+					;THEY ARE RESTORES AFTER
+	INC	SP
+	INC	SP			;LOOSE LAST VALUE ON STACK
+
+
+VID_COMPLETE:
+; FUDGE TO WORK OUT HOW MANY BOTTOM MARGIN LINES WE NEED
+	LD	A,36 + (24 - NUMBER_OF_ROWS) * 8
+	NEG
+;MAKE SURE NEXT nmi DOES THE vSYNC
+	LD	IX,$028F
+	JP	$02A1
+
+;@CHARLIE
+;IF YOU WANT TO CALL A ROUTINE EVERY 1/50 SECOND
+;THEN REPLACE THE JP $02A1 ABOVE WITH THE FOLLOWING
+;AS LONG AS WHATEVER YOU DO WILL BE COMPLETE WITHIN
+;THE LOWER MARGIN BEFORE vSYNC OCCURS
+
+;               EX      AF,A'F'
+;               OUT     (+FE),A
+;               POP     HL
+;               POP     DE
+;               POP     BC
+;               POP     AF
+		;AT THIS PIONT ALL REGISTERS RESTORED AS THEY WERE BEFORE 
+		;VIDEO GENERATION TOOK PLACE
+		
+;               CALL SOUND_GEN                  ;THIS ROUTINE SHOULD PRESERVE ALL REGISTERS EXCEPT 'AF WHICH OF COURSE IS IN USE 
+
+;               RET
+
+VID_STACK:
+	.word	NXT_ROW
+	.word	NXT_SCANL
+	.word	FINAL_RET
+
+STORE3BYTES:
+	.byte 0,0,0
+
+JUST_TWO_BYTES:
+	.byte 0,0
+
+TOP_LINE:
+	.fill 32,0
+	RET
+
+BOTTOM_LINE:
+	.fill 32,0
+	RET
+
+D_BUFFER:
+    .fill 6000,0
+    RET
