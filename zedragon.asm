@@ -53,6 +53,7 @@ mainloop:
     ld      hl,(xscroll)
     inc     hl
     ld      (xscroll),hl
+    and     a
     rr      h
     rr      l
     ld      (BUFF_OFFSET),hl
