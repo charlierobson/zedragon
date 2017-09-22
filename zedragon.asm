@@ -42,16 +42,35 @@ starthere:
     call    setupDisplay
 
 mainloop:
+    ; wait for new frame
     ld      hl,FRAMES
     ld      a,(hl)
 -:  cp      (hl)
     jr      z,{-}
 
+    ; scroll
     ld      hl,(xscroll)
-    inc     hl
+    ld      a,l
+    cp      (2400-128) & $ff
+    jr      nz,{+}
+    ld      a,h
+    cp      (2400-128) / 256
+    jr      z,{++}
+
++:  inc     hl
     ld      (xscroll),hl
 
-    ld      a,l
+++: and     a
+    rr      h
+    rr      l
+    and     a
+    rr      h
+    rr      l
+    ld      (BUFF_OFFSET),hl
+
++:
+    ; animate the water
+    ld      a,(FRAMES)
     and     %01110000
     rrca
     rrca
@@ -62,24 +81,6 @@ mainloop:
     ld      e,a
     ld      a,(de)
     ld      (wsa-charsets+$2000),a
-
-    and     a
-    rr      h
-    rr      l
-    and     a
-    rr      h
-    rr      l
-    ld      (BUFF_OFFSET),hl
-
-    ld      hl,(xscroll)
-    ld      de,600-32
-    or      a
-    sbc     hl,de
-    ld      a,l
-    or      h
-    jr      nz,{+}
-
-    ld      (xscroll),hl
 
 +:  call    updateair
 
