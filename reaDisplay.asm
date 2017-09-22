@@ -350,6 +350,7 @@ TOP_LINE:
 	.fill 32,0
 	RET
 
+	.align	32	; to assist in air display calculations
 BOTTOM_LINE:
 	.fill 32,0
 	RET

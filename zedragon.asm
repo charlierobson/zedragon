@@ -16,10 +16,7 @@ starthere:
     ld      bc,32
     ldir
 
-    ld      hl,airline
-    ld      de,BOTTOM_LINE
-    ld      bc,32
-    ldir
+    call    resetair
 
     ld      bc,600
     ld      e,$3b
@@ -53,10 +50,38 @@ mainloop:
     ld      hl,(xscroll)
     inc     hl
     ld      (xscroll),hl
+
+    ld      a,l
+    and     %01110000
+    rrca
+    rrca
+    rrca
+    rrca
+    ld      de,wateranimation
+    add     a,e
+    ld      e,a
+    ld      a,(de)
+    ld      (wsa-charsets+$2000),a
+
+    and     a
+    rr      h
+    rr      l
     and     a
     rr      h
     rr      l
     ld      (BUFF_OFFSET),hl
+
+    ld      hl,(xscroll)
+    ld      de,600-32
+    or      a
+    sbc     hl,de
+    ld      a,l
+    or      h
+    jr      nz,{+}
+
+    ld      (xscroll),hl
+
++:  call    updateair
 
     call    $1ffe           ; readjoy
     and     $f8
@@ -69,6 +94,8 @@ mainloop:
     jp      restoreDisplay
 
 #include "readisplay.asm"
+
+#include "air.asm"
 
 #include "data.asm"
 

@@ -10,3 +10,9 @@ airline:
 
 xscroll:
     .word   0
+
+airupdatecounter:
+    .byte   0
+
+airlevel:
+    .byte   0
