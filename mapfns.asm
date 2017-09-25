@@ -1,9 +1,9 @@
 initmap:
-    ld      de,mapname
-    xor     a
-    call    $1ff8
+    ld      hl,D_BUFFER
+    ld      de,map
+    ld      bc,6000
+    ldir
 
-addwatertomap:
     ld      bc,600
     ld      e,$3b
     ld      hl,map

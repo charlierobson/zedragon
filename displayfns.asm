@@ -8,6 +8,14 @@ setupudg:
     ret
 
 
+waitvsync:
+    ld      hl,FRAMES
+    ld      a,(hl)
+-:  cp      (hl)
+    jr      z,{-}
+    ret
+
+
 cls:
     xor     a
     ld      hl,D_BUFFER
@@ -24,6 +32,9 @@ cls:
     inc     de
     ld      (hl),a
     ldir
+
+    ld      (BUFF_OFFSET),bc    ; bc is 0 at thispoint
+
     ret
 
 
@@ -53,24 +64,59 @@ drawmap:
     ret
 
 
-animateEnemies:
+animatecharacters:
     ; animate shooters
     ld      a,(FRAMES)
     and     15
-    jr      nz,{+}
+    jr      nz,testevery8
+
+    ; every 16 frames
+
+    ld      hl,flaganimation
+    ld      a,(FRAMES)
+    rra
+    rra
+    rra
+    rra
+    and     %00000011
+    add     a,a
+    add     a,l
+    ld      l,a
+    ld      a,(hl)
+	ld      ($2000+$f8),a
+    inc     hl
+    ld      a,(hl)
+	ld      ($2000+$f8+1),a
 
     ld      a,(ssa-charsets+$2001)
     xor     $66 ^ $7e
     ld      (ssa-charsets+$2001),a
     and     $3c
     ld      (ssa-charsets+$200e),a
+
     ld      a,(ssa-charsets+$2009)
     xor     $a7 ^ $e5
     ld      (ssa-charsets+$2009),a
+
+    ld      a,(waterframe)
+    inc     a
+    ld      (waterframe),a
+    and     7
+    ld      hl,wateranimation
+    ld      d,0
+    ld      e,a
+    add     hl,de
+    ld      a,(hl)
+    ld      (wsa-charsets+$2000),a
+
     xor     a
 
-+:  and     7
+testevery8:
+    and     7
     ret     nz
+
+    ; every 8 frames
+
     ld      a,(shooterframe)
     and     a
     jr      nz,{+}
@@ -84,22 +130,6 @@ animateEnemies:
     ld      (ssa-charsets+$2003),a
     ld      (ssa-charsets+$200b),a
     ret
-
-
-animatewater:
-    ld      a,(FRAMES)
-    and     %01110000
-    rrca
-    rrca
-    rrca
-    rrca
-    ld      de,wateranimation
-    add     a,e
-    ld      e,a
-    ld      a,(de)
-    ld      (wsa-charsets+$2000),a
-    ret
-
 
 
 resetscroll:

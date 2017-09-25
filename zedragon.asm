@@ -1,22 +1,35 @@
     .emptyfill  0
     .org        $4009
 
-#include "include\sysvars.asm"
-#include "include\zxline0.asm"
+#include "include/sysvars.asm"
+#include "include/zxline0.asm"
 
 ; ------------------------------------------------------------
 starthere:
     ; one off initialisations
+
+    call    golow
     call    initmap
     call    setupudg
-    call    setupDisplay
+    call    setupdisplay
     call    initjoy
 
--:  call    cls
+-:  ; title screen
+    call    cls
     call    drawtitle
+
+    call    INIT_STC
+    ld      hl,GO_PLAYER
+    inc     (hl)
+
     ld      hl,attractmain
     call    mainproc
 
+    ld      hl,GO_PLAYER
+    dec     (hl)
+    call    MUTE_STC
+
+    ; game
     call    cls
     call    drawmap
     call    resetscore
@@ -46,23 +59,12 @@ gamemain:
 mainproc:
     ld      (pj+1),hl
 
---:
-    ; wait for new frame
-    ld      hl,FRAMES
-    ld      a,(hl)
--:  cp      (hl)
-    jr      z,{-}
-
-    ; do the stuff we always do
-    call    animateEnemies
-    call    animateWater
+-:  call    waitvsync
+    call    animatecharacters
     call    readjoy
+pj: call    0                   ; call the active process - it returns with z set when complete
+    jr      nz,{-}
 
-    ; call the active process - it returns with z set when complete
-pj: call    0
-    jr      nz,{--}
-
-    ; process has completed
     ret
 
 
@@ -74,6 +76,8 @@ pj: call    0
 #include "scorefns.asm"
 #include "displayfns.asm"
 #include "mapfns.asm"
+#include "stcplay.asm"
+#include "zxpand.asm"
 
 #include "data.asm"
 
@@ -84,6 +88,6 @@ charsets:
 endshere:
 ; ------------------------------------------------------------
 
-#include "include\zxline1.asm"
+#include "include/zxline1.asm"
 
     .end

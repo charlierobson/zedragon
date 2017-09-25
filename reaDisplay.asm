@@ -2,7 +2,11 @@
     BUFFER_WIDTH    .equ 600
     NUMBER_OF_ROWS  .equ 10
 
-setupDisplay:
+setupdisplay:
+	LD HL,D_BUFFER+6000
+	LD (HL),$C9
+	CALL cls
+
 ;NOW WE PREPARE TO PATCH THE D_FILE WITH A JP(IY) AFTER THE INITIAL HALT
 	LD	HL , (D_FILE)
 	INC	HL
@@ -31,7 +35,7 @@ setupDisplay:
 	RET
 
 
-restoreDisplay:
+restoredisplay:
 	LD	HL , (D_FILE)
 	INC	HL
 
@@ -325,7 +329,7 @@ VID_COMPLETE:
 	NEG
 ;MAKE SURE NEXT nmi DOES THE vSYNC
 	LD	IX,$028F
-	JP	$02A1
+	;JP	$02A1
 
 ;@CHARLIE
 ;IF YOU WANT TO CALL A ROUTINE EVERY 1/50 SECOND
@@ -333,17 +337,29 @@ VID_COMPLETE:
 ;AS LONG AS WHATEVER YOU DO WILL BE COMPLETE WITHIN
 ;THE LOWER MARGIN BEFORE vSYNC OCCURS
 
-;               EX      AF,A'F'
-;               OUT     (+FE),A
-;               POP     HL
-;               POP     DE
-;               POP     BC
-;               POP     AF
+
+	       EX      AF,AF'
+	       OUT     ($FE),A
+;STC_STUFF
+GO_PLAYER = $+1
+		LD	A,0		;TEST IF NONE ZERO.
+		AND A
+		JR  Z,DO_NOT_PLAY	;IF ZERO DO NOT CALL PLAY
+
+		PUSH	IY		;STC PLAYER USES IY
+		CALL PLAY_STC
+		POP  IY
+
+DO_NOT_PLAY:
+	       POP     HL
+	       POP     DE
+	       POP     BC
+	       POP     AF
 		;AT THIS PIONT ALL REGISTERS RESTORED AS THEY WERE BEFORE 
 		;VIDEO GENERATION TOOK PLACE
 		
-;               CALL SOUND_GEN                  ;THIS ROUTINE SHOULD PRESERVE ALL REGISTERS EXCEPT 'AF WHICH OF COURSE IS IN USE 
-;               RET
+
+	       RET
 
 
 VID_STACK:
@@ -358,11 +374,10 @@ TOP_LINE:
 	.fill 32,0
 	RET
 
+D_BUFFER:
+	.incbin "mungedmap.bin"
+
 	.align	32	; to assist in air display calculations
 BOTTOM_LINE:
 	.fill 32,0
 	RET
-
-D_BUFFER:
-    .fill 6000,0
-    RET
