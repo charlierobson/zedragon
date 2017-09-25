@@ -1,5 +1,5 @@
 setlocal
-set converter=%~dp0..\tools\converter\atasciiconvert.exe
+set converter=python atasciiconvert.py
 call :convertFiles disk1
 call :convertFiles disk2
 call :convertFiles disk3

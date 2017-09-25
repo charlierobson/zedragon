@@ -6,17 +6,8 @@
 
 ; ------------------------------------------------------------
 starthere:
-    ld      hl,charsets
-    ld      de,$2000
-    ld      bc,1024
-    ldir
-
-    ld      hl,scoreline
-    ld      de,TOP_LINE
-    ld      bc,32
-    ldir
-
-    call    resetair
+    call    cls
+    call    drawtitle
 
     ld      bc,600
     ld      e,$3b
@@ -31,14 +22,7 @@ starthere:
     or      c
     jr      nz,{-}
 
-    ld      hl,map
-    ld      de,D_BUFFER
-    ld      bc,6000
-    ldir
-
-    ld      a,$21
-    ld      i,a
-
+    call    setupudg
     call    setupDisplay
 
 mainloop:
@@ -57,7 +41,7 @@ mainloop:
     cp      (2400-128) / 256
     jr      z,{++}
 
-+:  inc     hl
++:  ;;;inc     hl
     ld      (xscroll),hl
 
 ++: and     a
@@ -68,23 +52,10 @@ mainloop:
     rr      l
     ld      (BUFF_OFFSET),hl
 
-+:
-    ; animate the water
-    ld      a,(FRAMES)
-    and     %01110000
-    rrca
-    rrca
-    rrca
-    rrca
-    ld      de,wateranimation
-    add     a,e
-    ld      e,a
-    ld      a,(de)
-    ld      (wsa-charsets+$2000),a
++:  call    animateEnemies
+    call    animateWater
 
-+:  call    updateair
-
-    call    $1ffe           ; readjoy
++:  call    $1ffe           ; readjoy
     and     $f8
     cp      $f8
     jr      z,mainloop
@@ -97,6 +68,8 @@ mainloop:
 #include "readisplay.asm"
 
 #include "air.asm"
+#include "score.asm"
+#include "display.asm"
 
 #include "data.asm"
 

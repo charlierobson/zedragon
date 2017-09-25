@@ -11,7 +11,8 @@ line1:
     .byte   $76                         ; N/L
 
 exdfile:
-   .fill    25,$76                      ; collapsed d-file
+   .byte    $76,0,0,0                   ; for custom driver JP
+   .fill    24,$76                      ; semi-collapsed d-file
 
 ;- BASIC-Variables ----------------------------------------
 
