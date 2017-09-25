@@ -12,14 +12,14 @@ resetair:
 
 updateair:
     ld      a,(airupdatecounter)
-    inc     a
+    or      a
+    jr      nz,{+}
+    ld      a,6
++:  dec     a
     ld      (airupdatecounter),a
-    cp      5                           ; update rate
     ret     nz
-    xor     a
-    ld      (airupdatecounter),a
 
-    ld      a,(airlevel)
+    ld      a,(airlevel)            ; quit when air all gone
     or      a
     ret     z
 

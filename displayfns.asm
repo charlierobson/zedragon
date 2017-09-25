@@ -71,13 +71,13 @@ animateEnemies:
 
 +:  and     7
     ret     nz
-    ld      a,(sbframe)
+    ld      a,(shooterframe)
     and     a
     jr      nz,{+}
     ld      a,6
 +:  dec     a
-    ld      (sbframe),a
-    ld      de,sbdata
+    ld      (shooterframe),a
+    ld      de,shooteranimation
     add     a,e
     ld      e,a
     ld      a,(de)
@@ -98,4 +98,38 @@ animatewater:
     ld      e,a
     ld      a,(de)
     ld      (wsa-charsets+$2000),a
+    ret
+
+
+
+resetscroll:
+    ld      hl,0
+    ld      (scrollpos),hl
+    ret
+
+
+scroll:
+    ld      a,(scrolltick)
+    and     a
+    jr      nz,{+}
+
+    ld      a,13+1
+
++:  dec     a
+    ld      (scrolltick),a
+    ret     nz
+
+    ld      hl,(scrollpos)  
+    ld      a,l
+    cp      (600-32) & 255
+    jr      nz,{+}
+
+    ld      a,h
+    cp      (600-32) / 256
+    ret     z
+
++:  inc     hl
+    ld      (scrollpos),hl
+
+    ld      (BUFF_OFFSET),hl
     ret
