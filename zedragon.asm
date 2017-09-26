@@ -77,6 +77,7 @@ pj: call    0                   ; call the active process - it returns with z se
 #include "displayfns.asm"
 #include "mapfns.asm"
 #include "stcplay.asm"
+#include "ayfxplay.asm"
 #include "zxpand.asm"
 
 #include "data.asm"
