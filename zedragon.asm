@@ -17,14 +17,11 @@ starthere:
 -:  ; title screen
     call    cls
     call    drawtitle
-
     call    INIT_STC
     ld      hl,GO_PLAYER
     inc     (hl)
-
     ld      hl,attractmain
     call    mainproc
-
     ld      hl,GO_PLAYER
     dec     (hl)
     call    MUTE_STC
@@ -35,8 +32,16 @@ starthere:
     call    resetscore
     call    resetair
     call    resetscroll
+    ld      hl,sfx
+    call    INIT_AFX
+    ld      hl,GO_PLAYER
+    set     1,(hl)
     ld      hl,gamemain
     call    mainproc
+    ld      hl,GO_PLAYER
+    res     1,(hl)
+    ld      hl,sfx
+    call    INIT_AFX
 
     jr      {-}
 
@@ -50,11 +55,23 @@ attractmain:
 gamemain:
     call    scroll
     call    updateair
-    ld      a,(fire)
+
+    ld      a,(frames)
+    and     127
+    cp      35
+    jr      nz,{+}
+
+    ld      a,(sfxnum)
+    inc     a
+    and     3
+    ld      (sfxnum),a
+    call    AFXPLAY
+
++:  ld      a,(fire)
     cp      1
     ret
 
-
+sfxnum: .byte -0
 
 mainproc:
     ld      (pj+1),hl

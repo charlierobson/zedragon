@@ -9,7 +9,7 @@
 ; If there are no free channels, the longest sounding          ;
 ; is selected.                                                 ;
 ;                                                              ;
-;The playing procedure uses the registers AF, BC, DE, HL, IX.  ;
+;The playing procedure uses the registers AF, BC, DE, HL, IY.  ;
 ;                                                              ;
 ; Initialization:                                              ;
 ;   ld hl, Effects Bank Address                                ;
@@ -41,7 +41,7 @@ afxChDesc	.fill 3*4
 ; Input: HL = bank address with effects                        ;
 ;--------------------------------------------------------------;
 
-AFXINIT
+INIT_AFX:
 	inc hl
 	ld (afxBnkAdr+1),hl	;save the address of the table of offsets
 	
@@ -59,13 +59,13 @@ afxInit0
 	inc hl
 	djnz afxInit0
 
-	ld hl,$ffbf			;initialize AY
+	ld hl,$cf0f			;initialize AY
 	ld e,$15
 afxInit1
 	dec e
-	ld b,h
+	ld c,h
 	out (c),e
-	ld b,l
+	ld c,l
 	out (c),d
 	jr nz,afxInit1
 
@@ -80,18 +80,18 @@ afxInit1
 ; No parameters      .                                         ;
 ;--------------------------------------------------------------;
 
-AFXFRAME
-	ld bc,$03fd
-	ld ix,afxChDesc
+AFXFRAME:
+	ld bc,$0300
+	ld iy,afxChDesc
 
 afxFrame0
 	push bc
 	
 	ld a,11
-	ld h,(ix+1)			;the comparison of the high-order byte of the address to <11
+	ld h,(iy+1)			;the comparison of the high-order byte of the address to <11
 	cp h
 	jr nc,afxFrame7		;the channel does not play, we skip
-	ld l,(ix+0)
+	ld l,(iy+0)
 	
 	ld e,(hl)			;we take the value of the information byte
 	inc hl
@@ -99,11 +99,11 @@ afxFrame0
 	sub b				;select the volume register:
 	ld d,b				;(11-3=8, 11-2=9, 11-1=10)
 
-	ld b,$ff			;output the volume value
+	ld c,$cf			;output the volume value
 	out (c),a
-	ld b,$bf
 	ld a,e
 	and $0f
+	ld c,$0f
 	out (c),a
 	
 	bit 5,e				;will change the tone?
@@ -113,18 +113,18 @@ afxFrame0
 	sub d				;3-3=0, 3-2=1, 3-1=2
 	add a,a				;0*2=0, 1*2=2, 2*2=4
 	
-	ld b,$ff			;output the tone values
+	ld c,$cf			;output the tone values
 	out (c),a
-	ld b,$bf
 	ld d,(hl)
 	inc hl
+	ld c,$0f
 	out (c),d
-	ld b,$ff
 	inc a
+	ld c,$cf
 	out (c),a
-	ld b,$bf
 	ld d,(hl)
 	inc hl
+	ld c,$0f
 	out (c),d
 	
 afxFrame1
@@ -163,35 +163,35 @@ afxFrame4
 	ld (bc),a
 	
 afxFrame5
-	ld c,(ix+2)			;increase the time counter
-	ld b,(ix+3)
+	ld c,(iy+2)			;increase the time counter
+	ld b,(iy+3)
 	inc bc
 	
 afxFrame6
-	ld (ix+2),c
-	ld (ix+3),b
+	ld (iy+2),c
+	ld (iy+3),b
 	
-	ld (ix+0),l			;save the changed address
-	ld (ix+1),h
+	ld (iy+0),l			;save the changed address
+	ld (iy+1),h
 	
 afxFrame7
 	ld bc,4				;go to the next channel
-	add ix,bc
+	add iy,bc
 	pop bc
 	djnz afxFrame0
 
-	ld hl,$ffbf			;output the value of noise and mixer
+	ld hl,$cf0f			;output the value of noise and mixer
 afxNseMix
 	ld de,0				;+1 (E) = noise, +2 (D) = mixer
 	ld a,6
-	ld b,h
+	ld c,h
 	out (c),a
-	ld b,l
+	ld c,l
 	out (c),e
 	inc a
-	ld b,h
+	ld c,h
 	out (c),a
-	ld b,l
+	ld c,l
 	out (c),d
 	
 	ret
@@ -204,7 +204,8 @@ afxNseMix
 ; Input: A = Effect number 0..255                              ;
 ;--------------------------------------------------------------;
 
-AFXPLAY
+AFXPLAY:
+    push iy
 	ld de,0				;in DE the longest time in search
 	ld h,e
 	ld l,a
@@ -233,16 +234,17 @@ afxPlay0
 	jr c,afxPlay1
 	ld e,c				;remember the longest time
 	ld d,a
-	push hl				;remember the channel address + 3 in IX
-	pop ix
+	push hl				;remember the channel address + 3 in iy
+	pop iy
 afxPlay1
 	inc hl
 	djnz afxPlay0
 
 	pop de				;take the effect address from the stack
-	ld (ix-3),e			;enter in the channel descriptor
-	ld (ix-2),d
-	ld (ix-1),b			;zero the playing time
-	ld (ix-0),b
+	ld (iy-3),e			;enter in the channel descriptor
+	ld (iy-2),d
+	ld (iy-1),b			;zero the playing time
+	ld (iy-0),b
 
+    pop iy
 	ret

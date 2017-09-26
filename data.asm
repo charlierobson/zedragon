@@ -18,6 +18,9 @@ airline:
 titletune:
 	.incbin	"title.stc"
 
+sfx:
+	.incbin	"zedrag.afb"
+
 lastjoy:
 	.byte	0
 fire:
