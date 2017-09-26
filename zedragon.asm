@@ -5,6 +5,9 @@
 #include "include/zxline0.asm"
 
 ; ------------------------------------------------------------
+
+#include "readisplay.asm"
+
 starthere:
     ; one off initialisations
 
@@ -14,41 +17,76 @@ starthere:
     call    setupdisplay
     call    initjoy
 
--:  ; title screen
+-:  ; --------------------- title screen
     call    cls
     call    drawtitle
+
     call    INIT_STC
+
+    xor     a
+    ld      (titlecredidx),a
+    ld      (FRAMES),a
+    call    updatecredits
+
     ld      hl,GO_PLAYER
     inc     (hl)
+
     ld      hl,attractmain
     call    mainproc
+
     ld      hl,GO_PLAYER
     dec     (hl)
-    call    MUTE_STC
+    call    MUTE_AY
 
-    ; game
+    ; --------------------- game
     call    cls
-    call    drawmap
+    call    resetscroll
     call    resetscore
     call    resetair
-    call    resetscroll
+    call    drawmap
+
     ld      hl,sfx
     call    INIT_AFX
     ld      hl,GO_PLAYER
     set     1,(hl)
+
     ld      hl,gamemain
     call    mainproc
+
     ld      hl,GO_PLAYER
     res     1,(hl)
-    ld      hl,sfx
-    call    INIT_AFX
+    call    MUTE_AY
 
     jr      {-}
 
 
 attractmain:
-    ld      a,(fire)
+    ;;;call    displaylastk
+    ld      a,(FRAMES)
     cp      1
+    jr      nz,{+}
+
+    call    updatecredits
+
++:  ld      a,(fire)
+    cp      1
+    ret
+
+updatecredits:
+    ld      a,(titlecredidx)
+    add     a,32
+    ld      (titlecredidx),a
+
+    ld      hl,titlecreds
+    add     a,l
+    ld      l,a
+    adc     a,h
+    sub     l
+    ld      h,a
+
+    ld      de,BOTTOM_LINE
+    ld      bc,32
+    ldir
     ret
 
 
@@ -71,22 +109,24 @@ gamemain:
     cp      1
     ret
 
+;tempora
 sfxnum: .byte -0
 
+
 mainproc:
-    ld      (pj+1),hl
+    ld      ({+}+1),hl
 
 -:  call    waitvsync
     call    animatecharacters
     call    readjoy
-pj: call    0                   ; call the active process - it returns with z set when complete
+
++:  call    0                   ; call the active process - it returns with z set when complete
     jr      nz,{-}
 
     ret
 
 
 
-#include "readisplay.asm"
 #include "input.asm"
 
 #include "airfns.asm"

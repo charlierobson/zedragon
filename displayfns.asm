@@ -163,3 +163,27 @@ scroll:
 
     ld      (BUFF_OFFSET),hl
     ret
+
+
+displaylastk:
+    ld      de,BOTTOM_LINE+28
+    ld      a,(LAST_K+1)
+    call    hexout
+    ld      a,(LAST_K)
+
+hexout:
+    push    af
+    rrca
+    rrca
+    rrca
+    rrca
+    call    {+}
+    pop     af
++:  and     $0f
+    cp      10
+    jr      c,{+}
+    add     a,7
++:  add     a,$90
+    ld      (de),a
+    inc     de
+    ret

@@ -44,10 +44,10 @@ afxChDesc	.fill 3*4
 INIT_AFX:
 	inc hl
 	ld (afxBnkAdr+1),hl	;save the address of the table of offsets
-	
+
 	ld hl,afxChDesc		;mark all channels as empty
 	ld de,$00ff
-	ld bc,$0cfd
+	ld bc,$0300
 afxInit0
 	ld (hl),d
 	inc hl
@@ -60,7 +60,7 @@ afxInit0
 	djnz afxInit0
 
 	ld hl,$cf0f			;initialize AY
-	ld e,$15
+	ld e,15
 afxInit1
 	dec e
 	ld c,h
@@ -70,11 +70,10 @@ afxInit1
 	jr nz,afxInit1
 
 	ld (afxNseMix+1),de	;reset the player variables
-
 	ret
-	
-	
-	
+
+
+
 ;--------------------------------------------------------------;
 ; Playing the current frame.                                   ;
 ; No parameters      .                                         ;
@@ -86,7 +85,7 @@ AFXFRAME:
 
 afxFrame0
 	push bc
-	
+
 	ld a,11
 	ld h,(iy+1)			;the comparison of the high-order byte of the address to <11
 	cp h
@@ -205,7 +204,6 @@ afxNseMix
 ;--------------------------------------------------------------;
 
 AFXPLAY:
-    push iy
 	ld de,0				;in DE the longest time in search
 	ld h,e
 	ld l,a
@@ -234,17 +232,21 @@ afxPlay0
 	jr c,afxPlay1
 	ld e,c				;remember the longest time
 	ld d,a
-	push hl				;remember the channel address + 3 in iy
-	pop iy
+	ld (peet),hl
 afxPlay1
 	inc hl
 	djnz afxPlay0
 
 	pop de				;take the effect address from the stack
-	ld (iy-3),e			;enter in the channel descriptor
-	ld (iy-2),d
-	ld (iy-1),b			;zero the playing time
-	ld (iy-0),b
-
-    pop iy
+	ld hl,(peet)
+	ld (hl),b			;b is 0
+	dec hl
+	ld (hl),b
+	dec hl
+	ld (hl),d
+	dec hl
+	ld (hl),e
 	ret
+
+peet:
+	.word	0

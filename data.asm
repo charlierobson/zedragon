@@ -8,11 +8,24 @@ airline:
 	.asc    "AIR: ---------------------------"
     		;--------========--------========
 
+titlecredidx:
+    .byte   0
+titlecreds:
+    ;        --------========--------========
+    .asc    "          PRESS   FIRE          "
+    .asc    "       S E A  D R A G O N       "
+    .asc    "   ZX81 VERSION BY: SIRMORRIS   "
+    .asc    "DISPLAY AND STC PLAYER: ANDY REA"
+    .asc    " TITLE TUNE: REAR ADMIRAL MOGGY "
+    .asc    "          PRESS   FIRE          "
+    .asc    "       S E A  D R A G O N       "
+    .asc    "ORIGINAL CODE/GFX:  RUSS WETMORE"
 
-	.asciimap 'A','Z', {*}-'A'+$26
-	.asciimap '0','9', {*}-'0'+$1c
-	.asciimap '.', $1b
-	.asciimap ';', $19
+
+;;	.asciimap 'A','Z', {*}-'A'+$26
+;;	.asciimap '0','9', {*}-'0'+$1c
+;;	.asciimap '.', $1b
+;;	.asciimap ';', $19
 
 
 titletune:
