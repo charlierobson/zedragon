@@ -20,51 +20,32 @@ starthere:
 -:  ; --------------------- title screen
     call    cls
     call    drawtitle
-
-    xor     a
-    ld      (titlecredidx),a
-    ld      (FRAMES),a
-    call    updatecredits
-
-    call    INIT_STC
-    ld      hl,PLAY_STC
-    ld      (SOUNDFN),hl
-    ld      hl,GO_PLAYER
-    inc     (hl)
+    call    resetcredits
+    call    enabletitlesound
 
     ld      hl,attractmain
     call    mainproc
 
-    ld      hl,GO_PLAYER
-    dec     (hl)
-    call    MUTE_AY
+    call    silencesound
 
     ; --------------------- game
     call    cls
     call    resetscroll
+    call    drawmap
     call    resetscore
     call    resetair
-    call    drawmap
-
-    ld      hl,sfx
-    call    INIT_AFX
-    ld      hl,AFXFRAME
-    ld      (SOUNDFN),hl
-    ld      hl,GO_PLAYER
-    inc     (hl)
+    call    enablegamesound
 
     ld      hl,gamemain
     call    mainproc
 
-    ld      hl,GO_PLAYER
-    res     1,(hl)
-    call    MUTE_AY
+    call    silencesound
 
     jr      {-}
 
 
 attractmain:
-    ;;;call    displaylastk
+    ;;;;call    displaylastk
     ld      a,(FRAMES)
     cp      1
     jr      nz,{+}
@@ -73,23 +54,6 @@ attractmain:
 
 +:  ld      a,(fire)
     cp      1
-    ret
-
-updatecredits:
-    ld      a,(titlecredidx)
-    add     a,32
-    ld      (titlecredidx),a
-
-    ld      hl,titlecreds
-    add     a,l
-    ld      l,a
-    adc     a,h
-    sub     l
-    ld      h,a
-
-    ld      de,BOTTOM_LINE
-    ld      bc,32
-    ldir
     ret
 
 
@@ -135,6 +99,7 @@ mainproc:
 #include "airfns.asm"
 #include "scorefns.asm"
 #include "displayfns.asm"
+#include "soundfns.asm"
 #include "mapfns.asm"
 #include "stcplay.asm"
 #include "ayfxplay.asm"

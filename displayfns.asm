@@ -56,6 +56,29 @@ drawtitle:
     ret
 
 
+resetcredits:
+    xor     a
+    ld      (titlecredidx),a
+    ld      (FRAMES),a
+
+updatecredits:
+    ld      a,(titlecredidx)
+    add     a,32
+    ld      (titlecredidx),a
+
+    ld      hl,titlecreds
+    add     a,l
+    ld      l,a
+    adc     a,h
+    sub     l
+    ld      h,a
+
+    ld      de,BOTTOM_LINE
+    ld      bc,32
+    ldir
+    ret
+
+
 drawmap:
     ld      hl,map
     ld      de,D_BUFFER
