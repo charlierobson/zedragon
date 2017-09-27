@@ -22,10 +22,8 @@ starthere:
     call    drawtitle
     call    resetcredits
     call    enabletitlesound
-
     ld      hl,attractmain
     call    mainproc
-
     call    silencesound
 
     ; --------------------- game
@@ -35,10 +33,8 @@ starthere:
     call    resetscore
     call    resetair
     call    enablegamesound
-
     ld      hl,gamemain
     call    mainproc
-
     call    silencesound
 
     jr      {-}
