@@ -21,13 +21,14 @@ starthere:
     call    cls
     call    drawtitle
 
-    call    INIT_STC
-
     xor     a
     ld      (titlecredidx),a
     ld      (FRAMES),a
     call    updatecredits
 
+    call    INIT_STC
+    ld      hl,PLAY_STC
+    ld      (SOUNDFN),hl
     ld      hl,GO_PLAYER
     inc     (hl)
 
@@ -47,8 +48,10 @@ starthere:
 
     ld      hl,sfx
     call    INIT_AFX
+    ld      hl,AFXFRAME
+    ld      (SOUNDFN),hl
     ld      hl,GO_PLAYER
-    set     1,(hl)
+    inc     (hl)
 
     ld      hl,gamemain
     call    mainproc

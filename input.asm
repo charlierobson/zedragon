@@ -6,29 +6,29 @@ initjoy:
 
 
 readjoy:
-    call    $1ffe
-    ld      l,a             ; cache joystick value
+    ld      hl,(LAST_K)
 
-    ld      a,(LAST_K)      ; cache 'enter' key
-    and     $40
+    ld      de,$0240        ; mask for enter key - done this way to potentially allow redefinable keys
+    ld      a,h
+    and     d
     ld      h,a
-    ld      a,(LAST_K+1)
-    and     $02
+    ld      a,l
+    and     e
     or      h
     ld      h,a
+    jr      z,{+}           ; skip joystick read if pressed - h is 0
 
-    ld      a,(fire)        ; 0 - fire not pressed, 1 - fire just pressed, 3 - fire held, 2 - fire just released
-    sla     a
+    call    $1ffe
+    ld      h,a             ; cache joystick value
 
-    bit     6,l
-    jr      z,{+}           ; z set if fire pressed, so don't bother with testing kb
++:  ld      a,(fire)        ; 0 - fire not pressed, 1 - fire just pressed, 3 - fire held, 2 - fire just released
+    sla     a               ;  C <- [7......0] <- 0
 
-    ld      a,h             ; h 0 if enter pressed
-    and     a
-    jr      nz,{++}
+    bit     6,h
+    jr      nz,{+}          ; skip if fire bit zero
 
-+:  or      1               ; indicates that an input is asserted
+    or      1               ; indicate that the input is asserted
 
-++: and     3               ; we only keep bottom 2 bits
++:  and     3               ; we only keep bottom 2 bits - perhaps keep more bits for timing purposes?
     ld      (fire),a
     ret

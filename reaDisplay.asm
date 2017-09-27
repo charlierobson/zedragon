@@ -3,8 +3,6 @@
     NUMBER_OF_ROWS  .equ 10
 
 setupdisplay:
-	LD HL,D_BUFFER+6000
-	LD (HL),$C9
 	CALL cls
 
 ;NOW WE PREPARE TO PATCH THE D_FILE WITH A JP(IY) AFTER THE INITIAL HALT
@@ -338,32 +336,24 @@ VID_COMPLETE:
 ;THE LOWER MARGIN BEFORE vSYNC OCCURS
 
 
-	       EX      AF,AF'
-	       OUT     ($FE),A
-;STC_STUFF
+	EX		AF,AF'
+	OUT		($FE),A
+
+	PUSH	IY				;STC (and AYFX) PLAYER USES IY
 GO_PLAYER = $+1
-		LD	A,0		;TEST IF NONE ZERO.
-		AND A
-		JR  Z,DO_NOT_PLAY	;IF ZERO DO NOT CALL PLAY
+	LD		A,0
+	AND		A
+SOUNDFN = $+1
+	CALL	nz,0
+	POP		IY
 
-		PUSH	IY		;STC (and AYFX) PLAYER USES IY
-		cp 1
-		push af
-		call nz,AFXFRAME
-		pop af
-		CALL z,PLAY_STC
-		POP  IY
-
-DO_NOT_PLAY:
-	       POP     HL
-	       POP     DE
-	       POP     BC
-	       POP     AF
-		;AT THIS PIONT ALL REGISTERS RESTORED AS THEY WERE BEFORE 
-		;VIDEO GENERATION TOOK PLACE
-		
-
-	       RET
+	POP		HL
+	POP		DE
+	POP		BC
+	POP		AF
+	;AT THIS PIONT ALL REGISTERS RESTORED AS THEY WERE BEFORE 
+	;VIDEO GENERATION TOOK PLACE
+	RET
 
 
 VID_STACK:
@@ -380,6 +370,7 @@ TOP_LINE:
 
 D_BUFFER:
 	.incbin "mungedmap.bin"
+	RET
 
 	.align	32	; to assist in air display calculations
 BOTTOM_LINE:
