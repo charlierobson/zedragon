@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 <head>
-<title>List file for zedragon.asm (28/09/2017 16:08:28)</title>
+<title>List file for zedragon.asm (28/09/2017 16:35:12)</title>
 </head>
 <body>
 <style>
@@ -169,100 +169,100 @@ h1, h2, h3, h4, p { font-family: trebuchet ms, verdana, tahoma, sans serif; text
 <tr class="r0"><td class="c">4089</td><td>76</td><td>.byte $76</td></tr>
 <tr><td class="f" colspan="4">C:\Users\Developer\Documents\GH\zedragon\readisplay.asm</td></tr>
 <tr><td class="l" colspan="4">setupdisplay</td></tr>
-<tr class="r1"><td class="c">408A</td><td>CD&nbsp;CF&nbsp;5A</td><td>&#9;CALL cls</td></tr>
-<tr class="r0"><td class="c">408D</td><td>2A&nbsp;0C&nbsp;40</td><td>&#9;LD&#9;HL,($400C)</td></tr>
-<tr class="r1"><td class="c">4090</td><td>22&nbsp;AE&nbsp;40</td><td>&#9;LD&#9;(REAL_D_FILE),HL</td></tr>
-<tr class="r0"><td class="c">4093</td><td>D3&nbsp;FD</td><td>&#9;OUT ($FD),A</td></tr>
-<tr class="r1"><td class="c">4095</td><td>21&nbsp;B3&nbsp;40</td><td>&#9;LD&#9;HL,FAKE_D_FILE</td></tr>
-<tr class="r0"><td class="c">4098</td><td>22&nbsp;0C&nbsp;40</td><td>&#9;LD&#9;($400C),HL</td></tr>
+<tr class="r1"><td class="c">408A</td><td>CD&nbsp;CF&nbsp;5A</td><td>&#9;CALL&#9;cls</td></tr>
+<tr class="r0"><td class="c">408D</td><td>2A&nbsp;0C&nbsp;40</td><td>&#9;LD&#9;&#9;HL,($400C)</td></tr>
+<tr class="r1"><td class="c">4090</td><td>22&nbsp;AE&nbsp;40</td><td>&#9;LD&#9;&#9;(REAL_D_FILE),HL</td></tr>
+<tr class="r0"><td class="c">4093</td><td>D3&nbsp;FD</td><td>&#9;OUT&#9;&#9;($FD),A</td></tr>
+<tr class="r1"><td class="c">4095</td><td>21&nbsp;B3&nbsp;40</td><td>&#9;LD&#9;&#9;HL,FAKE_D_FILE</td></tr>
+<tr class="r0"><td class="c">4098</td><td>22&nbsp;0C&nbsp;40</td><td>&#9;LD&#9;&#9;($400C),HL</td></tr>
 <tr class="r1"><td class="c">409B</td><td>E5</td><td>&#9;PUSH&#9;HL</td></tr>
-<tr class="r0"><td class="c">409C</td><td>CB&nbsp;FC</td><td>&#9;SET 7,H</td></tr>
-<tr class="r1"><td class="c">409E</td><td>D1</td><td>&#9;POP&#9;DE</td></tr>
-<tr class="r0"><td class="c">409F</td><td>EB</td><td>&#9;EX&#9;DE,HL</td></tr>
+<tr class="r0"><td class="c">409C</td><td>CB&nbsp;FC</td><td>&#9;SET&#9;&#9;7,H</td></tr>
+<tr class="r1"><td class="c">409E</td><td>D1</td><td>&#9;POP&#9;&#9;DE</td></tr>
+<tr class="r0"><td class="c">409F</td><td>EB</td><td>&#9;EX&#9;&#9;DE,HL</td></tr>
 <tr class="r1"><td class="c">40A0</td><td>ED&nbsp;A0</td><td>&#9;LDI</td></tr>
 <tr class="r0"><td class="c">40A2</td><td>ED&nbsp;A0</td><td>&#9;LDI</td></tr>
 <tr class="r1"><td class="c">40A4</td><td>ED&nbsp;A0</td><td>&#9;LDI</td></tr>
 <tr class="r0"><td class="c">40A6</td><td>ED&nbsp;A0</td><td>&#9;LDI</td></tr>
-<tr class="r1"><td class="c">40A8</td><td>D3&nbsp;FE</td><td>&#9;OUT&#9;($FE) , A</td></tr>
+<tr class="r1"><td class="c">40A8</td><td>D3&nbsp;FE</td><td>&#9;OUT&#9;&#9;($FE),A</td></tr>
 <tr class="r0"><td class="c">40AA</td><td>C9</td><td>&#9;RET</td></tr>
 <tr><td class="l" colspan="4">restoredisplay</td></tr>
-<tr class="r1"><td class="c">40AB</td><td>D3&nbsp;FD</td><td>&#9;OUT ($FD),A</td></tr>
-<tr class="r0"><td class="c">40AD</td><td>21&nbsp;00&nbsp;00</td><td>&#9;LD&#9;HL,$0000</td></tr>
-<tr class="r1"><td class="c">40B0</td><td>D3&nbsp;FE</td><td>&#9;OUT&#9;($FE) , A</td></tr>
+<tr class="r1"><td class="c">40AB</td><td>D3&nbsp;FD</td><td>&#9;OUT&#9;&#9;($FD),A</td></tr>
+<tr class="r0"><td class="c">40AD</td><td>21&nbsp;00&nbsp;00</td><td>&#9;LD&#9;&#9;HL,$0000</td></tr>
+<tr class="r1"><td class="c">40B0</td><td>D3&nbsp;FE</td><td>&#9;OUT&#9;&#9;($FE),A</td></tr>
 <tr class="r0"><td class="c">40B2</td><td>C9</td><td>&#9;RET</td></tr>
 <tr><td class="l" colspan="4">FAKE_D_FILE</td></tr>
 <tr class="r1"><td class="c">40B3</td><td>76</td><td>&#9;HALT&#9;</td></tr>
-<tr class="r0"><td class="c">40B4</td><td>CD&nbsp;B7&nbsp;40</td><td>&#9;CALL OUR_DISPLAY_ROUTINE</td></tr>
+<tr class="r0"><td class="c">40B4</td><td>CD&nbsp;B7&nbsp;40</td><td>&#9;CALL&#9;OUR_DISPLAY_ROUTINE</td></tr>
 <tr><td class="l" colspan="4">OUR_DISPLAY_ROUTINE</td></tr>
-<tr class="r1"><td class="c">40B7</td><td>F3</td><td>&#9;DI&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40B8</td><td>E1</td><td>&#9;POP&#9;HL&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40B9</td><td>21&nbsp;00&nbsp;00</td><td>&#9;LD&#9;HL , $0000&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40BC</td><td>11&nbsp;BA&nbsp;C1</td><td>&#9;LD&#9;DE , D_BUFFER + $8000&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40BF</td><td>19</td><td>&#9;ADD&#9;HL , DE &#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40C0</td><td>22&nbsp;F6&nbsp;40</td><td>&#9;LD&#9;(HLST) , HL&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40C3</td><td>11&nbsp;20&nbsp;80</td><td>&#9;LD&#9;DE , $8000 + 32 &#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40C6</td><td>19</td><td>&#9;ADD&#9;HL , DE &#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40C7</td><td>22&nbsp;EC&nbsp;40</td><td>&#9;LD&#9;(ALTHL) , HL&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40CA</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40B7</td><td>F3</td><td>&#9;DI&#9;&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40B8</td><td>E1</td><td>&#9;POP&#9;&#9;HL&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40B9</td><td>21&nbsp;00&nbsp;00</td><td>&#9;LD&#9;&#9;HL,$0000&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40BC</td><td>11&nbsp;BA&nbsp;C1</td><td>&#9;LD&#9;&#9;DE,D_BUFFER + $8000&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40BF</td><td>19</td><td>&#9;ADD&#9;&#9;HL,DE &#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40C0</td><td>22&nbsp;F6&nbsp;40</td><td>&#9;LD&#9;&#9;(HLST),HL&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40C3</td><td>11&nbsp;20&nbsp;80</td><td>&#9;LD&#9;&#9;DE,$8000 + 32 &#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40C6</td><td>19</td><td>&#9;ADD&#9;&#9;HL,DE &#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40C7</td><td>22&nbsp;EC&nbsp;40</td><td>&#9;LD&#9;&#9;(ALTHL),HL&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40CA</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
 <tr class="r1"><td class="c">40CB</td><td>C5</td><td>&#9;PUSH&#9;BC&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
 <tr class="r0"><td class="c">40CC</td><td>D5</td><td>&#9;PUSH&#9;DE&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40CD</td><td>06&nbsp;08</td><td>&#9;LD&#9;B , 8&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40CF</td><td>00</td><td>&#9;NOP&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40D0</td><td>DB&nbsp;FE</td><td>&#9;IN&#9;A , ($FE)&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40D2</td><td>D3&nbsp;FF</td><td>&#9;OUT&#9;($FF) , A&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40D4</td><td>00</td><td>&#9;NOP&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40D5</td><td>18&nbsp;07</td><td>&#9;JR&#9;TOP_DO_SCAN_LINE&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40CD</td><td>06&nbsp;08</td><td>&#9;LD&#9;&#9;B,8&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40CF</td><td>00</td><td>&#9;NOP&#9;&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40D0</td><td>DB&nbsp;FE</td><td>&#9;IN&#9;&#9;A,($FE)&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40D2</td><td>D3&nbsp;FF</td><td>&#9;OUT&#9;&#9;($FF),A&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40D4</td><td>00</td><td>&#9;NOP&#9;&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40D5</td><td>18&nbsp;07</td><td>&#9;JR&#9;&#9;TOP_DO_SCAN_LINE&#9;&#9;</td></tr>
 <tr><td class="l" colspan="4">TOP_MORE_LINES</td></tr>
 <tr class="r1"><td class="c">40D7</td><td>FD&nbsp;E5</td><td>&#9;PUSH&#9;IY&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40D9</td><td>FD&nbsp;E1</td><td>&#9;POP&#9;IY&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40DB</td><td>C3&nbsp;DE&nbsp;40</td><td>&#9;JP&#9;TOP_DO_SCAN_LINE&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40D9</td><td>FD&nbsp;E1</td><td>&#9;POP&#9;&#9;IY&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40DB</td><td>C3&nbsp;DE&nbsp;40</td><td>&#9;JP&#9;&#9;TOP_DO_SCAN_LINE&#9;&#9;</td></tr>
 <tr><td class="l" colspan="4">TOP_DO_SCAN_LINE</td></tr>
-<tr class="r0"><td class="c">40DE</td><td>CD&nbsp;99&nbsp;C1</td><td>&#9;CALL&#9;TOP_LINE + $8000&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40DE</td><td>CD&nbsp;99&nbsp;C1</td><td>&#9;CALL&#9;TOP_LINE + $8000&#9;&#9;</td></tr>
 <tr><td class="l" colspan="4">TOP_AFTER_LINE</td></tr>
-<tr class="r1"><td class="c">40E1</td><td>10&nbsp;F4</td><td>&#9;DJNZ&#9;TOP_MORE_LINES&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40E1</td><td>10&nbsp;F4</td><td>&#9;DJNZ&#9;TOP_MORE_LINES&#9;&#9;&#9;</td></tr>
 <tr class="r0"><td class="c">40E3</td><td>E5</td><td>&#9;PUSH&#9;HL&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40E4</td><td>ED&nbsp;73&nbsp;50&nbsp;41</td><td>&#9;LD&#9;(SP_STORE) , SP &#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40E8</td><td>31&nbsp;93&nbsp;41</td><td>&#9;LD&#9;SP , VID_STACK+2&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40EB</td><td>21&nbsp;DA&nbsp;41</td><td>&#9;LD&#9;HL , D_BUFFER + 32&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40EE</td><td>11&nbsp;58&nbsp;02</td><td>&#9;LD&#9;DE , BUFFER_WIDTH&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40F1</td><td>01&nbsp;C9&nbsp;0A</td><td>&#9;LD&#9;BC , NUMBER_OF_ROWS * 256 + $C9</td></tr>
-<tr class="r0"><td class="c">40F4</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40F5</td><td>21&nbsp;BA&nbsp;C1</td><td>&#9;Ld&#9;HL , D_BUFFER + $8000&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40F8</td><td>11&nbsp;58&nbsp;02</td><td>&#9;LD&#9;DE , BUFFER_WIDTH&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">40FB</td><td>01&nbsp;07&nbsp;07</td><td>&#9;LD&#9;BC , 7 * 256 + 7&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">40FE</td><td>FD&nbsp;22&nbsp;97&nbsp;41</td><td>&#9;LD&#9;(JUST_TWO_BYTES),IY&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">4102</td><td>FD&nbsp;22&nbsp;97&nbsp;41</td><td>&#9;LD&#9;(JUST_TWO_BYTES),IY&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">4106</td><td>FD&nbsp;22&nbsp;97&nbsp;41</td><td>&#9;LD&#9;(JUST_TWO_BYTES),IY&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">410A</td><td>FD&nbsp;22&nbsp;97&nbsp;41</td><td>&#9;LD&#9;(JUST_TWO_BYTES),IY&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">410E</td><td>FD&nbsp;22&nbsp;97&nbsp;41</td><td>&#9;LD&#9;(JUST_TWO_BYTES),IY&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">4112</td><td>00</td><td>&#9;NOP&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">4113</td><td>00</td><td>&#9;NOP&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">4114</td><td>DB&nbsp;FE</td><td>&#9;IN&#9;A , ($FE)&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">4116</td><td>D3&nbsp;FF</td><td>&#9;OUT&#9;($FF),A &#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">4118</td><td>3E&nbsp;00</td><td>&#9;LD&#9;A , 0&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">411A</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">411B</td><td>7E</td><td>&#9;LD  A , (HL)&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">411C</td><td>71</td><td>&#9;LD  (HL) , C&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">411D</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">411E</td><td>E9</td><td>&#9;JP&#9;(HL)&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40E4</td><td>ED&nbsp;73&nbsp;50&nbsp;41</td><td>&#9;LD&#9;&#9;(SP_STORE),SP &#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40E8</td><td>31&nbsp;93&nbsp;41</td><td>&#9;LD&#9;&#9;SP,VID_STACK+2&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40EB</td><td>21&nbsp;DA&nbsp;41</td><td>&#9;LD&#9;&#9;HL,D_BUFFER + 32&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40EE</td><td>11&nbsp;58&nbsp;02</td><td>&#9;LD&#9;&#9;DE,BUFFER_WIDTH&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40F1</td><td>01&nbsp;C9&nbsp;0A</td><td>&#9;LD&#9;&#9;BC,NUMBER_OF_ROWS * 256 + $C9</td></tr>
+<tr class="r0"><td class="c">40F4</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40F5</td><td>21&nbsp;BA&nbsp;C1</td><td>&#9;Ld&#9;&#9;HL,D_BUFFER + $8000&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40F8</td><td>11&nbsp;58&nbsp;02</td><td>&#9;LD&#9;&#9;DE,BUFFER_WIDTH&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">40FB</td><td>01&nbsp;07&nbsp;07</td><td>&#9;LD&#9;&#9;BC,7 * 256 + 7&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">40FE</td><td>FD&nbsp;22&nbsp;97&nbsp;41</td><td>&#9;LD&#9;&#9;(JUST_TWO_BYTES),IY&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">4102</td><td>FD&nbsp;22&nbsp;97&nbsp;41</td><td>&#9;LD&#9;&#9;(JUST_TWO_BYTES),IY&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">4106</td><td>FD&nbsp;22&nbsp;97&nbsp;41</td><td>&#9;LD&#9;&#9;(JUST_TWO_BYTES),IY&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">410A</td><td>FD&nbsp;22&nbsp;97&nbsp;41</td><td>&#9;LD&#9;&#9;(JUST_TWO_BYTES),IY&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">410E</td><td>FD&nbsp;22&nbsp;97&nbsp;41</td><td>&#9;LD&#9;&#9;(JUST_TWO_BYTES),IY&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">4112</td><td>00</td><td>&#9;NOP&#9;&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">4113</td><td>00</td><td>&#9;NOP&#9;&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">4114</td><td>DB&nbsp;FE</td><td>&#9;IN&#9;&#9;A,($FE)&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">4116</td><td>D3&nbsp;FF</td><td>&#9;OUT&#9;&#9;($FF),A &#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">4118</td><td>3E&nbsp;00</td><td>&#9;LD&#9;&#9;A,0&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">411A</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">411B</td><td>7E</td><td>&#9;LD&#9;&#9;A,(HL)&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">411C</td><td>71</td><td>&#9;LD&#9;&#9;(HL),C&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">411D</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">411E</td><td>E9</td><td>&#9;JP&#9;&#9;(HL)</td></tr>
 <tr><td class="l" colspan="4">NXT_ROW</td></tr>
-<tr class="r1"><td class="c">411F</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">4120</td><td>77</td><td>&#9;LD&#9;(HL),A&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">4121</td><td>19</td><td>&#9;ADD&#9;HL,DE&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">4122</td><td>7E</td><td>&#9;LD&#9;A,(HL)&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">4123</td><td>71</td><td>&#9;LD&#9;(HL),C&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">4124</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">4125</td><td>41</td><td>&#9;LD&#9;B,C&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">4126</td><td>19</td><td>&#9;ADD&#9;HL,DE&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">411F</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">4120</td><td>77</td><td>&#9;LD&#9;&#9;(HL),A&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">4121</td><td>19</td><td>&#9;ADD&#9;&#9;HL,DE&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">4122</td><td>7E</td><td>&#9;LD&#9;&#9;A,(HL)&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">4123</td><td>71</td><td>&#9;LD&#9;&#9;(HL),C&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">4124</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">4125</td><td>41</td><td>&#9;LD&#9;&#9;B,C&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">4126</td><td>19</td><td>&#9;ADD&#9;&#9;HL,DE&#9;&#9;</td></tr>
 <tr><td class="l" colspan="4">JUMP_HL1</td></tr>
-<tr class="r1"><td class="c">4127</td><td>C3&nbsp;2A&nbsp;41</td><td>&#9;JP&#9;JUMP_HL &#9;</td></tr>
+<tr class="r1"><td class="c">4127</td><td>C3&nbsp;2A&nbsp;41</td><td>&#9;JP&#9;&#9;JUMP_HL &#9;</td></tr>
 <tr><td class="l" colspan="4">JUMP_HL</td></tr>
-<tr class="r0"><td class="c">412A</td><td>E9</td><td>&#9;JP&#9;(HL)&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">412A</td><td>E9</td><td>&#9;JP&#9;&#9;(HL)&#9;&#9;</td></tr>
 <tr><td class="l" colspan="4">NXT_SCANL</td></tr>
 <tr class="r1"><td class="c">412B</td><td>10&nbsp;14</td><td>&#9;DJNZ&#9;NOT_LAST_LINE&#9;</td></tr>
-<tr class="r0"><td class="c">412D</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">412E</td><td>05</td><td>&#9;DEC&#9;B&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">412F</td><td>28&nbsp;09</td><td>&#9;JR&#9;Z,NO_MORE_ROWS&#9;</td></tr>
+<tr class="r0"><td class="c">412D</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">412E</td><td>05</td><td>&#9;DEC&#9;&#9;B&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">412F</td><td>28&nbsp;09</td><td>&#9;JR&#9;&#9;Z,NO_MORE_ROWS&#9;&#9;</td></tr>
 <tr><td class="l" colspan="4">MORE_ROWS</td></tr>
 <tr class="r1"><td class="c">4131</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;</td></tr>
 <tr class="r0"><td class="c">4132</td><td>3B</td><td>&#9;DEC&#9;SP&#9;&#9;&#9;</td></tr>
@@ -274,7 +274,7 @@ h1, h2, h3, h4, p { font-family: trebuchet ms, verdana, tahoma, sans serif; text
 <tr><td class="l" colspan="4">NO_MORE_ROWS</td></tr>
 <tr class="r0"><td class="c">413A</td><td>D9</td><td>&#9;EXX&#9;&#9;&#9;&#9;</td></tr>
 <tr class="r1"><td class="c">413B</td><td>32&nbsp;00&nbsp;00</td><td>&#9;LD&#9;($0000),A&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">413E</td><td>C3&nbsp;27&nbsp;41</td><td>&#9;JP   JUMP_HL1&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">413E</td><td>C3&nbsp;27&nbsp;41</td><td>&#9;JP&#9;JUMP_HL1&#9;&#9;</td></tr>
 <tr><td class="l" colspan="4">NOT_LAST_LINE</td></tr>
 <tr class="r1"><td class="c">4141</td><td>3B</td><td>&#9;DEC&#9;SP&#9;&#9;&#9;</td></tr>
 <tr class="r0"><td class="c">4142</td><td>3B</td><td>&#9;DEC&#9;SP&#9;&#9;&#9;</td></tr>
@@ -295,8 +295,8 @@ h1, h2, h3, h4, p { font-family: trebuchet ms, verdana, tahoma, sans serif; text
 <tr class="r1"><td class="c">4158</td><td>00</td><td>&#9;nop&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
 <tr class="r0"><td class="c">4159</td><td>06&nbsp;08</td><td>&#9;ld&#9;b,8&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
 <tr class="r1"><td class="c">415B</td><td>06&nbsp;08</td><td>&#9;LD&#9;B,8&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r0"><td class="c">415D</td><td>DB&nbsp;FE</td><td>&#9;IN&#9;A , ($FE)&#9;&#9;&#9;&#9;&#9;</td></tr>
-<tr class="r1"><td class="c">415F</td><td>D3&nbsp;FF</td><td>&#9;OUT&#9;($FF) , A&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r0"><td class="c">415D</td><td>DB&nbsp;FE</td><td>&#9;IN&#9;A,($FE)&#9;&#9;&#9;&#9;&#9;</td></tr>
+<tr class="r1"><td class="c">415F</td><td>D3&nbsp;FF</td><td>&#9;OUT&#9;($FF),A&#9;&#9;&#9;&#9;&#9;</td></tr>
 <tr class="r0"><td class="c">4161</td><td>00</td><td>&#9;NOP&#9;&#9;&#9;&#9;&#9;&#9;&#9;</td></tr>
 <tr class="r1"><td class="c">4162</td><td>18&nbsp;07</td><td>&#9;JR&#9;BOTTOM_DO_SCAN_LINE&#9;&#9;&#9;</td></tr>
 <tr><td class="l" colspan="4">BOTTOM_MORE_LINES</td></tr>
