@@ -1,4 +1,3 @@
-    BUFFER_HEIGHT   .equ 10
     BUFFER_WIDTH    .equ 600
     NUMBER_OF_ROWS  .equ 10
 

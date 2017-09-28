@@ -35,6 +35,7 @@ starthere:
     call    enablegamesound
     ld      hl,gamemain
     call    mainproc
+
     call    silencesound
 
     jr      {-}
@@ -43,6 +44,7 @@ starthere:
 attractmain:
     ;;;;call    displaylastk
     ld      a,(FRAMES)
+    and     127
     cp      1
     jr      nz,{+}
 

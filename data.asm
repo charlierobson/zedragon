@@ -12,14 +12,13 @@ titlecredidx:
     .byte   0
 titlecreds:
     ;        --------========--------========
-    .asc    "          PRESS   FIRE          "
-    .asc    "       S E A  D R A G O N       "
-    .asc    "   ZX81 VERSION BY: SIRMORRIS   "
-    .asc    "DISPLAY AND STC PLAYER: ANDY REA"
+    .asc    "     PROGRAMMING: SIRMORRIS     "
+    .asc    "    DISPLAY DRIVER: ANDY REA    "
     .asc    " TITLE TUNE: REAR ADMIRAL MOGGY "
-    .asc    "          PRESS   FIRE          "
-    .asc    "       S E A  D R A G O N       "
+    .asc    "   STC MUSIC DRIVER: ANDY REA   "
+    .asc    "   AYFX DRIVER:  ALEX SEMENOV   "
     .asc    "ORIGINAL CODE/GFX:  RUSS WETMORE"
+    .asc    "      P R E S S    F I R E      "
 
 
 ;;	.asciimap 'A','Z', {*}-'A'+$26

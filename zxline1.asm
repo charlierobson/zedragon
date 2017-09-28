@@ -11,8 +11,7 @@ line1:
     .byte   $76                         ; N/L
 
 exdfile:
-   .byte    $76
-   .fill    24,$76                      ; FULL-collapsed d-file
+   .fill    25,$76                      ; FULL-collapsed d-file
 
 ;- BASIC-Variables ----------------------------------------
 

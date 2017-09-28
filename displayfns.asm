@@ -21,9 +21,13 @@ cls:
     ld      hl,D_BUFFER
     ld      bc,6000-1
     call    {+}
+
+    ld      (BUFF_OFFSET),bc    ; bc is 0 at thispoint
+
     ld      hl,TOP_LINE
     ld      bc,32-1
     call    {+}
+
     ld      hl,BOTTOM_LINE
     ld      bc,32-1
 +:
@@ -32,9 +36,6 @@ cls:
     inc     de
     ld      (hl),a
     ldir
-
-    ld      (BUFF_OFFSET),bc    ; bc is 0 at thispoint
-
     ret
 
 
@@ -58,16 +59,32 @@ drawtitle:
 
 resetcredits:
     xor     a
-    ld      (titlecredidx),a
     ld      (FRAMES),a
+    jr      {+}
+
 
 updatecredits:
     ld      a,(titlecredidx)
-    add     a,32
-    ld      (titlecredidx),a
+    inc     a
+    cp      12          ; reset counter every complete cycle
+    jr      nz,{+}
 
+    xor     a
+
++:  ld      (titlecredidx),a
+
+    bit     0,a         ; if bit 1 is set show one of the two repeated items 
+    jr      z,{+}
+
+    ld      a,6*2
+
++:  and     $fe
+    sla     a
+    sla     a
+    sla     a
+    sla     a
     ld      hl,titlecreds
-    add     a,l
+    add     a,l         ; add A to HL
     ld      l,a
     adc     a,h
     sub     l
