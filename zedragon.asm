@@ -15,11 +15,11 @@ starthere:
     call    initmap
     call    setupudg
     call    setupdisplay
-    call    initjoy
 
 -:  ; --------------------- title screen
     call    cls
     call    drawtitle
+    ;ld      hl,slkmain
     call    resetcredits
     call    enabletitlesound
     ld      hl,attractmain
@@ -27,6 +27,8 @@ starthere:
     call    silencesound
 
     ; --------------------- game
+    ld      hl,1
+    ld      (subpos),hl
     call    cls
     call    resetscroll
     call    drawmap
@@ -41,8 +43,14 @@ starthere:
     jr      {-}
 
 
+slkmain:
+    call    displaylastk
+    xor     a
+    cp      1
+    ret
+
+
 attractmain:
-    ;;;;call    displaylastk
     ld      a,(FRAMES)
     and     127
     cp      1
@@ -50,7 +58,7 @@ attractmain:
 
     call    updatecredits
 
-+:  ld      a,(fire)
+    ld      a,(fire)
     cp      1
     ret
 
@@ -58,24 +66,13 @@ attractmain:
 gamemain:
     call    scroll
     call    updateair
-
-    ld      a,(frames)
-    and     127
-    cp      35
-    jr      nz,{+}
-
-    ld      a,(sfxnum)
-    inc     a
-    and     3
-    ld      (sfxnum),a
-    call    AFXPLAY
+    call    movesub
+    call    drawsub
 
 +:  ld      a,(fire)
     cp      1
     ret
 
-;tempora
-sfxnum: .byte -0
 
 
 mainproc:
@@ -93,7 +90,7 @@ mainproc:
 
 
 #include "input.asm"
-
+#include "sub.asm"
 #include "airfns.asm"
 #include "scorefns.asm"
 #include "displayfns.asm"

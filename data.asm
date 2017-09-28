@@ -33,15 +33,43 @@ titletune:
 sfx:
 	.incbin	"zedrag.afb"
 
-lastjoy:
+LAST_J:
 	.byte	0
-fire:
-	.byte	0
+
+; btb = bit test byte = 2nd byte of bit N,b instruction
+btb0 = %01000000
+btb1 = %01001000
+btb2 = %01010000
+btb3 = %01011000
+btb4 = %01100000
+btb5 = %01101000
+btb6 = %01110000
+btb7 = %01111000
+
+; joystick bit test opcode fragment, LAST_K mask, input impulse
+inputstates:
+    .byte	btb7,$11,$10,0        ; up
+    .byte	btb6,$21,$10,0        ; down
+    .byte	btb5,$21,$08,0        ; left
+    .byte	btb4,$09,$10,0        ; right
+    .byte	btb3,$02,$40,0        ; fire
+
+; calculate actual input impulse addresses
+up    = inputstates + 3
+down  = inputstates + 7
+left  = inputstates + 11
+right = inputstates + 15
+fire  = inputstates + 19
 
 scrolltick:
 	.byte	0
 scrollpos:
     .word   0
+
+subpos:
+	.word	0
+lastsubpos:
+	.word	0
 
 airupdatecounter:
     .byte   0

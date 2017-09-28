@@ -19,18 +19,20 @@ waitvsync:
 cls:
     xor     a
     ld      hl,D_BUFFER
-    ld      bc,6000-1
-    call    {+}
+    ld      bc,6000
+    call    zeromem
 
     ld      (BUFF_OFFSET),bc    ; bc is 0 at thispoint
 
     ld      hl,TOP_LINE
-    ld      bc,32-1
-    call    {+}
+    ld      bc,32
+    call    zeromem
 
     ld      hl,BOTTOM_LINE
-    ld      bc,32-1
-+:
+    ld      bc,32
+
+zeromem:
+    dec     bc
     ld      d,h
     ld      e,l
     inc     de
@@ -206,10 +208,17 @@ scroll:
 
 
 displaylastk:
-    ld      de,BOTTOM_LINE+28
+    ld      de,BOTTOM_LINE+23
     ld      a,(LAST_K+1)
     call    hexout
     ld      a,(LAST_K)
+    call    hexout
+    ld      de,BOTTOM_LINE+28
+    ld      a,(LAST_K+1)
+    xor     $ff
+    call    hexout
+    ld      a,(LAST_K)
+    xor     $ff
 
 hexout:
     push    af
