@@ -38,6 +38,5 @@ updateair:
     and     7
     jr      z,{+}
     add     a,6
-+:  or      $80
-    ld      (hl),a
++:  ld      (hl),a
     ret

@@ -1,7 +1,7 @@
 setupudg:
     ld      hl,charsets
     ld      de,$2000
-    ld      bc,1024
+    ld      bc,3*$200
     ldir
     ld      a,$21
     ld      i,a
@@ -130,15 +130,15 @@ animatecharacters:
     ld      a,(hl)
 	ld      ($2000+$f8+1),a
 
-    ld      a,(ssa-charsets+$2001)
+    ld      a,($2000+$101)
     xor     $66 ^ $7e
-    ld      (ssa-charsets+$2001),a
+    ld      ($2000+$101),a
     and     $3c
-    ld      (ssa-charsets+$200e),a
+    ld      ($2000+$10e),a
 
-    ld      a,(ssa-charsets+$2009)
+    ld      a,($2000+$109)
     xor     $a7 ^ $e5
-    ld      (ssa-charsets+$2009),a
+    ld      ($2000+$109),a
 
     ld      a,(waterframe)
     inc     a
@@ -149,7 +149,7 @@ animatecharacters:
     ld      e,a
     add     hl,de
     ld      a,(hl)
-    ld      (wsa-charsets+$2000),a
+    ld      ($2000+$1df),a
 
     xor     a
 
@@ -169,8 +169,8 @@ testevery8:
     add     a,e
     ld      e,a
     ld      a,(de)
-    ld      (ssa-charsets+$2003),a
-    ld      (ssa-charsets+$200b),a
+    ld      ($2000+$103),a
+    ld      ($2000+$10b),a
     ret
 
 

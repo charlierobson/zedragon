@@ -12,13 +12,12 @@ drawsub:
     add     hl,de
     ld      (lastsubpos),hl
 
-    ld      a,$be
+    ld      a,$80
     ld      (hl),a
     inc     hl
     inc     a
     ld      (hl),a
     ret
-
 
 movesub:
     ld      a,(up)

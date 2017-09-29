@@ -87,8 +87,6 @@ mainproc:
 
     ret
 
-
-
 #include "input.asm"
 #include "sub.asm"
 #include "airfns.asm"
@@ -104,7 +102,7 @@ mainproc:
 
     .align 512
 charsets:
-#include "charset.asm"
+    .incbin "charset.bin"
 
 endshere:
 ; ------------------------------------------------------------

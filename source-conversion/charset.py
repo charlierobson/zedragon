@@ -21,7 +21,7 @@ for line in open('converted\disk2\dispdata', 'r'):
 
     print ';' + line.strip()
     lines = line.replace('\t',' ').replace(',',' ').strip().split()
-    numbers = [int(s) ^ 255 for s in lines if s.isdigit()]
+    numbers = [int(s)  for s in lines if s.isdigit()]
     if len(numbers) < 8:
         continue
 
