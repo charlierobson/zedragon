@@ -11,15 +11,23 @@ resetair:
 
 
 updateair:
+    ld      a,(suby)
+    cp      6
     ld      a,(airupdatecounter)
-    or      a
     jr      nz,{+}
-    ld      a,6
+
+    inc     a
+    ld      (airupdatecounter),a
+    ret    
+
++:  or      a                   ; decrease air every 10 cycles
+    jr      nz,{+}
+    ld      a,11
 +:  dec     a
     ld      (airupdatecounter),a
     ret     nz
 
-    ld      a,(airlevel)            ; quit when air all gone
+    ld      a,(airlevel)        ; quit when air all gone
     or      a
     ret     z
 

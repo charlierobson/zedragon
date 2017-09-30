@@ -123,7 +123,7 @@ HLST =	$+1
 	LD		DE,BUFFER_WIDTH			;10	34
 	LD		BC,7 * 256 + 7			;10	44
 
-	ld		a,$20					;7 51		game font
+	ld		a,$21					;7 51		game font
 	ld		i,a						;9 60
 	nop								;4 64
 	LD		(JUST_TWO_BYTES),IY		;20	84

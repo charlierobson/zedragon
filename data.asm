@@ -66,11 +66,6 @@ scrolltick:
 scrollpos:
     .word   0
 
-subpos:
-	.word	0
-lastsubpos:
-	.word	0
-
 airupdatecounter:
     .byte   0
 

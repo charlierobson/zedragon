@@ -27,8 +27,7 @@ starthere:
     call    silencesound
 
     ; --------------------- game
-    ld      hl,1
-    ld      (subpos),hl
+    call    initsub
     call    cls
     call    resetscroll
     call    drawmap

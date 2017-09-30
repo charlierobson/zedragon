@@ -1,3 +1,2 @@
 brass zedragon.asm zedragon.p -l listing.html
 cp zedragon.p ~/Desktop/zd/menu.p
-cp mungedmap.bin ~/Desktop/zd/zd.map
