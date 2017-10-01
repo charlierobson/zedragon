@@ -1,38 +1,53 @@
-resetair:
-    ld      a,27*8
-    ld      (airlevel),a
+AIR_MAX = 25*8
 
+resetair:
+    xor     a
+    ld      (airupdatecounter),a
+    ld      a,AIR_MAX
+    ld      (airlevel),a
     ld      hl,airline
     ld      de,BOTTOM_LINE
     ld      bc,32
     ldir
-
     ret
 
 
 updateair:
+    ld      hl,airupdatecounter
+
     ld      a,(suby)
     cp      6
-    ld      a,(airupdatecounter)
-    jr      nz,{+}
+    jr      nz,decreaseair
+
+
+increaseair:
+    ld      c,3                 ; increase air every 3 cycles
+    call    updatecounter
+    ret     nz                  ; not time to modify air value yet
+
+    ld      a,(airlevel)
+    cp      AIR_MAX
+    ret     z
 
     inc     a
-    ld      (airupdatecounter),a
-    ret    
+    ld      (airlevel),a
+    jr      displayair
 
-+:  or      a                   ; decrease air every 10 cycles
-    jr      nz,{+}
-    ld      a,11
-+:  dec     a
-    ld      (airupdatecounter),a
-    ret     nz
+decreaseair:
+    ld      c,10                ; decrease air every 10 cycles
+    call    updatecounter
+    ret     nz                  ; not time to modify air value yet
 
-    ld      a,(airlevel)        ; quit when air all gone
+    ld      a,(airlevel)
+
+    ; quit when air all gone
     or      a
     ret     z
 
     dec     a
     ld      (airlevel),a
+
+displayair:
     push    af
 
     ld      hl,BOTTOM_LINE+5
@@ -44,7 +59,12 @@ updateair:
 
     pop     af
     and     7
-    jr      z,{+}
     add     a,6
-+:  ld      (hl),a
+    ld      (hl),a
+    cp      7+6
+    ret     nz
+
+    xor     a
+    inc     hl
+    ld      (hl),a
     ret

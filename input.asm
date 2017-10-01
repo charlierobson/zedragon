@@ -13,6 +13,10 @@ readjoy:
     ; fall into here for last input - fire
 
 updateinputstate:
+    ld      a,(frames)
+    and     3
+    ret     nz
+
     ld      a,(hl)
     ld      (uibittest),a
     inc     hl

@@ -50,6 +50,8 @@ slkmain:
 
 
 attractmain:
+    ;call    displaylastk
+
     ld      a,(FRAMES)
     and     127
     cp      1
@@ -57,7 +59,7 @@ attractmain:
 
     call    updatecredits
 
-    ld      a,(fire)
++:  ld      a,(fire)
     cp      1
     ret
 
@@ -81,6 +83,13 @@ mainproc:
     call    animatecharacters
     call    readjoy
 
+    ld      a,(frames)
+    and     127
+    jr      nz,{+}
+
+    ld      a,0
+    call    AFXPLAY
+
 +:  call    0                   ; call the active process - it returns with z set when complete
     jr      nz,{-}
 
@@ -90,6 +99,7 @@ mainproc:
 #include "sub.asm"
 #include "airfns.asm"
 #include "scorefns.asm"
+#include "datafns.asm"
 #include "displayfns.asm"
 #include "soundfns.asm"
 #include "mapfns.asm"

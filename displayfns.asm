@@ -185,7 +185,7 @@ scroll:
     and     a
     jr      nz,{+}
 
-    ld      a,13+1
+    ld      a,23+1
 
 +:  dec     a
     ld      (scrolltick),a

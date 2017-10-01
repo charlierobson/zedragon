@@ -5,7 +5,7 @@ scoreline:
         	;--------========--------========
 
 airline:
-	.asc    "AIR: ---------------------------"
+	.asc    "AIR: -------------------------- "
     		;--------========--------========
 
 titlecredidx:
@@ -15,7 +15,7 @@ titlecreds:
     .asc    "     PROGRAMMING: SIRMORRIS     "
     .asc    "    DISPLAY DRIVER: ANDY REA    "
     .asc    " TITLE TUNE: REAR ADMIRAL MOGGY "
-    .asc    "   STC MUSIC DRIVER: ANDY REA   "
+    .asc    "   STC MUSIC PLAYER: ANDY REA   "
     .asc    "   AYFX DRIVER:  ALEX SEMENOV   "
     .asc    "ORIGINAL CODE/GFX:  RUSS WETMORE"
     .asc    "      P R E S S    F I R E      "
@@ -31,7 +31,7 @@ titletune:
 	.incbin	"title.stc"
 
 sfx:
-	.incbin	"zedrag.afb"
+	.incbin	"zedragon.afb"
 
 LAST_J:
 	.byte	0
@@ -48,10 +48,10 @@ btb7 = %01111000
 
 ; joystick bit test opcode fragment, LAST_K mask, input impulse
 inputstates:
-    .byte	btb7,$11,$10,0        ; up
-    .byte	btb6,$21,$10,0        ; down
-    .byte	btb5,$21,$08,0        ; left
-    .byte	btb4,$09,$10,0        ; right
+    .byte	btb7,$02,$04,0        ; up
+    .byte	btb6,$02,$02,0        ; down
+    .byte	btb5,$10,$80,0        ; left
+    .byte	btb4,$08,$80,0        ; right
     .byte	btb3,$02,$40,0        ; fire
 
 ; calculate actual input impulse addresses

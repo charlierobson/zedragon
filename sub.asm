@@ -8,6 +8,8 @@ lastsubaddress:
     .word   0
 mul600:
     .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
+collision:
+    .byte   0
 
 initsub:
     ld      hl,$0600
@@ -114,7 +116,7 @@ drawsub:
     sla     a
     sla     a 
 
-    ; get pointers to sub pixel data
+    ; get pointers to sub pixel data within the character set
 
     ld      h,$22
     ld      l,a
@@ -126,8 +128,7 @@ drawsub:
 
     ld      b,3
 
---:
-    push    bc
+--: push    bc
 
     ; copy 8 sub pixels into bg bitmap
 
@@ -135,8 +136,9 @@ drawsub:
 
 -:  ld      c,(hl)          ; get sub pixels
     ld      a,(de)          ; get bg pixels
-    and      c              ; merge sub into background
+    and     c              ; merge sub into background
     ld      (de),a
+
     inc     hl
     inc     de
     djnz    {-}
@@ -197,6 +199,7 @@ copychar:
     inc     hl
     inc     de
     djnz    {-}
+
     ret
 
 
