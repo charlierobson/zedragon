@@ -1,25 +1,25 @@
 bulletinfo:
-    .byte   0,0,0,0
+    .byte   $20,0,0,0
 
 startbullet:
     ld      a,(subx)
     add     a,12
+    srl     a
+    srl     a
+    srl     a
     ld      (bulletinfo),a
     ld      a,(suby)
-    add     a,6
+    add     a,4
     ld      (bulletinfo+1),a
     ret
 
 updatebullets:
     ld      a,(bulletinfo)
-    and     a
+    cp      32
     ret     z
 
     inc     a
     ld      (bulletinfo),a
-    srl     a
-    srl     a
-    srl     a
     ld      l,a
     ld      h,0
 
@@ -35,6 +35,13 @@ updatebullets:
     call    mulby600        ; de = a * 600
     add     hl,de
 
-    ld      a,$B0
+    ld      a,(bulletinfo+1)
+    and     7
+    srl     a
+    add     a,$B0
     ld      (hl),a
+    ld      hl,(bulletinfo+2)
+    xor     a
+    ld      (hl),a
+    ld      (bulletinfo+2),hl
     ret
