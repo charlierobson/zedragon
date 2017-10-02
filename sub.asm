@@ -208,6 +208,27 @@ drawsub:
 
 
 copychar:
+    bit     7,a
+    jr      z,copynormal
+
+    and     $7f
+    or      $40
+
+    ld      h,4
+    ld      l,a
+    sla     l
+    rl      h
+    sla     l
+    rl      h
+    sla     l
+    rl      h
+    ldi \ ldi
+    ldi \ ldi
+    ldi \ ldi
+    ldi \ ldi
+    ret
+
+copynormal:
     ld      h,4
     ld      l,a
     sla     l

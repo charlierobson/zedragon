@@ -64,7 +64,7 @@ resetcredits:
     ld      (FRAMES),a
     jr      {+}
 
-
+ 
 updatecredits:
     ld      a,(titlecredidx)
     inc     a
@@ -149,7 +149,7 @@ animatecharacters:
     ld      e,a
     add     hl,de
     ld      a,(hl)
-    ld      ($2000+$1df),a
+    ld      ($2000+$3ff),a
 
     xor     a
 
