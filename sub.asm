@@ -1,21 +1,47 @@
-subx:
-    .byte   0
-suby:
-    .byte   0
-lastsubdata:
-    .byte   0,0,0,0,0,0
-lastsubaddress:
-    .word   0
-mul600:
-    .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
-collision:
-    .byte   0
-
 initsub:
     ld      hl,$0600
     ld      (subx),hl               ; sets subx = 0, suby = 1
-    ld      (lastsubaddress),hl     ; will sink the first sub 'undraw' into the ROM
+    ld      (subaddress),hl     ; will sink the first sub 'undraw' into the ROM
     ret
+
+
+movesub:
+    ld      hl,suby
+
+    ld      a,(up)          ; min y = 6
+    and     1
+    jr      z,{+}
+    ld      a,(hl)
+    cp      7
+    jr      c,{+}
+    dec     (hl)
+
++:  ld      a,(down)        ; max y = $47
+    and     1
+    jr      z,{+}
+    ld      a,(hl)
+    cp      $47
+    jr      nc,{+}
+    inc     (hl)
+
++:  ld      hl,subx
+
+    ld      a,(left)        ; min x = 0
+    and     1
+    jr      z,{+}
+    ld      a,(hl)
+    and     a
+    jr      z,{+}
+    dec     (hl)
+
++:  ld      a,(right)       ; max x = 160
+    and     1
+    jr      z,{+}
+    ld      a,(hl)
+    cp      $a0
+    jr      nc,{+}
+    inc     (hl)
++:  ret
 
 
 drawsub:
@@ -58,8 +84,8 @@ drawsub:
     ; undraw sub
     ; ideally we should do this as late as possible
 
-    ld      hl,lastsubdata
-    ld      de,(lastsubaddress)
+    ld      hl,subundrawdata
+    ld      de,(subaddress)
     ldi
     ldi
     ldi
@@ -75,8 +101,8 @@ drawsub:
     ; and preserve the characters under the sub
 
     pop     hl
-    ld      (lastsubaddress),hl
-    ld      de,lastsubdata
+    ld      (subaddress),hl
+    ld      de,subundrawdata
     ldi
     ldi
     ldi
@@ -90,17 +116,17 @@ drawsub:
     ; under the sub to a new group of 3x2 characters - effectively a tiny bitmap
 
     ld      de,$22c0
-    ld      a,(lastsubdata+0)
+    ld      a,(subundrawdata+0)
     call    copychar
-    ld      a,(lastsubdata+3)
+    ld      a,(subundrawdata+3)
     call    copychar
-    ld      a,(lastsubdata+1)
+    ld      a,(subundrawdata+1)
     call    copychar
-    ld      a,(lastsubdata+4)
+    ld      a,(subundrawdata+4)
     call    copychar
-    ld      a,(lastsubdata+2)
+    ld      a,(subundrawdata+2)
     call    copychar
-    ld      a,(lastsubdata+5)
+    ld      a,(subundrawdata+5)
     call    copychar
 
     ; now we've effectively built our tiny bitmap we can render the sub into it
@@ -136,7 +162,7 @@ drawsub:
 
 -:  ld      c,(hl)          ; get sub pixels
     ld      a,(de)          ; get bg pixels
-    and     c              ; merge sub into background
+    and     c               ; merge sub into background
     ld      (de),a
 
     inc     hl
@@ -155,28 +181,27 @@ drawsub:
     pop     bc
     djnz    {--}
 
-    ld      hl,(lastsubaddress)
-    ld      a,$98
-    ld      (hl),a
-    inc     a
-    inc     a
-    inc     hl
-    ld      (hl),a
-    inc     a
-    inc     a
-    inc     hl
-    ld      (hl),a
-    ld      de,600-2
+    ; now draw the mini bitmap containing the sub to the screen
+
+    ld      hl,600
+    ld      de,(subaddress)
     add     hl,de
-    ld      a,$99
+    ld      a,$98
+    ld      (de),a
+    inc     a
+    inc     de
     ld      (hl),a
     inc     a
-    inc     a
     inc     hl
+    ld      (de),a
+    inc     a
+    inc     de
     ld      (hl),a
     inc     a
-    inc     a
     inc     hl
+    ld      (de),a
+    inc     a
+    inc     de
     ld      (hl),a
 
     ret
@@ -202,41 +227,3 @@ copychar:
 
     ret
 
-
-movesub:
-    ld      hl,suby
-
-    ld      a,(up)          ; min y = 6
-    and     1
-    jr      z,{+}
-    ld      a,(hl)
-    cp      7
-    jr      c,{+}
-    dec     (hl)
-
-+:  ld      a,(down)        ; max y = $47
-    and     1
-    jr      z,{+}
-    ld      a,(hl)
-    cp      $47
-    jr      nc,{+}
-    inc     (hl)
-
-+:  ld      hl,subx
-
-    ld      a,(left)        ; min x = 0
-    and     1
-    jr      z,{+}
-    ld      a,(hl)
-    and     a
-    jr      z,{+}
-    dec     (hl)
-
-+:  ld      a,(right)       ; max x = 160
-    and     1
-    jr      z,{+}
-    ld      a,(hl)
-    cp      $a0
-    jr      nc,{+}
-    inc     (hl)
-+:  ret

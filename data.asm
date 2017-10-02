@@ -66,9 +66,21 @@ scrolltick:
 scrollpos:
     .word   0
 
-airupdatecounter:
+subx:
+    .byte   0
+suby:
+    .byte   0
+subaddress:
+    .word   0
+subundrawdata:
+    .byte   0,0,0,0,0,0
+mul600:
+    .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
+collision:
     .byte   0
 
+airupdatecounter:
+    .byte   0
 airlevel:
     .byte   0
 
