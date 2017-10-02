@@ -5,6 +5,23 @@ setupudg:
     ldir
     ld      a,$21
     ld      i,a
+
+    ; invert the source character set in memory,
+    ; makes the subpixel rendering easier
+
+    ld      hl,charsets
+    ld      b,0
+
+-:  ld      a,(hl)
+    xor     $ff
+    ld      (hl),a
+    inc     hl
+    ld      a,(hl)
+    xor     $ff
+    ld      (hl),a
+    inc     hl
+    djnz    {-}
+
     ret
 
 
@@ -150,6 +167,7 @@ animatecharacters:
     add     hl,de
     ld      a,(hl)
     ld      ($2000+$3ff),a
+    ld      (charsets+$3ff),a
 
     xor     a
 
