@@ -12,6 +12,7 @@ starthere:
     ; one off initialisations
 
     call    golow
+    call    inittables
     call    initmap
     call    setupudg
     call    setupdisplay
@@ -55,11 +56,9 @@ attractmain:
     ld      a,(FRAMES)
     and     127
     cp      1
-    jr      nz,{+}
+    call    z,updatecredits
 
-    call    updatecredits
-
-+:  ld      a,(fire)
+    ld      a,(fire)
     cp      1
     ret
 
@@ -67,10 +66,16 @@ attractmain:
 gamemain:
     call    scroll
     call    updateair
+    call    updatebullets
+
     call    movesub
     call    drawsub
 
-+:  ld      a,(fire)
+    ld      a,(fire)
+    cp      1
+    call    z,startbullet
+
+    xor     a
     cp      1
     ret
 
@@ -97,6 +102,7 @@ mainproc:
 
 #include "input.asm"
 #include "sub.asm"
+#include "bullets.asm"
 #include "airfns.asm"
 #include "scorefns.asm"
 #include "datafns.asm"

@@ -54,29 +54,16 @@ drawsub:
     ld      l,a
     ld      h,0
 
-    ld      a,(suby)        ; div by 8 then mul by 2 to index the mul600 table
+    ld      a,(suby)        ; div by 8 to get character line then mul by 600
     srl     a
     srl     a
-    and     $fe
-
-    ld      de,mul600
-    add     a,e             ; add A to de
-    ld      e,a
-    adc     a,d
-    sub     e
-    ld      d,a
-
-    ex      de,hl           ; retrieve multiplied value
-    ld      a,(hl)
-    inc     hl
-    ld      h,(hl)
-    ld      l,a
-    ex      de,hl
-
+    srl     a
+    call    mulby600        ; de = a * 600
     add     hl,de           ; character offset relative to visible window
 
     ld      de,(scrollpos)
     add     hl,de
+
     ld      de,D_BUFFER
     add     hl,de
     push    hl              ; character offset relative to display window
