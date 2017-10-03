@@ -74,7 +74,7 @@ drawsub:
 
     res     6,h                 ; point hl at mapcache in high memory
     set     7,h
-    ld      de,bgchardata    ; cache the characters from the map copy
+    ld      de,bgchardata       ; cache the characters from the map copy
     ldi
     ldi
     ldi
@@ -86,8 +86,14 @@ drawsub:
     ldi
     ldi
 
-    ; copy the pixel data corresponding to the characters
-    ; under the sub to a new group of 3x2 characters - effectively a tiny bitmap
+    ; copy the pixel data corresponding to the characters under the sub
+    ; to a new group of 3x2 characters - effectively a tiny bitmap
+    ;
+    ; on-screen:
+    ;   $98 $9a $9c
+    ;   $99 $9b $9d
+    ;
+    ; it's like this because the rendering of the sub char is easier using columns
 
     ld      de,$22c0
     ld      a,(bgchardata+0)
@@ -102,6 +108,15 @@ drawsub:
     call    copychar
     ld      a,(bgchardata+5)
     call    copychar
+
+
+
+
+
+
+
+
+
 
     ; now we've effectively built our tiny bitmap we can render the sub into it
     ; choose which set of 3 pre-scrolled sub tiles to use
@@ -154,11 +169,11 @@ drawsub:
     pop     bc
     djnz    {--}
 
-    ; undraw the old sub pos
+    ; undraw the old sub
 
     ld      hl,(oldsubaddress)      ; point hl into clean map
     ld      e,l
-    ld      d,h    
+    ld      d,h
     res     6,h
     set     7,h
     ldi
@@ -168,8 +183,8 @@ drawsub:
     add     hl,de
     ld      e,l
     ld      d,h    
-    res     6,h
-    set     7,h
+    res     7,d
+    set     6,d
     ldi
     ldi
     ldi
@@ -202,25 +217,19 @@ drawsub:
 
 
 copychar:
-    ld      hl,charsets     ; source data pointer
-
-    ld      b,0             ; forward initialisation of counter
-
-    bit     7,a             ; is this a character from the $+64 set
-    jr      z,{+}
-
-    and     $7f             ; high character, so adjust offset in char map
-    or      $40
-
-+:  ld      c,a             ; char number -> byte offset
-    sla     c
+    ld      hl,charsets
+    ld      b,0             ; prep to receive carry
+    sla     a               ; if this char is +64 then C is set
+    rr      b               ; 0, or $80 if this was a +64 char
+    or      b               ; add bit 7 back into the function, but as bit 6 instead
+    ld      b,0
+    ld      c,a
     rl      b
     sla     c
     rl      b
     sla     c
     rl      b
     add     hl,bc
-
     ldi \ ldi               ; copy pixel data to new character pointed at by DE
     ldi \ ldi
     ldi \ ldi
