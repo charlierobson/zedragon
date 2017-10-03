@@ -10,6 +10,7 @@ void putchar(PImage target, byte[] charset, int c, int x, int y)
   for (int c2 = 0; c2 < 8; c2++)
   {
     byte charb = charset[c * 8 + c2];
+    if (c > 63) charb ^= 255;
 
     if ((charb & 0x80) != 0) target.pixels[x + 0 + y] = fg; else target.pixels[x + 0 + y] = bg;
     if ((charb & 0x40) != 0) target.pixels[x + 1 + y] = fg; else target.pixels[x + 1 + y] = bg;
@@ -29,33 +30,60 @@ void putchar(PImage target, byte[] charset, int c, int x, int y)
 
 void setup()
 {
-  byte[] chardata = loadBytes("charset.bin");
+  byte[] chardata = loadBytes("sdchars.bin");
 
-  PImage pg = createImage(33*8, 25*8,RGB);
+  PImage pg = createImage(192, 8,RGB);
+
+  size(384,16);
+
+  background(190);
+  
   pg.loadPixels();
   for (int i = 0; i < pg.pixels.length; i++) {
     pg.pixels[i] = color(220); 
   }
 
-  for(int c = 0; c < 192; c++)
+  int b = 0;
+  for (int i = 0; i < 8; ++i)
   {
-    putchar(pg, chardata, c, 8 + 16 * (c & 15), 8 + 16 * (c / 16));
+    putchar(pg, chardata,   0,   0+b, 0);
+    putchar(pg, chardata,   0,   8+b, 0);
+    putchar(pg, chardata,   0,  16+b, 0);
+    putchar(pg, chardata, 126, 0+i+b, 0);
+    putchar(pg, chardata, 127, 8+i+b, 0);
+    b += 24;
   }
 
-  size(560,432);
-  background(190);
-  smooth();
-  image(pg, 16, 16, pg.width * 2, pg.height * 2);
+  image(pg, 0, 0, pg.width * 2, pg.height * 2);
 
-  fill(0,50,100);
-  for(int c = 0; c < 64; c++)
+  pg.loadPixels();
+
+  byte[] bytes = new byte[8*24];
+  
+  int bx = 0;
+  for (int i = 0; i < 24; ++i)
   {
-    text(hex(c&15, 2), 32 + 32 * (c & 15), 12);
-    text(hex(c/16, 2), 0, 44 + 32 * (c / 16));
-    text(hex((c+128)/16, 2), 0, 172 + 32 * (c / 16));
-    text(hex(c/16, 2), 0, 300 + 32 * (c / 16));
+    for(int y = 0; y < 8; ++y)
+    {
+      int mask = 128;
+      bytes[bx+y] = 0;
+      for(int x = 0; x < 8; ++x)
+      {
+        Boolean pix = pg.pixels[bx + x + (y*pg.width)] != color(0);
+        if (pix)
+        {
+          bytes[bx+y] |= mask;
+        }
+        mask /= 2;
+      }
+    }
+
+    bx = bx + 8;
   }
-  save("sd-chars.png");
+
+  image(pg, 0, 0, pg.width * 2, pg.height * 2);
+
+  saveBytes("subs.bin", bytes);
 }
 
 void draw()
