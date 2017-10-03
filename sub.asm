@@ -41,7 +41,9 @@ movesub:
     cp      $a0
     jr      nc,{+}
     inc     (hl)
+
 +:  ret
+
 
 
 drawsub:
@@ -71,21 +73,6 @@ drawsub:
 
     ; find the character codes that appear under the sub in its new position
     ; use the map cache as the code source because the display is dirty at this point
-
-    res     6,h                 ; point hl at mapcache in high memory
-    set     7,h
-    ld      de,bgchardata       ; cache the characters from the map copy
-    ldi
-    ldi
-    ldi
-    push    de
-    ld      de,600-3
-    add     hl,de
-    pop     de
-    ldi
-    ldi
-    ldi
-
     ; copy the pixel data corresponding to the characters under the sub
     ; to a new group of 3x2 characters - effectively a tiny bitmap
     ;
@@ -95,28 +82,24 @@ drawsub:
     ;
     ; it's like this because the rendering of the sub char is easier using columns
 
-    ld      de,$22c0
-    ld      a,(bgchardata+0)
+    res     6,h                 ; point hl at mapcache in high memory
+    set     7,h
+    push    hl
+    ld      de,$22c0            ; address of char $98
     call    copychar
-    ld      a,(bgchardata+3)
+    ld      e,$d0
     call    copychar
-    ld      a,(bgchardata+1)
+    ld      e,$e0
     call    copychar
-    ld      a,(bgchardata+4)
+    pop     hl
+    ld      bc,600
+    add     hl,bc
+    ld      e,$c8
     call    copychar
-    ld      a,(bgchardata+2)
+    ld      e,$d8
     call    copychar
-    ld      a,(bgchardata+5)
+    ld      e,$e8
     call    copychar
-
-
-
-
-
-
-
-
-
 
     ; now we've effectively built our tiny bitmap we can render the sub into it
     ; choose which set of 3 pre-scrolled sub tiles to use
@@ -157,14 +140,12 @@ drawsub:
     inc     de
     djnz    {-}
 
-    ; step across the dest bitmap
+    ; step across the dest bitmap to the next column
+    ; we know the address won't overflow the bottom 8 bits
 
     ld      a,8
     add     a,e
     ld      e,a
-    adc     a,d
-    sub     e
-    ld      d,a
 
     pop     bc
     djnz    {--}
@@ -217,6 +198,10 @@ drawsub:
 
 
 copychar:
+    ld      a,(hl)
+    inc     hl
+    push    hl
+
     ld      hl,charsets
     ld      b,0             ; prep to receive carry
     sla     a               ; if this char is +64 then C is set
@@ -230,8 +215,11 @@ copychar:
     sla     c
     rl      b
     add     hl,bc
+
     ldi \ ldi               ; copy pixel data to new character pointed at by DE
     ldi \ ldi
     ldi \ ldi
     ldi \ ldi
+
+    pop     hl
     ret
