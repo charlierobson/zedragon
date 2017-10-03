@@ -1,47 +1,57 @@
 bulletinfo:
-    .byte   $20,0,0,0
+    .byte   0,0,0,0,0
+
 
 startbullet:
     ld      a,(subx)
-    add     a,12
     srl     a
     srl     a
     srl     a
-    ld      (bulletinfo),a
-    ld      a,(suby)
-    add     a,4
-    ld      (bulletinfo+1),a
-    ret
-
-updatebullets:
-    ld      a,(bulletinfo)
-    cp      32
-    ret     z
-
-    inc     a
-    ld      (bulletinfo),a
     ld      l,a
     ld      h,0
-
-    ld      de,(scrollpos)
-    add     hl,de
     ld      de,D_BUFFER
     add     hl,de
-
-    ld      a,(bulletinfo+1)
-    srl     a
-    srl     a
-    srl     a
-    call    mulby600        ; de = a * 600
+    ld      de,(scrollpos)
     add     hl,de
+    ld      a,(suby)
+    add     a,4
+    srl     a
+    srl     a
+    srl     a
+    call    mulby600
+    add     hl,de
+    ld      (bulletinfo),hl
 
-    ld      a,(bulletinfo+1)
+    ld      a,(subx)
+    add     a,10
+    neg
+    srl     a
+    srl     a
+    srl     a
+    ld      (bulletinfo+2),a    ; max lifetime for bullet
+
+    ld      a,(suby)
+    add     a,4
     and     7
     srl     a
-    add     a,$B0
-    ld      (hl),a
-    ld      hl,(bulletinfo+2)
+    add     a,$b0
+    ld      (bulletinfo+3),a
+    ret
+
+
+updatebullets:
+    ld      a,(bulletinfo+2)
+    and     a
+    ret     z
+    dec     a
+    ld      (bulletinfo+2),a
+
+    ld      hl,(bulletinfo)      ; xpos
     xor     a
     ld      (hl),a
-    ld      (bulletinfo+2),hl
+    inc     hl
+    ld      (bulletinfo),hl
+
+    ld      a,(bulletinfo+3)
+    ld      (hl),a
     ret

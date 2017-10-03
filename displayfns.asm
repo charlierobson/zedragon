@@ -252,7 +252,7 @@ hexout:
     cp      10
     jr      c,{+}
     add     a,7
-+:  add     a,$90
++:  add     a,$10
     ld      (de),a
     inc     de
     ret
