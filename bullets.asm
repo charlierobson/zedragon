@@ -1,7 +1,6 @@
 bulletinfo:
     .byte   0,0,0,0,0
 
-
 startbullet:
     ld      a,(subx)
     srl     a

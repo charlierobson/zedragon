@@ -1,7 +1,7 @@
 initsub:
     ld      hl,$0600
     ld      (subx),hl               ; sets subx = 0, suby = 1
-    ld      (subaddress),hl     ; will sink the first sub 'undraw' into the ROM
+    ld      (oldsubaddress),hl      ; we'll sink the first sub 'undraw' into the ROM
     ret
 
 
@@ -54,47 +54,34 @@ drawsub:
     ld      l,a
     ld      h,0
 
-    ld      a,(suby)        ; div by 8 to get character line then mul by 600
+    ld      a,(suby)            ; div by 8 to get character line then mul by 600
     srl     a
     srl     a
     srl     a
-    call    mulby600        ; de = a * 600
-    add     hl,de           ; character offset relative to visible window
+    call    mulby600            ; de = a * 600
+    add     hl,de               ; character offset relative to visible window
 
     ld      de,(scrollpos)
     add     hl,de
 
     ld      de,D_BUFFER
     add     hl,de
-    push    hl              ; character offset relative to display window
 
-    ; undraw sub
-    ; ideally we should do this as late as possible
+    ld      (subaddress),hl     ; sub's address in the display memory
 
-    ld      hl,subundrawdata
-    ld      de,(subaddress)
-    ldi
-    ldi
-    ldi
-    ex      de,hl
-    ld      bc,600-3
-    add     hl,bc
-    ex      de,hl
-    ldi
-    ldi
-    ldi
+    ; find the character codes that appear under the sub in its new position
+    ; use the map cache as the code source because the display is dirty at this point
 
-    ; save newposition as next frame's undraw location
-    ; and preserve the characters under the sub
-
-    pop     hl
-    ld      (subaddress),hl
-    ld      de,subundrawdata
+    res     6,h                 ; point hl at mapcache in high memory
+    set     7,h
+    ld      de,bgchardata    ; cache the characters from the map copy
     ldi
     ldi
     ldi
-    ld      bc,600-3
-    add     hl,bc
+    push    de
+    ld      de,600-3
+    add     hl,de
+    pop     de
     ldi
     ldi
     ldi
@@ -103,21 +90,20 @@ drawsub:
     ; under the sub to a new group of 3x2 characters - effectively a tiny bitmap
 
     ld      de,$22c0
-    ld      a,(subundrawdata+0)
+    ld      a,(bgchardata+0)
     call    copychar
-    ld      a,(subundrawdata+3)
+    ld      a,(bgchardata+3)
     call    copychar
-    ld      a,(subundrawdata+1)
+    ld      a,(bgchardata+1)
     call    copychar
-    ld      a,(subundrawdata+4)
+    ld      a,(bgchardata+4)
     call    copychar
-    ld      a,(subundrawdata+2)
+    ld      a,(bgchardata+2)
     call    copychar
-    ld      a,(subundrawdata+5)
+    ld      a,(bgchardata+5)
     call    copychar
 
     ; now we've effectively built our tiny bitmap we can render the sub into it
-
     ; choose which set of 3 pre-scrolled sub tiles to use
 
     ld      a,(subx)        ; pixel offset 0..7
@@ -168,10 +154,31 @@ drawsub:
     pop     bc
     djnz    {--}
 
+    ; undraw the old sub pos
+
+    ld      hl,(oldsubaddress)      ; point hl into clean map
+    ld      e,l
+    ld      d,h    
+    res     6,h
+    set     7,h
+    ldi
+    ldi
+    ldi
+    ld      de,600-3
+    add     hl,de
+    ld      e,l
+    ld      d,h    
+    res     6,h
+    set     7,h
+    ldi
+    ldi
+    ldi
+
     ; now draw the mini bitmap containing the sub to the screen
 
     ld      hl,600
     ld      de,(subaddress)
+    ld      (oldsubaddress),de
     add     hl,de
     ld      a,$98
     ld      (de),a
@@ -195,15 +202,17 @@ drawsub:
 
 
 copychar:
-    ld      hl,charsets
-    ld      b,0
-    bit     7,a
+    ld      hl,charsets     ; source data pointer
+
+    ld      b,0             ; forward initialisation of counter
+
+    bit     7,a             ; is this a character from the $+64 set
     jr      z,{+}
 
-    and     $7f
+    and     $7f             ; high character, so adjust offset in char map
     or      $40
 
-+:  ld      c,a
++:  ld      c,a             ; char number -> byte offset
     sla     c
     rl      b
     sla     c
@@ -211,7 +220,8 @@ copychar:
     sla     c
     rl      b
     add     hl,bc
-    ldi \ ldi
+
+    ldi \ ldi               ; copy pixel data to new character pointed at by DE
     ldi \ ldi
     ldi \ ldi
     ldi \ ldi

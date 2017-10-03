@@ -31,6 +31,7 @@ starthere:
     call    initsub
     call    cls
     call    resetscroll
+    call    refreshmap
     call    drawmap
     call    resetscore
     call    resetair
