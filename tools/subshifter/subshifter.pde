@@ -40,7 +40,7 @@ void setup()
   
   pg.loadPixels();
   for (int i = 0; i < pg.pixels.length; i++) {
-    pg.pixels[i] = color(220); 
+    pg.pixels[i] = color(255); 
   }
 
   int b = 0;
@@ -54,9 +54,26 @@ void setup()
     b += 24;
   }
 
-  image(pg, 0, 0, pg.width * 2, pg.height * 2);
+  PGraphics pg2;
+  pg2 = createGraphics(192,8);
+  pg2.beginDraw();
+  pg2.background(255);
+  pg2.stroke(0);
+  pg2.image(pg,0,0);
+  pg2.noFill();
 
-  pg.loadPixels();
+  pg2.rect(0*24,0,23,7);
+  pg2.rect(1*24,0,23,7);
+  pg2.rect(2*24,0,23,7);
+  pg2.rect(3*24,0,23,7);
+  pg2.rect(4*24,0,23,7);
+  pg2.rect(5*24,0,23,7);
+  pg2.rect(6*24,0,23,7);
+  pg2.rect(7*24,0,23,7);
+
+  pg2.endDraw();
+
+  pg2.loadPixels();
 
   byte[] bytes = new byte[8*24];
   
@@ -69,7 +86,7 @@ void setup()
       bytes[bx+y] = 0;
       for(int x = 0; x < 8; ++x)
       {
-        Boolean pix = pg.pixels[bx + x + (y*pg.width)] != color(0);
+        Boolean pix = pg2.pixels[bx + x + (y*pg.width)] != color(0);
         if (pix)
         {
           bytes[bx+y] |= mask;
@@ -81,7 +98,7 @@ void setup()
     bx = bx + 8;
   }
 
-  image(pg, 0, 0, pg.width * 2, pg.height * 2);
+  image(pg2, 0, 0, pg.width * 2, pg.height * 2);
 
   saveBytes("subs.bin", bytes);
 }

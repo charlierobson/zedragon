@@ -59,16 +59,16 @@ BUFF_OFFSET =  $+1
 	EXX								;4	119
 	PUSH	BC						;11	130
 	PUSH	DE						;11	141
-	LD		B,8						;7	148
+	LD		BC,$0800				;10	151
 
-	NOP								;4	152
+;	NOP							
 
 ;RESET ULA LINE COUNTER
-	IN		A,($FE)					;11	163
-	OUT		($FF),A					;11	174
+	IN		A,($FE)					;11	162
+	OUT		($FF),A					;11	173
 ;MORE TIMING
-	NOP								;4	178
-	JR		TOP_DO_SCAN_LINE		;12	190
+	LD	A,0						;7	180
+	JP		TOP_DO_SCAN_LINE		;12	190
 
 ;DISPLAY THE TOP LINE
 
@@ -121,24 +121,24 @@ ALTHL =  $+1
 HLST =	$+1
 	Ld		HL,D_BUFFER + $8000		;10	24
 	LD		DE,BUFFER_WIDTH			;10	34
-	LD		BC,7 * 256 + 7			;10	44
+	LD		BC,7 * 256 + 6			;10	44
+	INC		BC					;6	50
 
-	ld		a,$21					;7 51		game font
-	ld		i,a						;9 60
-	nop								;4 64
-	LD		(JUST_TWO_BYTES),IY		;20	84
-	LD		(JUST_TWO_BYTES),IY		;20	104
-	LD		(JUST_TWO_BYTES),IY		;20	124
-	LD		(JUST_TWO_BYTES),IY		;20	144
-	NOP								;4	148
-	NOP								;4	152
+	ld		a,$21					;7 57		game font
+	ld		i,a						;9 66
+	nop								;4 70
+	LD		(JUST_TWO_BYTES),IY		;20	90
+	LD		(JUST_TWO_BYTES),IY		;20	110
+	LD		(JUST_TWO_BYTES),IY		;20	130
+	LD		(JUST_TWO_BYTES),IY		;20	150
+
 
 
 ;RESET LINE COUNTER
-	IN		A,($FE)					;11	163
-	OUT		($FF),A 				;11	174
-	LD		A,0						;7	181
+	IN		A,($FE)					;11	161
+	OUT		($FF),A 				;11	172
 
+	LD	A,R						;9	181
 	EXX								;4	185
 	LD		A,(HL)					;7	192
 	LD		(HL),C					;7	199
@@ -260,19 +260,19 @@ WASTE207:
 
 	ld		a,$24				;7	125 ; text font
 	ld		i,a					;9	134
-	nop							;4	138
-	ld		b,0					;7  145
+	ld		bC,$0800				;10  144
 
 ;SAME KIND OF LOOP FOR BOTTOM LINE AS TOP LINE
 
-	LD	B,8						;7		152
+	INC	BC						;6	150
 ;RESET LINE COUNTER...
-	IN	A,($FE)					;11		163
-	OUT	($FF),A					;11		174
+	IN	A,($FE)					;11		161
+	OUT	($FF),A					;11		172
 ;MORE TIMING
-	NOP							;4	    178
+	NOP
+	NOP
 
-	JR	BOTTOM_DO_SCAN_LINE			;12    190
+	JP	BOTTOM_DO_SCAN_LINE			;10    190
 
 BOTTOM_MORE_LINES:					;13	   151
 	PUSH IY 						;15	   166

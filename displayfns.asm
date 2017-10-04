@@ -227,13 +227,31 @@ scroll:
     ret
 
 
+showsubcoords:
+    ld      a,(subx)
+    ld      de,TOP_LINE+6
+    call    hexout
+    xor     a
+    ld      (de),a
+    inc     de
+    ld      a,(suby)
+    call    hexout
+    xor     a
+    ld      (de),a
+    inc     de
+    ld      a,(subx)
+    and     7
+    call    hexout
+    ret
+
+
 displaylastk:
-    ld      de,BOTTOM_LINE+23
+    ld      de,TOP_LINE+23
     ld      a,(LAST_K+1)
     call    hexout
     ld      a,(LAST_K)
     call    hexout
-    ld      de,BOTTOM_LINE+28
+    ld      de,TOP_LINE+28
     ld      a,(LAST_K+1)
     xor     $ff
     call    hexout
@@ -268,14 +286,14 @@ copychar:
     jr      nz,{+}
 
     ld      a,$ff           ; blat the character
-    ld      (de),a \ inc     de
-    ld      (de),a \ inc     de
-    ld      (de),a \ inc     de
-    ld      (de),a \ inc     de
-    ld      (de),a \ inc     de
-    ld      (de),a \ inc     de
-    ld      (de),a \ inc     de
-    ld      (de),a \ inc     de
+    ld (de),a \ inc de
+    ld (de),a \ inc de
+    ld (de),a \ inc de
+    ld (de),a \ inc de
+    ld (de),a \ inc de
+    ld (de),a \ inc de
+    ld (de),a \ inc de
+    ld (de),a \ inc de
 
     pop     hl
     ret

@@ -53,7 +53,8 @@ inputstates:
     .byte	btb5,$10,$80,0        ; left
     .byte	btb4,$08,$80,0        ; right
     .byte	btb3,$02,$80,0        ; fire
-    .byte	btb0,$02,$40,0        ; quit
+    .byte	btb0,$02,$08,0        ; advance
+    .byte	btb0,$02,$10,0        ; quit
 
 ; calculate actual input impulse addresses
 up    = inputstates + 3
@@ -61,7 +62,8 @@ down  = inputstates + 7
 left  = inputstates + 11
 right = inputstates + 15
 fire  = inputstates + 19
-quit  = inputstates + 23
+advance = inputstates + 23
+quit  = inputstates + 27
 
 scrolltick:
 	.byte	0
@@ -115,3 +117,8 @@ flagframe:
 	.byte		0
 flaganimation:
 	.byte		$1e,$de, $1e,$dc, $1c,$dc, $1c,$de
+
+    .align 512
+charsets:
+    .incbin "charset.bin"
+

@@ -44,15 +44,8 @@ starthere:
     jr      {-}
 
 
-slkmain:
-    call    displaylastk
-    xor     a
-    cp      1
-    ret
-
-
 attractmain:
-    ;call    displaylastk
+    call    displaylastk
 
     ld      a,(FRAMES)
     and     127
@@ -65,19 +58,26 @@ attractmain:
 
 
 gamemain:
+    ld      a,(advance)
+    cp      1
+    ;ret     nz
+
     call    scroll
     call    updateair
 
     call    movesub
+
+    call    showsubcoords
+
     call    drawsub
     call    updatebullets
 
     ld      a,(fire)
-    cp      1
+    cp      3
     call    z,startbullet
 
-    xor     a
-    cp      1
+    ld      a,(quit)
+    cp      3
     ret
 
 
@@ -115,10 +115,6 @@ mainproc:
 #include "zxpand.asm"
 
 #include "data.asm"
-
-    .align 512
-charsets:
-    .incbin "charset.bin"
 
 endshere:
 ; ------------------------------------------------------------
