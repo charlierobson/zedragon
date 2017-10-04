@@ -67,10 +67,10 @@ attractmain:
 gamemain:
     call    scroll
     call    updateair
-    call    updatebullets
 
     call    movesub
     call    drawsub
+    call    updatebullets
 
     ld      a,(fire)
     cp      1

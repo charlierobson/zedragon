@@ -196,30 +196,3 @@ drawsub:
 
     ret
 
-
-copychar:
-    ld      a,(hl)
-    inc     hl
-    push    hl
-
-    ld      hl,charsets
-    ld      b,0             ; prep to receive carry
-    sla     a               ; if this char is +64 then C is set
-    rr      b               ; 0, or $80 if this was a +64 char
-    or      b               ; add bit 7 back into the function, but as bit 6 instead
-    ld      b,0
-    ld      c,a
-    rl      b
-    sla     c
-    rl      b
-    sla     c
-    rl      b
-    add     hl,bc
-
-    ldi \ ldi               ; copy pixel data to new character pointed at by DE
-    ldi \ ldi
-    ldi \ ldi
-    ldi \ ldi
-
-    pop     hl
-    ret
