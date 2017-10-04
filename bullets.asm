@@ -20,7 +20,7 @@ startbullet:
     ld      de,(scrollpos)
     add     hl,de
     ld      a,(suby)
-    add     a,4
+    add     a,5
     srl     a
     srl     a
     srl     a

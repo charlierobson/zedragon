@@ -1,5 +1,6 @@
 readjoy:
     call    $1ffe
+    or      %00000111
     ld      (LAST_J),a
 
     ; point at first input state block
@@ -9,8 +10,9 @@ readjoy:
     call    updateinputstate ; (down)
     call    updateinputstate
     call    updateinputstate
+    call    updateinputstate
 
-    ; fall into here for last input - fire
+    ; fall into here for last input - quit
 
 updateinputstate:
     ld      a,(hl)

@@ -52,7 +52,8 @@ inputstates:
     .byte	btb6,$02,$02,0        ; down
     .byte	btb5,$10,$80,0        ; left
     .byte	btb4,$08,$80,0        ; right
-    .byte	btb3,$02,$40,0        ; fire
+    .byte	btb3,$02,$80,0        ; fire
+    .byte	btb0,$02,$40,0        ; quit
 
 ; calculate actual input impulse addresses
 up    = inputstates + 3
@@ -60,6 +61,7 @@ down  = inputstates + 7
 left  = inputstates + 11
 right = inputstates + 15
 fire  = inputstates + 19
+quit  = inputstates + 23
 
 scrolltick:
 	.byte	0
