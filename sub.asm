@@ -16,11 +16,11 @@ movesub:
     jr      c,{+}
     dec     (hl)
 
-+:  ld      a,(down)        ; max y = $47
++:  ld      a,(down)        ; max y = $48
     and     1
     jr      z,{+}
     ld      a,(hl)
-    cp      $47
+    cp      $48
     jr      nc,{+}
     inc     (hl)
 
