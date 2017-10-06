@@ -282,23 +282,11 @@ copychar:
     inc     hl
     push    hl
 
+    ld      hl,eightuffuffs    
     and     a
-    jr      nz,{+}
+    jr      z,{+}
 
-    ld      a,$ff           ; blat the character
-    ld (de),a \ inc de
-    ld (de),a \ inc de
-    ld (de),a \ inc de
-    ld (de),a \ inc de
-    ld (de),a \ inc de
-    ld (de),a \ inc de
-    ld (de),a \ inc de
-    ld (de),a \ inc de
-
-    pop     hl
-    ret
-
-+:  ld      hl,charsets
+    ld      hl,charsets
     ld      b,0             ; prep to receive carry
     sla     a               ; if this char is +64 then C is set
     rr      b               ; 0, or $80 if this was a +64 char
@@ -312,10 +300,13 @@ copychar:
     rl      b
     add     hl,bc
 
-    ldi \ ldi               ; copy pixel data to new character pointed at by DE
+:+  ldi \ ldi               ; copy pixel data to new character pointed at by DE
     ldi \ ldi
     ldi \ ldi
     ldi \ ldi
 
     pop     hl
     ret
+
+eightuffuffs:
+    .fill   8
