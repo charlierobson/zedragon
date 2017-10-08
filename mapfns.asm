@@ -1,33 +1,21 @@
-;  rom   ram   ram   ram   ram
-; $0000 $2000 $4000 $6000 $8000 $a000 $c000 $e000
-;  0000  0010  0100  0110  1000  1010  1100  1110 
-
-
-map = $2600
+puremap = $2600
 
 initmap:
+    ; done once at load time. map is piggy-backing the display buffer.
+    ; make a pure map copy in 8k block
+
     ld      hl,D_BUFFER
-    ld      de,map
-    ld      bc,6000
-    ldir
-    ret
-
-
-refreshmap:
-    ; copy 'pure' map data up into high memory where it mirrors the display file
-
-    ld      hl,map
-    push    hl
-    ld      de,D_BUFFER+$4000
-    push    de
+    ld      de,puremap
     ld      bc,6000
     ldir
 
-    ; reset mines and stalactites
+    ; reset mines and stalactites in the pure map
 
     ld      b,minecount
     ld      hl,minetbl
--:  push    bc
+
+mineloop:
+    push    bc
 
     ld      e,(hl)      ; x char => de
     inc     hl
@@ -40,29 +28,85 @@ refreshmap:
     ex      de,hl       ; hl = x char
     call    mulby600    ; de = a * 600
     add     hl,de
-    ld      de,D_BUFFER+$4000
+    ld      de,puremap
     add     hl,de
     ex      de,hl
 
     pop     hl
-    ld      a,(hl)
+    ld      a,(hl)      ; get enemy type
+    and     $3f         ; mask off modifier bits
+    bit     6,(hl)      ; but remember state of modifier
     inc     hl
     ld      (de),a
+    call    nz,drawchain
 
     pop     bc
-    djnz    {-}
+    djnz    mineloop
+
+    ret
+
+
+
+
+-:  xor     a
+    ld      (de),a
+
+undrawchain:
+    ld      a,$58           ; de += 600
+    add     a,e
+    ld      e,a
+    ld      a,$02
+    adc     a,d
+    ld      d,a
+
+    ld      a,(de)          ; if (de) == 0, make (de) = $22, else done
+    cp      $22
+    jr      z,{-}
+
+    ret
+
+
+
+-:  ld      a,$22           ; draw a chain character into the map
+    ld      (de),a
+
+drawchain:
+    ld      a,$58           ; de += 600
+    add     a,e
+    ld      e,a
+    ld      a,$02
+    adc     a,d
+    ld      d,a
+
+    ld      a,(de)          ; if (de) == 0, make (de) = $22, else done
+    and     a
+    jr      z,{-}
+
+    ret
+
+
+
+refreshmap:
+    ; copy 'pure' map data up into high memory where it mirrors the display file
+
+    ld      hl,puremap
+    ld      de,D_BUFFER+$4000
+    ld      bc,6000
+    ldir
 
     ; copy the mirror map into the display
 
-    pop     hl
-    pop     de
+    ld      hl,puremap
+    ld      de,D_BUFFER
     ld      bc,6000
     ldir
 
     ret
 
+
+
 mine = $3f
-staticmine = $3f
+staticmine = $3f+$40
 stalactite = $37
 minecount = 216
 minetbl:

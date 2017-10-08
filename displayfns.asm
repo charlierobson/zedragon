@@ -118,7 +118,7 @@ updatecredits:
 
 
 drawmap:
-    ld      hl,map
+    ld      hl,puremap
     ld      de,D_BUFFER
     ld      bc,6000
     ldir

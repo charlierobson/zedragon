@@ -66,17 +66,40 @@ updatebullets:
     ld      l,a
     ld      h,d
 
-    ld      a,(hl)              ; see what's on screen under the blt
+    ld      a,(hl)              ; see what's on screen under the bullet
     ld      (hl),0              ; then draw the blt
     cp      $ff
-    jr      nz,{+}              ; jump if pixels detected under blt
 
-    ld      hl,(bltdrawaddr)     ; draw our freshly rendered blt + bg
+    ld      hl,(bltdrawaddr)    ; fetch the character that the bullet hit
     ld      a,(hl)
+
+    jr      nz,bullethit        ; jump if pixels detected under blt
+
     ld      (bltundrawchar),a
     ld      a,$be
     ld      (hl),a
     ret
+
+
+bullethit:
+    ; a has the hit character, hl is the screen address
+    and     $f0
+    cp      $30
+    jr      nz,{+}
+
+    ; clear enemy from screen and mirror map
+    ld      (hl),0
+    push    hl
+    res     6,h                 ; point hl at mapcache in high memory
+    set     7,h
+    ld      (hl),0
+    push    hl
+
+    ; clear tether if there is one
+    pop     de
+    call    undrawchain
+    pop     de
+    call    undrawchain
 
 +:  xor     a                   ; deactivate
     ld      (bltlife),a

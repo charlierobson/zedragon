@@ -101,6 +101,7 @@ mainproc:
 
     ret
 
+
 #include "input.asm"
 #include "sub.asm"
 #include "bullets.asm"
