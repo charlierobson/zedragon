@@ -4,6 +4,9 @@
 #include "include/sysvars.asm"
 #include "include/zxline0.asm"
 
+    .exportmode NO$GMB          ; xxxx:yyyy NAME
+    .export
+
 ; ------------------------------------------------------------
 
 #include "readisplay.asm"
