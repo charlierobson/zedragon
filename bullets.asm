@@ -72,9 +72,14 @@ updatebullets:
 
     ld      hl,(bltdrawaddr)    ; fetch the character that the bullet hit
     ld      a,(hl)
+    ld      b,a
+    jr      z,{+}
 
-    jr      nz,bullethit        ; jump if pixels detected under blt
+    and     $f0
+    cp      $30
+    jr      nz,bullethit        ; jump if blocking pixels detected under blt
 
++:  ld      a,b
     ld      (bltundrawchar),a
     ld      a,$be
     ld      (hl),a
@@ -83,24 +88,92 @@ updatebullets:
 
 bullethit:
     ; a has the hit character, hl is the screen address
-    and     $f0
-    cp      $30
+    ; clear enemy from screen and mirror map
+    cp      $20
     jr      nz,{+}
 
-    ; clear enemy from screen and mirror map
     ld      (hl),0
-    push    hl
+    call    explode_start
+    call    chaindrop_start
     res     6,h                 ; point hl at mapcache in high memory
     set     7,h
     ld      (hl),0
-    push    hl
-
-    ; clear tether if there is one
-    pop     de
-    call    undrawchain
-    pop     de
-    call    undrawchain
 
 +:  xor     a                   ; deactivate
     ld      (bltlife),a
     ret
+
+
+chaindrop_start:
+    call    findfnslot
+    ret     nz
+    ld      de,chaindrop_impl
+    ld      (iy+1),e
+    ld      (iy+2),d
+    ld      (iy+3),l
+    ld      (iy+4),h
+    xor     a
+    ld      (iy+5),a
+    ret
+
+chaindrop_impl:
+    inc     (iy+5)
+    bit     1,(iy+5)
+    ret     z
+
+    ld      e,(iy+3)
+    ld      d,(iy+4)
+
+    ld      a,$58           ; de += 600
+    add     a,e
+    ld      e,a
+    ld      a,$02
+    adc     a,d
+    ld      d,a
+
+    ld      a,(de)          ; if (de) == 0, make (de) = $22, else done
+    cp      CH_CHAIN
+    jp      nz,fnstop
+
+    ld      (iy+3),e
+    ld      (iy+4),d
+    xor     a
+    ld      (de),a
+    set     7,d
+    res     6,d
+    ld      (de),a
+    ret
+
+
+
+explode_start:
+    call    findfnslot
+    ret     nz
+
+    ld      de,explode_impl
+    ld      (iy+1),e
+    ld      (iy+2),d
+    ld      (iy+3),l
+    ld      (iy+4),h
+    xor     a
+    ld      (iy+5),a
+    ret
+
+
+explode_impl:
+    ld      l,(iy+3)
+    ld      h,(iy+4)
+    ld      a,(iy+5)
+    inc     a
+    ld      (iy+5),a
+    cp      24
+    jr      nc,{+}
+
+    sra     a
+    sra     a
+    add     a,CH_EXPLODEBASE
+    ld      (hl),a
+    ret
+
++:  ld      (hl),0
+    jp      fnstop

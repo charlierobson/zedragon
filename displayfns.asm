@@ -149,15 +149,15 @@ animatecharacters:
     ld      a,(hl)
 	ld      ($2000+$f8+1),a
 
-    ld      a,($2000+$101)
+    ld      a,($2000+$181)
     xor     $66 ^ $7e
-    ld      ($2000+$101),a
+    ld      ($2000+$181),a
     and     $3c
-    ld      ($2000+$10e),a
+    ld      ($2000+$18e),a
 
-    ld      a,($2000+$109)
+    ld      a,($2000+$189)
     xor     $a7 ^ $e5
-    ld      ($2000+$109),a
+    ld      ($2000+$189),a
 
     ld      a,(waterframe)
     inc     a

@@ -59,15 +59,15 @@ undrawchain:
     adc     a,d
     ld      d,a
 
-    ld      a,(de)          ; if (de) == 0, make (de) = $22, else done
-    cp      $22
+    ld      a,(de)          ; if (de) == 0, make (de) = chain character, else done
+    cp      CH_CHAIN
     jr      z,{-}
 
     ret
 
 
 
--:  ld      a,$22           ; draw a chain character into the map
+-:  ld      a,CH_CHAIN      ; draw a chain character into the map
     ld      (de),a
 
 drawchain:
@@ -78,7 +78,7 @@ drawchain:
     adc     a,d
     ld      d,a
 
-    ld      a,(de)          ; if (de) == 0, make (de) = $22, else done
+    ld      a,(de)
     and     a
     jr      z,{-}
 
@@ -105,9 +105,9 @@ refreshmap:
 
 
 
-mine = $3f
-staticmine = $3f+$40
-stalactite = $37
+mine = $2f
+staticmine = $2f+$40
+stalactite = $27
 minecount = 216
 minetbl:
     .word     8

@@ -9,13 +9,15 @@
 #include "readisplay.asm"
 
 starthere:
-    ; one off initialisations
+	out		($fd),a				; disable NMIs
 
     call    golow
     call    inittables
     call    initmap
     call    setupudg
     call    setupdisplay
+
+	out		($fe),a             ; enable NMIs
 
 -:  ; --------------------- title screen
     call    cls
@@ -75,6 +77,8 @@ gamemain:
     ld      a,(fire)
     cp      3
     call    z,startbullet
+
+    call    funfuns
 
     ld      a,(quit)
     cp      3

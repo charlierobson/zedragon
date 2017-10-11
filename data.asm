@@ -1,5 +1,8 @@
     .asciimap ' ', '_', {*}-' '
 
+CH_CHAIN = $32
+CH_EXPLODEBASE = $39
+
 scoreline:
 	.asc    "SCORE: 000000  HI: 000000  ^_: 4"
         	;--------========--------========

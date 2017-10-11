@@ -6,7 +6,7 @@ setupdisplay:
 	CALL	cls
 	LD		HL,($400C)
 	LD		(REAL_D_FILE),HL
-	OUT		($FD),A
+
 	LD		HL,FAKE_D_FILE
 	LD		($400C),HL
 	PUSH	HL
@@ -17,9 +17,6 @@ setupdisplay:
 	LDI
 	LDI
 	LDI
-
-;START NMI'S 
-	OUT		($FE),A
 	RET
 
 restoredisplay:

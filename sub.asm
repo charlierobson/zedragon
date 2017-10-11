@@ -115,7 +115,7 @@ drawsub:
 
     ; get pointers to sub pixel data within the character set
 
-    ld      h,$22
+    ld      h,$22           ; form address in character set $22xx
     ld      l,a
     ld      de,$22c0
     ld      a,(suby)
