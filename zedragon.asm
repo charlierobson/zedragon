@@ -14,6 +14,8 @@
 starthere:
 	out		($fd),a				; disable NMIs
 
+	call	initostore
+
     call    golow
     call    inittables
     call    initmap
@@ -109,6 +111,7 @@ mainproc:
     ret
 
 
+#include "ostore.asm"
 #include "input.asm"
 #include "sub.asm"
 #include "bullets.asm"

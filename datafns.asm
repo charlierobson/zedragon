@@ -10,9 +10,9 @@
 ; memory at $8000
 ;
 ; $8000 - $81bf
-; $81C0 - $84ff .. display mirror
-; $8500 - $9bff
-; $9c00 - $9fff task tables (16 x 64 bytes)
+; $81C0 - $9930  display mirror
+; $9931 - $99ff
+; $9a00 - $9fff  task tables (24 x 64 bytes)
 
 
 inittables:
@@ -21,39 +21,10 @@ inittables:
     ld      bc,$100
     call    zeromem
 
-    ld      hl,$8000
-    ld      bc,$2000
-    call    zeromem
-
     ld      hl,mul600
     ld      de,$3f00
     ld      bc,20
     ldir
-
-    ld      a,($4028)
-    ld      ($3f28),a
-    ld      a,($403b)
-    ld      ($3f3b),a
-
-    ld      bc,64
-    ld      hl,$9c00
-    ld      de,nullfn
-
--:  push    hl
-    pop     iy
-
-    ld      a,($4028)
-    ld      (iy+$28),a
-    ld      a,($403b)
-    ld      (iy+$3b),a
-    ld      a,$c3
-    ld      (iy+0),a
-    ld      (iy+1),e
-    ld      (iy+2),d
-    add     hl,bc
-    ld      a,h
-    cp      $a0
-    jr      nz,{-}
 
     ret
 
