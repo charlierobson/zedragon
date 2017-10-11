@@ -10,58 +10,96 @@
 ; ------------------------------------------------------------
 
 #include "readisplay.asm"
+#include "yield.asm"
 
 starthere:
 	out		($fd),a				; disable NMIs
 
+    call    golow
+
 	call	initostore
 
-    call    golow
     call    inittables
     call    initmap
+
     call    setupudg
     call    setupdisplay
 
+	; create the head of the linked object list: the 'main' object.
+	; this waits for vsync, then proceeds along to the next object in the chain,
+	; eventually returning to itself ad nauseum
+	;
+	; the head object is a special case - it can't be inserted into the chain -
+	; we must set up the next pointer manually
+	;
+	call	getobject
+	ld		bc,_fnmain
+	call	initobject
+	ld		hl,OSTORE
+	ld		(OSTORE+ONEXT),hl
+	ld		(OSTORE+OPREV),hl
+
 	out		($fe),a             ; enable NMIs
 
--:  ; --------------------- title screen
+    call    getobject
+    ld      bc,_attract
+    call    initobject
+
+; -:  ; --------------------- title screen
+;     call    cls
+;     call    drawtitle
+;     ;ld      hl,slkmain
+;     call    resetcredits
+;     call    enabletitlesound
+;     ld      hl,attractmain
+;     call    mainproc
+;     call    silencesound
+
+;     ; --------------------- game
+;     call    initsub
+;     call    cls
+;     call    resetscroll
+;     call    refreshmap
+;     call    drawmap
+;     call    resetscore
+;     call    resetair
+;     call    enablegamesound
+;     ld      hl,gamemain
+;     call    mainproc
+
+;     call    silencesound
+
+;     jr      {-}
+
+
+_fnmain
+    call    waitvsync
+    call    animatecharacters
+    call    readjoy
+    YIELD
+    jr      _fnmain
+
+
+
+_attract:
     call    cls
     call    drawtitle
-    ;ld      hl,slkmain
     call    resetcredits
     call    enabletitlesound
-    ld      hl,attractmain
-    call    mainproc
-    call    silencesound
 
-    ; --------------------- game
-    call    initsub
-    call    cls
-    call    resetscroll
-    call    refreshmap
-    call    drawmap
-    call    resetscore
-    call    resetair
-    call    enablegamesound
-    ld      hl,gamemain
-    call    mainproc
-
-    call    silencesound
-
-    jr      {-}
-
-
-attractmain:
-    call    displaylastk
-
-    ld      a,(FRAMES)
+attractloop:
+-:  ld      a,(FRAMES)
     and     127
-    cp      1
     call    z,updatecredits
+
+    YIELD
 
     ld      a,(fire)
     cp      1
-    ret
+    jr      nz,{-}
+
+
+
 
 
 gamemain:
@@ -83,8 +121,6 @@ gamemain:
     cp      3
     call    z,startbullet
 
-    call    funfuns
-
     ld      a,(quit)
     cp      3
     ret
@@ -98,7 +134,7 @@ mainproc:
     call    animatecharacters
     call    readjoy
 
-    ld      a,(frames)
+    ld      a,(FRAMES)
     and     127
     jr      nz,{+}
 

@@ -20,13 +20,6 @@
 	NEXTFREE	.equ	PRTBUF+2		; pointer to memory location holding address of next free object
 
 
-; process control macros
-;
-#define YIELD	call $+3 \ pop de \ jp yield
-#define	DIE		push iy \ pop hl \ call unlinkobject \ jp resumenext
-
-
-
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	;
 	; initialise a block of memory to be an object repository, and initialise a 
@@ -104,6 +97,10 @@ _pokey
 	dec		de
 	ld		(NEXTFREE),de
 
+
+	; set up THIS (iy) pointer for the main object, as would have been done by the YIELD macro.
+	;
+	ld		iy,OSTORE
 	ret
 
 
