@@ -81,15 +81,16 @@ drawsub:
     ;   $99 $9b $9d
     ;
     ; it's like this because the rendering of the sub char is easier using columns
+    ; all the character data is inverted
 
     res     6,h                 ; point hl at mapcache in high memory
     set     7,h
     push    hl
     ld      de,$22c0            ; address of char $98
     call    copychar
-    ld      e,$d0
+    ld      e,$d0               ; ... char 9a
     call    copychar
-    ld      e,$e0
+    ld      e,$e0               ; 9c
     call    copychar
     pop     hl
     ld      bc,600
@@ -102,39 +103,53 @@ drawsub:
     call    copychar
 
     ; now we've effectively built our tiny bitmap we can render the sub into it
-    ; choose which set of 3 pre-scrolled sub tiles to use
+    ; choose which set of 3 pre-scrolled sub tiles to use.
 
     ld      a,(subx)        ; pixel offset 0..7
     and     7
-    ld      c,a             ; * 3
+    ld      c,a
     add     a,a
-    add     a,c
-    sla     a               ; * 8
+    add     a,c             ; * 3, a is offset to set of 3 characters
+
     sla     a
-    sla     a 
+    sla     a
+    sla     a               ; * 8, a is offset to 1st byte of sub char data 
 
     ; get pointers to sub pixel data within the character set
 
     ld      h,$22           ; form address in character set $22xx
     ld      l,a
-    ld      de,$22c0
+
+    ld      de,$22c0        ; pointer to 1st byte within column of 16 that we will render to
     ld      a,(suby)
     and     7
     or      e
     ld      e,a
 
-    ld      b,3
+    ld      b,3             ; 3 characters
+
+    xor     a               ; zero out collision bits
+    ld      (collision),a
 
 --: push    bc
 
     ; copy 8 sub pixels into bg bitmap
 
-    ld      b,8
+    ld      b,8             ; 8 lines
 
 -:  ld      c,(hl)          ; get sub pixels
     ld      a,(de)          ; get bg pixels
+    push    af
     and     c               ; merge sub into background
     ld      (de),a
+
+    pop     af              ; get bg pixels
+    or      c               ; or together
+    xor     $ff             ; any 0 bits are collisions
+    ld      c,a
+    ld      a,(collision)
+    or      c
+    ld      (collision),a
 
     inc     hl
     inc     de
@@ -193,6 +208,14 @@ drawsub:
     inc     a
     inc     de
     ld      (hl),a
+
+    ; show collision bits
+
+    ld      a,(collision)
+    ld      ($2418),a       ; collision char
+
+    ld      a,$03           ; show collision character
+    ld      (TOP_LINE+26),a
 
     ret
 

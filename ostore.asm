@@ -11,7 +11,7 @@
 
 	; object store - we'll allocate space for 24 objects
 	;
-	OSTORE		.equ	$9a00
+	OSTORE		.equ	$9940
 	NSTRUCTS	.equ	$18
 
 	FREELIST	.equ	OSTORE+(NSTRUCTS*OSTRUCTSIZE)

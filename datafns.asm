@@ -8,8 +8,7 @@
 ;
 ; $8000 - $81bf
 ; $81C0 - $9930  display mirror
-; $9931 - $99ff
-; $9a00 - $9fff  task tables (24 x 64 bytes)
+; $9940 - $9fff  task tables (24 x 64 bytes + lists)
 
 
 inittables:

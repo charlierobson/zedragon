@@ -1,3 +1,3 @@
-brass zedragon.asm zedragon.p -l listing.html
+brass zedragon.asm zedragon.p -s -l listing.html
 cp zedragon.p ~/Desktop/zd/menu.p
 cp zedragon.p.sym ~/Desktop/zd/menu.p.sym
