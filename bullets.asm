@@ -12,6 +12,9 @@ startbullet:
     or      a
     ret     nz
 
+    ld      a,4-1
+    call    AFXPLAY
+
     ld      hl,(subaddress)     ; we always draw bullet in front of sub
     inc     hl
 

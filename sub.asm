@@ -1,8 +1,7 @@
-initsub:
+subfunction:
     ld      hl,$0600
     ld      (subx),hl               ; sets subx = 0, suby = 1
     ld      (oldsubaddress),hl      ; we'll sink the first sub 'undraw' into the ROM
-    ret
 
 
 movesub:
@@ -42,10 +41,7 @@ movesub:
     jr      nc,{+}
     inc     (hl)
 
-+:  ret
-
-
-
++:
 drawsub:
     ; calculate address of sub in the map, relative to the current scroll position
 
@@ -211,11 +207,68 @@ drawsub:
 
     ; show collision bits
 
+;    ld      ($2418),a       ; collision char
+;    ld      a,$03           ; show collision character
+;    ld      (TOP_LINE+26),a
+
+    YIELD
+
     ld      a,(collision)
-    ld      ($2418),a       ; collision char
+    and     a
+    jp      z,movesub
 
-    ld      a,$03           ; show collision character
-    ld      (TOP_LINE+26),a
+    ; trigger some explosions
+    ld      hl,explooff
+    ld      a,(FRAMES)
+    and     6
 
+    add     a,l
+    ld      l,a
+    adc     a,h
+    sub     l
+    ld      h,a
+    ld      (exploptr),hl
+
+    call    subsubexplo
+    call    subsubexplo
+    call    subsubexplo
+    call    subsubexplo
+    call    subsubexplo
+    call    subsubexplo
+
+    ld      a,12-1
+    call    AFXPLAY
+
+    DIE
+
+explooff:
+    .word   0,601,600,2,1,602
+    .word   0,601,600,2,1,602
+exploptr:
+    .word   0
+
+subsubexplo:
+    ld      hl,(exploptr)
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    inc     hl
+    ld      (exploptr),hl
+    ld      hl,(subaddress)
+    add     hl,de
+    push    hl
+
+    call	getobject
+	ld		bc,explosion
+	call	initobject
+	call	insertobject_afterthis
+
+    pop     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+
+    YIELD
+    YIELD
+    YIELD
     ret
-
