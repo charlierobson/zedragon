@@ -1,6 +1,5 @@
 gamemain:
     call    cls
-    call    refreshmap
     call    resetscore
     call    enablegamesound
 
@@ -9,12 +8,8 @@ gamemain:
     ;ret     nz
 
 resetafterdeath:
-    call    cls
     call    resetscroll
-
-    YIELD
-
-    call    drawmap
+    call    refreshmap
     call    resetair
 
 	call	getobject
