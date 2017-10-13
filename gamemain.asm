@@ -18,14 +18,14 @@ resetafterdeath:
 	call	insertobject_afterthis
 
 aliveloop:
-    call    scroll
+    call    scroll                  ; screen only scrolls every n frames where n > 16
     call    updateair
 
     call    showsubcoords
 
     call    updatebullets
 
-    ld      a,(FRAMES)              ; play sfx 0 every ~1 sec
+    ld      a,(FRAMES)              ; play ping sfx every so often
     and     127
     call    z,AFXPLAY
 
