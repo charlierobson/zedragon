@@ -112,7 +112,7 @@ refreshmap:
     ldir
 
     ld      hl,D_BUFFER
-    ld      b,600
+    ld      bc,600
 
 -:  ld      a,(hl)
     and     a
@@ -121,8 +121,12 @@ refreshmap:
     ld      a,$bf
     ld      (hl),a
 
-rmp0: inc     hl
-    djnz    {-}
+rmp0:
+    inc     hl
+    dec     bc
+    ld      a,b
+    or      c
+    jr      nz,{-}
     ret
 
 
