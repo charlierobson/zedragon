@@ -72,9 +72,9 @@ drawsub:
     ; copy the pixel data corresponding to the characters under the sub
     ; to a new group of 3x2 characters - effectively a tiny bitmap
     ;
-    ; on-screen:
-    ;   $98 $9a $9c
-    ;   $99 $9b $9d
+    ; on-screen (even frames)  (odd  frames)
+    ;            $98 $9a $9c    $a0 $a2 $a4
+    ;            $99 $9b $9d    $a1 $a3 $a5
     ;
     ; it's like this because the rendering of the sub char is easier using columns
     ; all the character data is inverted
@@ -82,23 +82,52 @@ drawsub:
     res     6,h                 ; point hl at mapcache in high memory
     set     7,h
     push    hl
-    ld      de,$22c0            ; address of char $98
+
+    ld      a,(gameframe)       ; even frames $22c0, odd frames $23c0
+    and     1
+    or      $22
+    ld      d,a
+
+    ld      e,$c0               ; address of char $98/$b8
+    ld      (basecharptr),de
     call    copychar
-    ld      e,$d0               ; ... char 9a
+    ld      (iy+OUSER),a        ; collision index 0, store character code
+
+    ld      e,$d0               ; ... char 9a/ba
     call    copychar
-    ld      e,$e0               ; 9c
+    ld      (iy+OUSER+4),a      ; coll. idx. 2
+
+    ld      e,$e0               ; 9c/bc
     call    copychar
+    ld      (iy+OUSER+8),a      ; c.i. 4
+
     pop     hl
     ld      bc,600
     add     hl,bc
+
     ld      e,$c8
     call    copychar
+    ld      (iy+OUSER+2),a      ; c.i 1 
+
     ld      e,$d8
     call    copychar
+    ld      (iy+OUSER+6),a      ; c.i 3
+
     ld      e,$e8
     call    copychar
+    ld      (iy+OUSER+10),a     ; c.i 5
 
-    ; now we've effectively built our tiny bitmap we can render the sub into it
+    xor     a               ; zero out collision bits
+    ld      (iy+OUSER+1),a
+    ld      (iy+OUSER+3),a
+    ld      (iy+OUSER+5),a
+    ld      (iy+OUSER+7),a
+    ld      (iy+OUSER+9),a
+    ld      (collision),a
+
+    ; now we've effectively built our tiny bitmap and cleared out the collision bits,
+    ; we can render the sub into it and collect any collision pixels
+    ;
     ; choose which set of 3 pre-scrolled sub tiles to use.
 
     ld      a,(subx)        ; pixel offset 0..7
@@ -116,22 +145,23 @@ drawsub:
     ld      h,$22           ; form address in character set $22xx
     ld      l,a
 
-    ld      de,$22c0        ; pointer to 1st byte within column of 16 that we will render to
-    ld      a,(suby)
+    ld      de,(basecharptr) ; pointer to 1st byte within column of 16 rows inside mini bitmap
+    ld      a,(suby)        ; that we will render to
     and     7
     or      e
     ld      e,a
 
     ld      b,3             ; 3 characters
 
-    xor     a               ; zero out collision bits
-    ld      (collision),a
-
 --: push    bc
 
     ; copy 8 sub pixels into bg bitmap
 
     ld      b,8             ; 8 lines
+
+    ld      a,(suby)        ; keep track of the row number that we're rendering into,
+    and     7               ; so that we can track collision data on a per character cell basis
+    ld      (subcoloff),a
 
 -:  ld      c,(hl)          ; get sub pixels
     ld      a,(de)          ; get bg pixels
@@ -143,10 +173,27 @@ drawsub:
     or      c               ; or together
     xor     $ff             ; any 0 bits are collisions
     ld      c,a
-    ld      a,(collision)
+
+    ; we need to know what collision pixels map to which background char
+    ;
+    ld      a,(subcoloff)
+    inc     a
+    ld      (subcoloff),a
+    and     8
+    sra     a
+    sra     a
+    add     a,OUSER+1
+    ld      ({+}+2),a
+    ld      ({++}+2),a
+
++:  ld      a,(iy+0)        ; update collision bits for this background cell
+    or      c
+++: ld      (iy+0),a
+
+    ld      a,(collision)   ; keep a flag/overview of the collision data
     or      c
     ld      (collision),a
-
+    
     inc     hl
     inc     de
     djnz    {-}
@@ -187,7 +234,14 @@ drawsub:
     ld      de,(subaddress)
     ld      (oldsubaddress),de
     add     hl,de
-    ld      a,$98
+
+    ld      a,(gameframe)           ; $98 even frames, $b8 odd frames
+    and     1
+    rrca
+    rrca
+    rrca
+    add     a,$98
+
     ld      (de),a
     inc     a
     inc     de

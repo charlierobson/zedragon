@@ -23,6 +23,10 @@ resetafterdeath:
 	call	insertobject_afterthis
 
 aliveloop:
+    ld      hl,(gameframe)
+    inc     hl
+    ld      (gameframe),hl
+
     call    scroll
     call    updateair
 
