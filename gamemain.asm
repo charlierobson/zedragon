@@ -1,6 +1,5 @@
 gamemain:
     call    cls
-    call    refreshmap
     call    resetscore
     call    enablegamesound
 
@@ -9,12 +8,8 @@ gamemain:
     ;ret     nz
 
 resetafterdeath:
-    call    cls
     call    resetscroll
-
-    YIELD
-
-    call    drawmap
+    call    refreshmap
     call    resetair
 
 	call	getobject
@@ -34,7 +29,7 @@ aliveloop:
 
     call    updatebullets
 
-    ld      a,(FRAMES)              ; play sfx 0 every ~1 sec
+    ld      a,(FRAMES)              ; play ping sfx every so often
     and     127
     call    z,AFXPLAY
 

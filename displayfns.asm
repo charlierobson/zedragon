@@ -117,14 +117,6 @@ updatecredits:
     ret
 
 
-drawmap:
-    ld      hl,puremap
-    ld      de,D_BUFFER
-    ld      bc,6000
-    ldir
-    ret
-
-
 animatecharacters:
     ; animate shooters
     ld      a,(FRAMES)

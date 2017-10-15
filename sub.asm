@@ -221,7 +221,7 @@ drawsub:
     ld      de,600-3
     add     hl,de
     ld      e,l
-    ld      d,h    
+    ld      d,h
     res     7,d
     set     6,d
     ldi
