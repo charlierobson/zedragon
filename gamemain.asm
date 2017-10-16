@@ -24,7 +24,7 @@ aliveloop:
     inc     hl
     ld      (gameframe),hl
 
-;    call    scroll
+    call    scroll
 
     YIELD
 
@@ -39,11 +39,10 @@ aliveloop:
 
     ld      a,(fire)
     cp      1
-   ; call    z,startbullet
+    call    z,startbullet
 
     ld      a,(collision)
     and     a
-    xor a
     jr      z,aliveloop
 
     xor     a

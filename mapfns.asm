@@ -5,12 +5,8 @@ puremap = $2600
 	;
 	; copy the map from its load position in screen ram down to its
 	; resting place in the 8k block after the character sets. this
-    ; map at 8k is known as the 'pure' map. it isused to reset
+    ; map at 8k is known as the 'pure' map. it is used to reset
     ; the collison map which shadows the display in upper memory. 
-	;
-	; [in]: nothing
-	; [out]: nothing
-	; preserves: nothing
 	;
 initmap:
     ld      hl,D_BUFFER
@@ -51,6 +47,25 @@ mineloop:
 
     pop     bc
     djnz    mineloop
+
+    ; set up the water
+
+    ld      hl,puremap
+    ld      bc,600
+
+-:  ld      a,(hl)
+    and     a
+    jr      nz,rmp0
+
+    ld      a,$bf
+    ld      (hl),a
+
+rmp0:
+    inc     hl
+    dec     bc
+    ld      a,b
+    or      c
+    jr      nz,{-}
 
     ret
 
@@ -111,22 +126,6 @@ refreshmap:
     ld      bc,6000
     ldir
 
-    ld      hl,D_BUFFER
-    ld      bc,600
-
--:  ld      a,(hl)
-    and     a
-    jr      nz,rmp0
-
-    ld      a,$bf
-    ld      (hl),a
-
-rmp0:
-    inc     hl
-    dec     bc
-    ld      a,b
-    or      c
-    jr      nz,{-}
     ret
 
 

@@ -277,6 +277,7 @@ binaryout:
 
 copychar:
     ld      a,(hl)
+    push    af
     inc     hl
     push    hl
 
@@ -305,6 +306,7 @@ copychar:
     ldi \ ldi
 
     pop     hl
+    pop     af
     ret
 
 eightuffuffs:

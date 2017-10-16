@@ -77,6 +77,8 @@ substart:
     ld      a,(hl)
     cp      7
     jr      c,{+}
+    cp      0
+    jr      z,{+}
     dec     (hl)
 
 +:  ld      a,(down)        ; max y = $48
@@ -191,9 +193,8 @@ substart:
     ld      (iy+OUSER+11),a
     ld      (collision),a
 
-    ld      a,OUSER+1           ; init collision indices
-    ld      (colidx1),a
-    ld      (colidx2),a
+    ld      a,OUSER+1
+    ld      (subcoloff),a
 
     ; now we've effectively built our tiny bitmap and cleared out the collision bits,
     ; we can render the sub into it and collect any collision pixels
@@ -233,6 +234,10 @@ substart:
     and     7               ; so that we can track collision data on a per character cell basis
     ld      (subrowoff),a
 
+    ld      a,(subcoloff)   ; init collision indices
+    ld      (colidx1),a
+    ld      (colidx2),a
+
 -:  ld      c,(hl)          ; get sub pixels
     ld      a,(de)          ; get bg pixels
     push    af
@@ -246,7 +251,7 @@ substart:
 
     ; we need to know what collision pixels map to which background char
 
-    ld      a,(subrowoff)   ; when rendering hits row 8 move collision data index along 1
+    ld      a,(subrowoff)   ; when rendering hits row 8 bump collision data index
     inc     a
     ld      (subrowoff),a
     cp      8
@@ -264,10 +269,6 @@ colidx2 = $+6
     or      c
     ld      (iy+0),a
 
-    ld      a,(collision)   ; keep a composite view of the collision data
-    or      c
-    ld      (collision),a
-    
     inc     hl
     inc     de
     djnz    {-}
@@ -279,23 +280,61 @@ colidx2 = $+6
     add     a,e
     ld      e,a
 
+    ld      a,(subcoloff)  ; iy+ouser progression: +1, (+3), +5, (+7), +9, (+11)
+    inc     a
+    inc     a
+    inc     a
+    inc     a
+    ld      (subcoloff),a
+
     pop     bc
     djnz    {--}
 
-    ; show collision bits
-
-;    ld      ($2418),a       ; collision char
-;    ld      a,$03           ; show collision character
-;    ld      (TOP_LINE+26),a
+    ; all rendered
 
     YIELD
 
-    ld      a,(collision)
-    and     a
-    xor a
-    jp      z,substart
+    ld      d,OUSER
+    ld      e,OUSER+1
+    ld      b,6
 
+-:  ld      a,d
+    ld      (chkidx1),a
+    ld      a,e
+    ld      (chkidx2),a
+
+chkidx1 = $+2
+chkidx2 = $+5
+    ld      c,(iy+0)                ; character cell content
+    ld      a,(iy+0)                ; pixel collision data
+    and     a                       ; clears carry
+    call    nz,testcollision        ; test the collision
+    jr      c,collided
+
+    inc     d
+    inc     d
+    inc     e
+    inc     e
+    djnz    {-}
+
+    ;call    showcols
+    jp      substart
+
+
+testcollision:
+    ld      a,c
+    and     a
+    ret     z
+    cp      $39
+    ret
+
+
+collided:
+    ld      a,1
+    ld      (collision),a
+    
     ; trigger some explosions
+
     ld      hl,explooff
     ld      a,(FRAMES)
     and     6
@@ -319,11 +358,6 @@ colidx2 = $+6
 
     DIE
 
-explooff:
-    .word   0,601,600,2,1,602
-    .word   0,601,600,2,1,602
-exploptr:
-    .word   0
 
 subsubexplo:
     ld      hl,(exploptr)
@@ -349,4 +383,57 @@ subsubexplo:
     YIELD
     YIELD
     YIELD
+    ret
+
+explooff:
+    .word   0,601,600,2,1,602
+    .word   0,601,600,2,1,602
+exploptr:
+    .word   0
+
+
+showcols:
+    ld      hl,TOP_LINE
+    ld      bc,32
+    xor     a
+    call    zeromem
+    ld      a,(iy+OUSER+0)
+    ld      de,TOP_LINE
+    call    hexout
+    ld      a,(iy+OUSER+1)
+    ld      de,TOP_LINE+2
+    call    hexout
+    ld      a,(iy+OUSER+2)
+    ld      de,TOP_LINE+5
+    call    hexout
+    ld      a,(iy+OUSER+3)
+    ld      de,TOP_LINE+7
+    call    hexout
+    ld      a,(iy+OUSER+4)
+    ld      de,TOP_LINE+10
+    call    hexout
+    ld      a,(iy+OUSER+5)
+    ld      de,TOP_LINE+12
+    call    hexout
+
+    ld      a,(iy+OUSER+6)
+    ld      de,TOP_LINE+15
+    call    hexout
+    ld      a,(iy+OUSER+7)
+    ld      de,TOP_LINE+17
+    call    hexout
+    ld      a,(iy+OUSER+8)
+    ld      de,TOP_LINE+20
+    call    hexout
+    ld      a,(iy+OUSER+9)
+    ld      de,TOP_LINE+22
+    call    hexout
+    ld      a,(iy+OUSER+10)
+    ld      de,TOP_LINE+25
+    call    hexout
+    ld      a,(iy+OUSER+11)
+    ld      de,TOP_LINE+27
+    call    hexout
+
+
     ret

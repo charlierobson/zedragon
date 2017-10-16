@@ -112,6 +112,8 @@ collision:
     .byte   0
 subrowoff:
     .byte   0
+subcoloff:
+    .byte   0
 
 airupdatecounter:
     .byte   0
