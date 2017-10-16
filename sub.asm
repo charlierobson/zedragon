@@ -291,6 +291,7 @@ colidx2 = $+6
 
     ld      a,(collision)
     and     a
+    xor a
     jp      z,substart
 
     ; trigger some explosions

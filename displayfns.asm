@@ -259,6 +259,20 @@ hexout:
     ret
 
 
+binaryout:
+    ld      b,8
+    ld      c,$80
+
+-:  ld      a,l
+    and     c
+    ld      a,'0'
+    jr      z,{+}
+    inc     a
++:  ld      (de),a
+    rrc     c
+    djnz    {-}
+    ret
+
 
 copychar:
     ld      a,(hl)

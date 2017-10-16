@@ -8,6 +8,11 @@ attract:
     and     127
     call    z,updatecredits
 
+    ld      de,TOP_LINE
+    ld      a,(kbin)
+    ld      l,a
+    call    binaryout
+
     YIELD
 
     ld      a,(fire)
