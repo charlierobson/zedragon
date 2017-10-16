@@ -35,6 +35,7 @@ updateinputstate:
     ld      (uibittest),a
     inc     hl
 
+    ld      b,0             ; setup for bit test below
     ld      de,kbin
     ld      a,(hl)
     inc     hl
@@ -43,12 +44,12 @@ updateinputstate:
     ld      a,(de)
     and     (hl)
     inc     hl
-    jr      nz,{+}          ; skip joystick read if pressed - h is 0
+    jr      z,{+}           ; skip joystick read if pressed - h is 0
 
     ld      a,(LAST_J)
     ld      b,a
 
-+:  ld      a,(hl)           ; 0 - not pressed, 1 - just pressed, 3 - held, 2 - just released
++:  ld      a,(hl)          ; 0 - not pressed, 1 - just pressed, 3 - held, 2 - just released
     sla     a               ;  C <- [7......0] <- 0
 
 uibittest = $+1

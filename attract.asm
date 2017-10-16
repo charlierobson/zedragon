@@ -9,7 +9,7 @@ attract:
     call    z,updatecredits
 
     ld      de,TOP_LINE
-    ld      a,(kbin)
+    ld      a,(kbin+7)
     ld      l,a
     call    binaryout
 

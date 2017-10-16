@@ -188,6 +188,7 @@ substart:
     ld      (iy+OUSER+5),a
     ld      (iy+OUSER+7),a
     ld      (iy+OUSER+9),a
+    ld      (iy+OUSER+11),a
     ld      (collision),a
 
     ld      a,OUSER+1           ; init collision indices
