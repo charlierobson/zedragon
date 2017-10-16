@@ -1,9 +1,18 @@
 puremap = $2600
 
-initmap:
-    ; done once at load time. map is piggy-backing the display buffer.
-    ; make a pure map copy in 8k block
 
+	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	;
+	; copy the map from its load position in screen ram down to its
+	; resting place in the 8k block after the character sets. this
+    ; map at 8k is known as the 'pure' map. it isused to reset
+    ; the collison map which shadows the display in upper memory. 
+	;
+	; [in]: nothing
+	; [out]: nothing
+	; preserves: nothing
+	;
+initmap:
     ld      hl,D_BUFFER
     ld      de,puremap
     ld      bc,6000
@@ -86,21 +95,38 @@ drawchain:
 
 
 
+	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	;
+	; copy the pure map up to the mirror above 16k. copy the mirror
+	; into the display file. update the display file to show water.
+    ;
 refreshmap:
-    ; copy 'pure' map data up into high memory where it mirrors the display file
-
     ld      hl,puremap
     ld      de,D_BUFFER+$4000
     ld      bc,6000
     ldir
-
-    ; copy the mirror map into the display
 
     ld      hl,puremap
     ld      de,D_BUFFER
     ld      bc,6000
     ldir
 
+    ld      hl,D_BUFFER
+    ld      bc,600
+
+-:  ld      a,(hl)
+    and     a
+    jr      nz,rmp0
+
+    ld      a,$bf
+    ld      (hl),a
+
+rmp0:
+    inc     hl
+    dec     bc
+    ld      a,b
+    or      c
+    jr      nz,{-}
     ret
 
 

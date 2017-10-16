@@ -1,11 +1,74 @@
-initsub:
+subfunction:
     ld      hl,$0600
     ld      (subx),hl               ; sets subx = 0, suby = 1
-    ld      (oldsubaddress),hl      ; we'll sink the first sub 'undraw' into the ROM
-    ret
+    ld      (subaddress),hl         ; we'll sink the first sub drawing into the ROM
+    ld      (oldsubaddress),hl
+ 
+substart:
+    ; undraw the old sub
+
+    ld      hl,(oldsubaddress)      ; point hl into clean map
+    ld      e,l
+    ld      d,h
+    res     6,h
+    set     7,h
+    ldi
+    ldi
+    ldi
+    ld      de,600-3
+    add     hl,de
+    ld      e,l
+    ld      d,h
+    res     7,d
+    set     6,d
+    ldi
+    ldi
+    ldi
+
+    ; now draw the mini bitmap containing the sub to the screen
+
+    ld      hl,600
+    ld      de,(subaddress)
+    add     hl,de
+
+    ld      a,(scrolltick)          ; because we draw one frame behind
+    and     a                       ; we need to bump (un)draw addresses when a scroll is due
+    jr      nz,{+}
+
+    inc     hl
+    inc     de
+
++:  ld      (oldsubaddress),de
+
+    ld      a,(gameframe)           ; $98 even frames, $b8 odd frames
+    dec     a
+    and     1
+    rrca
+    rrca
+    rrca
+    add     a,$98
+
+    ld      (de),a
+    inc     a
+    inc     de
+    ld      (hl),a
+    inc     a
+    inc     hl
+    ld      (de),a
+    inc     a
+    inc     de
+    ld      (hl),a
+    inc     a
+    inc     hl
+    ld      (de),a
+    inc     a
+    ld      (hl),a
 
 
-movesub:
+    ;
+    ; move sub
+    ;
+
     ld      hl,suby
 
     ld      a,(up)          ; min y = 6
@@ -42,12 +105,11 @@ movesub:
     jr      nc,{+}
     inc     (hl)
 
-+:  ret
+    ;
+    ; render sub
+    ;
 
-
-
-drawsub:
-    ; calculate address of sub in the map, relative to the current scroll position
++:  ; calculate address of sub in the map, relative to the current scroll position
 
     ld      a,(subx)            ; pixel -> char conversion
     srl     a
@@ -76,66 +138,135 @@ drawsub:
     ; copy the pixel data corresponding to the characters under the sub
     ; to a new group of 3x2 characters - effectively a tiny bitmap
     ;
-    ; on-screen:
-    ;   $98 $9a $9c
-    ;   $99 $9b $9d
+    ; on-screen (even frames)  (odd  frames)
+    ;            $98 $9a $9c    $a0 $a2 $a4
+    ;            $99 $9b $9d    $a1 $a3 $a5
     ;
     ; it's like this because the rendering of the sub char is easier using columns
 
     res     6,h                 ; point hl at mapcache in high memory
     set     7,h
     push    hl
-    ld      de,$22c0            ; address of char $98
+
+    ld      a,(gameframe)       ; even frames $22c0, odd frames $23c0
+    and     1
+    or      $22
+    ld      d,a
+
+    ld      e,$c0               ; address of char $98/$b8
+    ld      (basecharptr),de
     call    copychar
-    ld      e,$d0
+    ld      (iy+OUSER),a        ; collision index 0, store character code
+
+    ld      e,$d0               ; ... char 9a/ba
     call    copychar
-    ld      e,$e0
+    ld      (iy+OUSER+4),a      ; coll. idx. 2
+
+    ld      e,$e0               ; 9c/bc
     call    copychar
+    ld      (iy+OUSER+8),a      ; c.i. 4
+
     pop     hl
     ld      bc,600
     add     hl,bc
+
     ld      e,$c8
     call    copychar
+    ld      (iy+OUSER+2),a      ; c.i 1 
+
     ld      e,$d8
     call    copychar
+    ld      (iy+OUSER+6),a      ; c.i 3
+
     ld      e,$e8
     call    copychar
+    ld      (iy+OUSER+10),a     ; c.i 5
 
-    ; now we've effectively built our tiny bitmap we can render the sub into it
-    ; choose which set of 3 pre-scrolled sub tiles to use
+    xor     a                   ; zero out collision bits
+    ld      (iy+OUSER+1),a
+    ld      (iy+OUSER+3),a
+    ld      (iy+OUSER+5),a
+    ld      (iy+OUSER+7),a
+    ld      (iy+OUSER+9),a
+    ld      (collision),a
+
+    ld      a,OUSER+1           ; init collision indices
+    ld      (colidx1),a
+    ld      (colidx2),a
+
+    ; now we've effectively built our tiny bitmap and cleared out the collision bits,
+    ; we can render the sub into it and collect any collision pixels
+    ;
+    ; choose which set of 3 pre-scrolled sub tiles to use.
 
     ld      a,(subx)        ; pixel offset 0..7
     and     7
-    ld      c,a             ; * 3
+    ld      c,a
     add     a,a
-    add     a,c
-    sla     a               ; * 8
+    add     a,c             ; * 3, a is offset to set of 3 characters
+
     sla     a
-    sla     a 
+    sla     a
+    sla     a               ; * 8, a is offset to 1st byte of sub char data 
 
     ; get pointers to sub pixel data within the character set
 
     ld      h,$22           ; form address in character set $22xx
     ld      l,a
-    ld      de,$22c0
-    ld      a,(suby)
+
+    ld      de,(basecharptr) ; pointer to 1st byte within column of 16 rows inside mini bitmap
+    ld      a,(suby)        ; that we will render to
     and     7
     or      e
     ld      e,a
 
-    ld      b,3
+    ld      b,3             ; 3 characters
 
 --: push    bc
 
     ; copy 8 sub pixels into bg bitmap
 
-    ld      b,8
+    ld      b,8             ; 8 lines
+
+    ld      a,(suby)        ; keep track of the row number that we're rendering into,
+    and     7               ; so that we can track collision data on a per character cell basis
+    ld      (subrowoff),a
 
 -:  ld      c,(hl)          ; get sub pixels
     ld      a,(de)          ; get bg pixels
+    push    af
     and     c               ; merge sub into background
     ld      (de),a
 
+    pop     af              ; get bg pixels
+    or      c               ; or together
+    xor     $ff             ; any 0 bits are collisions
+    ld      c,a
+
+    ; we need to know what collision pixels map to which background char
+
+    ld      a,(subrowoff)   ; when rendering hits row 8 move collision data index along 1
+    inc     a
+    ld      (subrowoff),a
+    cp      8
+    jr      nz,{+}
+
+    ld      a,(colidx1)
+    inc     a
+    inc     a
+    ld      (colidx1),a
+    ld      (colidx2),a
+
+colidx1 = $+2
+colidx2 = $+6
++:  ld      a,(iy+0)        ; update collision bits for this background cell
+    or      c
+    ld      (iy+0),a
+
+    ld      a,(collision)   ; keep a composite view of the collision data
+    or      c
+    ld      (collision),a
+    
     inc     hl
     inc     de
     djnz    {-}
@@ -150,49 +281,70 @@ drawsub:
     pop     bc
     djnz    {--}
 
-    ; undraw the old sub
+    ; show collision bits
 
-    ld      hl,(oldsubaddress)      ; point hl into clean map
-    ld      e,l
-    ld      d,h
-    res     6,h
-    set     7,h
-    ldi
-    ldi
-    ldi
-    ld      de,600-3
-    add     hl,de
-    ld      e,l
-    ld      d,h    
-    res     7,d
-    set     6,d
-    ldi
-    ldi
-    ldi
+;    ld      ($2418),a       ; collision char
+;    ld      a,$03           ; show collision character
+;    ld      (TOP_LINE+26),a
 
-    ; now draw the mini bitmap containing the sub to the screen
+    YIELD
 
-    ld      hl,600
-    ld      de,(subaddress)
-    ld      (oldsubaddress),de
-    add     hl,de
-    ld      a,$98
-    ld      (de),a
-    inc     a
-    inc     de
-    ld      (hl),a
-    inc     a
+    ld      a,(collision)
+    and     a
+    jp      z,substart
+
+    ; trigger some explosions
+    ld      hl,explooff
+    ld      a,(FRAMES)
+    and     6
+
+    add     a,l
+    ld      l,a
+    adc     a,h
+    sub     l
+    ld      h,a
+    ld      (exploptr),hl
+
+    call    subsubexplo
+    call    subsubexplo
+    call    subsubexplo
+    call    subsubexplo
+    call    subsubexplo
+    call    subsubexplo
+
+    ld      a,12-1
+    call    AFXPLAY
+
+    DIE
+
+explooff:
+    .word   0,601,600,2,1,602
+    .word   0,601,600,2,1,602
+exploptr:
+    .word   0
+
+subsubexplo:
+    ld      hl,(exploptr)
+    ld      e,(hl)
     inc     hl
-    ld      (de),a
-    inc     a
-    inc     de
-    ld      (hl),a
-    inc     a
+    ld      d,(hl)
     inc     hl
-    ld      (de),a
-    inc     a
-    inc     de
-    ld      (hl),a
+    ld      (exploptr),hl
+    ld      hl,(subaddress)
+    add     hl,de
+    push    hl
 
+    call	getobject
+	ld		bc,explosion
+	call	initobject
+	call	insertobject_afterthis
+
+    pop     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+
+    YIELD
+    YIELD
+    YIELD
     ret
-

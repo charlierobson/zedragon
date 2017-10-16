@@ -7,108 +7,59 @@
     .exportmode NO$GMB          ; xxxx:yyyy NAME
     .export
 
-; ------------------------------------------------------------
-
 #include "readisplay.asm"
+#include "yield.asm"
 
+; ------------------------------------------------------------
 starthere:
-	out		($fd),a				; disable NMIs
+	out		($fd),a
 
     call    golow
+	call	initostore
     call    inittables
     call    initmap
+
     call    setupudg
     call    setupdisplay
 
-	out		($fe),a             ; enable NMIs
+	out		($fe),a
 
--:  ; --------------------- title screen
-    call    cls
-    call    drawtitle
-    ;ld      hl,slkmain
-    call    resetcredits
-    call    enabletitlesound
-    ld      hl,attractmain
-    call    mainproc
-    call    silencesound
+	; create the head of the linked object list: the 'main' object.
+	; this waits for vsync, then proceeds along to the next object in the chain,
+	; eventually returning to itself ad nauseum
+	;
+	; the head object is a special case - it can't be inserted into the chain -
+	; we must set up the next pointer manually
+	;
+	call	getobject
+	ld		bc,fnmain
+	call	initobject
+	ld		hl,OSTORE
+	ld		(OSTORE+ONEXT),hl
+	ld		(OSTORE+OPREV),hl
 
-    ; --------------------- game
-    call    initsub
-    call    cls
-    call    resetscroll
-    call    refreshmap
-    call    drawmap
-    call    resetscore
-    call    resetair
-    call    enablegamesound
-    ld      hl,gamemain
-    call    mainproc
+    ; seed the whole shebanga with the attract mode process
+    ;
+    call    getobject
+    ld      bc,attract
+    call    initobject
+	call	insertobject_afterhead
 
-    call    silencesound
+    ; here's the main loop, the root
 
-    jr      {-}
-
-
-attractmain:
-    call    displaylastk
-
-    ld      a,(FRAMES)
-    and     127
-    cp      1
-    call    z,updatecredits
-
-    ld      a,(fire)
-    cp      1
-    ret
-
-
-gamemain:
-    ld      a,(advance)
-    cp      1
-    ;ret     nz
-
-    call    scroll
-    call    updateair
-
-    call    movesub
-
-    call    showsubcoords
-
-    call    drawsub
-    call    updatebullets
-
-    ld      a,(fire)
-    cp      3
-    call    z,startbullet
-
-    call    funfuns
-
-    ld      a,(quit)
-    cp      3
-    ret
-
-
-
-mainproc:
-    ld      ({+}+1),hl
-
--:  call    waitvsync
+fnmain:
+    call    waitvsync
     call    animatecharacters
     call    readjoy
-
-    ld      a,(frames)
-    and     127
-    jr      nz,{+}
-
-    ld      a,0
-    call    AFXPLAY
-
-+:  call    0                   ; call the active process - it returns with z set when complete
-    jr      nz,{-}
-
-    ret
+    YIELD
+    jr      fnmain
 
 
+#include "attract.asm"
+#include "gamemain.asm"
+#include "fx.asm"
+
+#include "ostore.asm"
 #include "input.asm"
 #include "sub.asm"
 #include "bullets.asm"
@@ -124,7 +75,7 @@ mainproc:
 
 #include "data.asm"
 
-endshere:
+endhere:
 ; ------------------------------------------------------------
 
 #include "include/zxline1.asm"

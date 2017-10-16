@@ -117,14 +117,6 @@ updatecredits:
     ret
 
 
-drawmap:
-    ld      hl,puremap
-    ld      de,D_BUFFER
-    ld      bc,6000
-    ldir
-    ret
-
-
 animatecharacters:
     ; animate shooters
     ld      a,(FRAMES)
@@ -179,18 +171,16 @@ testevery8:
 
     ; every 8 frames
 
-    ld      a,(shooterframe)
-    and     a
-    jr      nz,{+}
-    ld      a,6
-+:  dec     a
-    ld      (shooterframe),a
+    ld      hl,shooterframe
+    ld      c,6
+    call    updatecounter
+
     ld      de,shooteranimation
     add     a,e
     ld      e,a
     ld      a,(de)
-    ld      ($2000+$103),a
-    ld      ($2000+$10b),a
+    ld      ($2000+$183),a
+    ld      ($2000+$18b),a
     ret
 
 
@@ -201,14 +191,9 @@ resetscroll:
 
 
 scroll:
-    ld      a,(scrolltick)
-    and     a
-    jr      nz,{+}
-
-    ld      a,23+1
-
-+:  dec     a
-    ld      (scrolltick),a
+    ld      hl,scrolltick
+    ld      c,23
+    call    updatecounter
     ret     nz
 
     ld      hl,(scrollpos)  
@@ -229,16 +214,14 @@ scroll:
 
 showsubcoords:
     ld      a,(subx)
-    ld      de,TOP_LINE+6
+    ld      de,TOP_LINE+7
     call    hexout
     xor     a
     ld      (de),a
-    inc     de
     ld      a,(suby)
     call    hexout
     xor     a
     ld      (de),a
-    inc     de
     ld      a,(subx)
     and     7
     call    hexout
@@ -286,11 +269,12 @@ copychar:
     and     a
     jr      z,{+}
 
+; todo - check this
     ld      hl,charsets
     ld      b,0             ; prep to receive carry
-    sla     a               ; if this char is +64 then C is set
+    sla     a               ; if this char is +64 (codes $80..$c0) then C is set
     rr      b               ; 0, or $80 if this was a +64 char
-    or      b               ; add bit 7 back into the function, but as bit 6 instead
+    or      b               ; add bit 7 back into the function as bit 6 after a shift
     ld      b,0
     ld      c,a
     rl      b
