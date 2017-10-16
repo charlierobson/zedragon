@@ -8,10 +8,10 @@ attract:
     and     127
     call    z,updatecredits
 
-    ld      de,TOP_LINE
-    ld      a,(kbin+7)
-    ld      l,a
-    call    binaryout
+;    ld      de,TOP_LINE
+;    ld      a,(kbin+7)
+;    ld      l,a
+;    call    binaryout
 
     YIELD
 
