@@ -265,10 +265,11 @@ binaryout:
 
 -:  ld      a,l
     and     c
-    ld      a,'0'
+    ld      a,16
     jr      z,{+}
     inc     a
 +:  ld      (de),a
+    inc     de
     rrc     c
     djnz    {-}
     ret

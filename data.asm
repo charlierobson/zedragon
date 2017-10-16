@@ -54,18 +54,27 @@ btb7 = %01111000
 ; 1 fd 1111-1101   a  s  d  f  g   h  j  k  l  nl  1011-1111 bf 6
 ; 0 fe 1111-1110  sh  z  x  c  v   b  n  m  .  sp  0111-1111 7f 7
 
+;$FE - SHIFT, Z, X, C, & V
+;$FD - A, S, D, F, & G
+;$FB - Q, W, E, R, & T
+;$F7 - 1, 2, 3, 4, & 5
+;$EF - 0, 9, 8, 7, & 6
+;$DF - P, O, I, U, & Y
+;$BF - ENTER, L, K, J, & H
+;$7F - SPACE, FULL-STOP, M, N, & B
+;
 ; joystick bit test opcode fragment,
 ; key row offset,
 ; key mask,
 ; input impulse
 inputstates:
-    .byte	btb7,2,%10000000,0        ; up      (q)
-    .byte	btb6,1,%10000000,0        ; down    (a)
-    .byte	btb5,7,%00001000,0        ; left    (n)
-    .byte	btb4,7,%00000100,0        ; right   (m)
+    .byte	btb7,2,%00000001,0        ; up      (q)
+    .byte	btb6,1,%00000001,0        ; down    (a)
+    .byte	btb5,7,%00010000,0        ; left    (n)
+    .byte	btb4,7,%00100000,0        ; right   (m)
     .byte	btb3,7,%00000001,0        ; fire    (space)
     .byte	btb0,3,%10000000,0        ; advance (1)
-    .byte	btb0,0,$10100000,0        ; quit    (shift-x)
+    .byte	btb0,0,$00000101,0        ; quit    (shift-x)
 
 ; calculate actual input impulse addresses
 up    = inputstates + 3
