@@ -23,9 +23,11 @@ aliveloop:
     ld      (gameframe),hl
 
     call    scroll
-    call    updateair
 
-    call    showsubcoords
+    YIELD
+
+    call    updateair
+;    call    showsubcoords
 
     call    updatebullets
 
@@ -36,8 +38,6 @@ aliveloop:
     ld      a,(fire)
     cp      1
     call    z,startbullet
-
-    YIELD
 
     ld      a,(collision)
     and     a

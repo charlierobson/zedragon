@@ -94,7 +94,7 @@ mul600:
 
 collision:
     .byte   0
-subcoloff:
+subrowoff:
     .byte   0
 
 airupdatecounter:
