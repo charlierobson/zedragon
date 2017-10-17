@@ -31,34 +31,29 @@ readjoy:
     ; fall into here for last input - quit
 
 updateinputstate:
-    ld      a,(hl)
-    ld      (uibittest),a
-    inc     hl
+    ld      a,(hl)          ; input info table
+    ld      (uibittest),a   ; get opcode for j/s bit test
 
-    ld      b,0             ; setup for bit test below
-    ld      de,kbin
-    ld      a,(hl)
     inc     hl
+    ld      a,(hl)          ; half-row index
+    inc     hl
+    ld      de,kbin         ; keyboard bits table pointer
     or      e
-    ld      e,a
-    ld      a,(de)
-    and     (hl)
+    ld      e,a             ; add offset to table
+    ld      a,(de)          ; get key input bits
+    and     (hl)            ; result will be 0 if required key is down
     inc     hl
     jr      z,{+}           ; skip joystick read if pressed - h is 0
 
     ld      a,(LAST_J)
-    ld      b,a
 
-+:  ld      a,(hl)          ; 0 - not pressed, 1 - just pressed, 3 - held, 2 - just released
-    sla     a               ;  C <- [7......0] <- 0
++:  sla     (hl)            ; (key & 3) = 0 - not pressed, 1 - just pressed, 2 - just released and >3 - held
 
 uibittest = $+1
-    bit     0,b
+    bit     0,a             ; if a key was already detected a will be 0 so this test succeeds
     jr      nz,{+}          ; skip if input bit is 1 (not pressed)
 
-    or      1               ; indicate that the input is asserted
+    set     0,(hl)          ; signify impulse
 
-+:  and     3               ; we only keep bottom 2 bits - perhaps keep more bits for timing purposes?
-    ld      (hl),a
-    inc     hl
++:  inc     hl              ; ready for next key in table
     ret

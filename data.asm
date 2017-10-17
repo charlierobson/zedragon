@@ -16,7 +16,7 @@ titlecredidx:
 titlecreds:
     ;        --------========--------========
     .asc    "     PROGRAMMING: SIRMORRIS     "
-    .asc    "    DISPLAY DRIVER: ANDY REA    "
+    .asc    "CUSTOM DISPLAY ROUTINE: ANDY REA"
     .asc    " TITLE TUNE: REAR ADMIRAL MOGGY "
     .asc    "   STC MUSIC PLAYER: ANDY REA   "
     .asc    "   AYFX DRIVER:  ALEX SEMENOV   "
@@ -39,41 +39,40 @@ sfx:
 LAST_J:
 	.byte	0
 
-; btb = bit test byte = 2nd byte of bit N,b instruction
-btb0 = %01000000
-btb1 = %01001000
-btb2 = %01010000
-btb3 = %01011000
-btb4 = %01100000
-btb5 = %01101000
-btb6 = %01110000
-btb7 = %01111000
+; btb = bit test byte = 2nd byte of bit N,a instruction
+btb0 = %01000111
+btb1 = %01001111
+btb2 = %01010111
+btb3 = %01011111
+btb4 = %01100111
+btb5 = %01101111
+btb6 = %01110111
+btb7 = %01111111
 
-;  ---      0  1  2  3  4
-;
-; $FE - SHIFT, Z, X, C, V   0
-; $FD -     A, S, D, F, G   1
-; $FB -     Q, W, E, R, T   2
-; $F7 -     1, 2, 3, 4, 5   3
-; $EF -     0, 9, 8, 7, 6   4
-; $DF -     P, O, I, U, Y   5
-; $BF - ENTER, L, K, J, H   6
-; $7F - SPACE, ., M, N, B   7
+; -----  4  3  2  1  0
+;                       
+; $FE -  V, C, X, Z, SH   0
+; $FD -  G, F, D, S, A    1
+; $FB -  T, R, E, W, Q    2
+; $F7 -  5, 4, 3, 2, 1    3
+; $EF -  6, 7, 8, 9, 0    4
+; $DF -  Y, U, I, O, P    5
+; $BF -  H, J, K, L, NL   6
+; $7F -  B, N, M, ., SP   7
 ;
 ; joystick bit test opcode fragment,
-; key row offset,
+; key row offset 0-7,
 ; key mask,
 ; input impulse
 
 inputstates:
-;                   ---43210
-    .byte	btb7,2,%00000001,0        ; up      (q)
-    .byte	btb6,1,%00000001,0        ; down    (a)
-    .byte	btb5,7,%00001000,0        ; left    (n)
-    .byte	btb4,7,%00000100,0        ; right   (m)
-    .byte	btb3,7,%00000001,0        ; fire    (space)
+    .byte	btb7,2,%00000001,0        ; up      (Q)
+    .byte	btb6,1,%00000001,0        ; down    (A)
+    .byte	btb5,7,%00001000,0        ; left    (N)
+    .byte	btb4,7,%00000100,0        ; right   (M)
+    .byte	btb3,7,%00000001,0        ; fire    (SP)
     .byte	btb0,3,%00000001,0        ; advance (1)
-    .byte	btb0,0,$00000101,0        ; quit    (shift-x)
+    .byte	btb0,0,$00000101,0        ; quit    (SH-X)
 
 ; calculate actual input impulse addresses
 up    = inputstates + 3

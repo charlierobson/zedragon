@@ -38,7 +38,7 @@ aliveloop:
     call    z,AFXPLAY
 
     ld      a,(fire)
-    cp      1
+    cp      $7f
     call    z,startbullet
 
     ld      a,(collision)
