@@ -3,6 +3,9 @@ gamemain:
     call    resetscore
     call    enablegamesound
 
+	ld		a,r
+	ld		(rng+1),a
+
     ;ld      a,(advance)
     ;cp      1
     ;ret     nz
@@ -19,17 +22,22 @@ resetafterdeath:
 
     call    scroll
 
+    call    resetmines              ; find the first mine on screen wrt scroll position
+
 aliveloop:
     ld      hl,(gameframe)
     inc     hl
     ld      (gameframe),hl
 
     call    scroll
+    call    findfirstmine
 
     YIELD
 
     call    updateair
 ;    call    showsubcoords
+
+    call    minerelease
 
     call    updatebullets
 

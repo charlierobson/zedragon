@@ -129,13 +129,70 @@ refreshmap:
     ret
 
 
+resetmines:
+    ld      hl,minetbl
+    ld      (minebase),hl
 
-mine = $2f
-staticmine = $2f+$40
+findfirstmine:
+    ld      hl,(minebase)
+    ld      de,(scrollpos)
+
+-:  push    hl
+    ld      a,(hl)
+    inc     hl
+    ld      h,(hl)
+    ld      l,a
+    sbc     hl,de
+    pop     hl
+    ld      (minebase),hl
+    ret     nc                  ; hl points to first mine on screen
+
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    jr      {-}
+
+
+    ;
+    ; return with carry set and hl = pointer to mine if a mine is considered for action
+    ;
+findmine:
+    ld      (consideration),hl
+    ld      hl,(scrollpos)
+    ld      de,32
+    add     hl,de
+    ex      de,hl
+
+    ld      hl,(minebase)
+
+-:  push    hl
+    ld      a,(hl)
+    inc     hl
+    ld      h,(hl)
+    ld      l,a
+    sbc     hl,de
+    pop     hl
+    ret     nc                  ; no more mines on screen
+
+    ; consider this mine
+consideration = $+1
+    call    0
+    ret     c                   ; this is our mine!
+
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    jr      {-}
+
+
+mine = $28
+staticmine = $28+$40
 stalactite = $27
 minecount = 216
 minetbl:
-    .word     8
+    .word    8
     .byte    6,staticmine
     .word    10
     .byte    3,staticmine
@@ -567,3 +624,4 @@ minetbl:
     .byte    6,mine
     .word   597
     .byte    5,staticmine
+    .word   $dead

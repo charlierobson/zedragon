@@ -19,6 +19,7 @@ explosion:
 
     YIELD
 
+becomeexplosion:
     ld      a,(iy+OUSER+2)
     inc     a
     cp      24

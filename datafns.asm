@@ -41,3 +41,15 @@ updatecounter:
 +:  dec     a           ; the dec is always performed which is why reset value was bumped
     ld      (hl),a
     ret                 ; we return with Z set when the counter has reached zero
+
+
+
+rng:
+	ld		a,0
+	ld		b,a
+	add		a,a
+	add		a,a
+	add		a,b
+	inc		a
+	ld		(rng+1),a
+	ret

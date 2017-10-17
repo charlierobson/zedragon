@@ -30,8 +30,8 @@ titlecreds:
 ;;	.asciimap ';', $19
 
 
-titletune:
-	.incbin	"title.stc"
+;titletune:
+;	.incbin	"title.stc"
 
 sfx:
 	.incbin	"zedragon.afb"
@@ -102,6 +102,9 @@ oldsubaddress:
 bgchardata:
 	.byte	0,0,0,0,0,0
 basecharptr:
+    .word   0
+
+minebase:
     .word   0
 
 mul600:

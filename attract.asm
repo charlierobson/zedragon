@@ -15,7 +15,21 @@ attract:
 
     YIELD
 
-    ld      a,(fire)
+    ld      a,(advance)
+    cp      1
+    jr      nz,{+}
+
+	call	getobject
+	ld		bc,minearise
+	call	initobject
+	call	insertobject_afterthis
+    ld      de,minetblx
+    ex      de,hl
+    ldi
+    ldi
+    ldi
+
++:  ld      a,(fire)
     cp      1
     jr      nz,{-}
 
@@ -27,3 +41,8 @@ attract:
 	call	insertobject_afterhead
 
 	DIE
+
+
+minetblx:
+    .word   5
+    .byte   8,mine
