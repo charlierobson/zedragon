@@ -45,4 +45,4 @@ attract:
 
 minetblx:
     .word   5
-    .byte   8,mine
+    .byte   8,CH_MINE
