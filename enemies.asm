@@ -53,6 +53,8 @@ minearise:
     dec     a
     ld      bc,600
     add     hl,bc
+    ex      de,hl
+    add     hl,bc
     ld      (hl),a
     ld      (de),a
 
