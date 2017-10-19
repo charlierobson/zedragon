@@ -99,8 +99,7 @@ updatebullets:
 
 +:  ld      a,b
     ld      (bltundrawchar),a
-    ld      a,$be
-    ld      (hl),a
+    ld      (hl),$be
     ret
 
 

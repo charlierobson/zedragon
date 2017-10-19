@@ -58,41 +58,61 @@ minearise:
 
     YIELD
 
+    ; is the bullet reporting a collision, and is it in our column?
     ld      hl,(bulletHitX)
     ld      a,l
     or      h
-    jr      z,{+}
+    jr      z,{+}               ; skip column check if no x position reported
 
-aaaa:
-    ld      e,(iy+OUSER+4)
+    ld      e,(iy+OUSER+4)      ; column check
     ld      d,(iy+OUSER+5)
     and     a
     sbc     hl,de
     jr      z,gobang
 
-+:  ld      l,(iy+OUSER+0)
++:  ld      l,(iy+OUSER+0)      ; restore screen pointer
     ld      h,(iy+OUSER+1)
 
-    inc     (iy+OUSER+2)
+    inc     (iy+OUSER+2)        ; only move mine up when frame = 0
     ld      a,(iy+OUSER+2)
     and     15
     jr      nz,{-}
 
-    dec     (iy+OUSER+3)
+    dec     (iy+OUSER+3)        ; explode when mine hits the top
     jr      z,gobang
 
-    ld      de,600
+    ld      de,600              ; move mine up
     and     a
     sbc     hl,de
-    ld      a,(hl)
+
+    ld      a,(hl)              ; are we about to hit some thing?
     and     a
     jr      z,{-}
-    cp      $20
+
+    cp      $20                 ; some solid thing?
     jr      nc,{-}
 
     ; all done - become an explosion
+
 gobang:
+    ; remove characters from screen
+
+    ld      l,(iy+OUSER)
+    ld      h,(iy+OUSER+1)
+    ld      d,h
+    ld      e,l
+    set     7,d
+    res     6,d
     xor     a
+    ld      (hl),a
+    ld      (de),a
+    ld      bc,600
+    add     hl,bc
+    ex      de,hl
+    add     hl,bc
+    ld      (hl),a
+    ld      (de),a
+
     ld      (iy+OUSER+2),a
     jp      becomeexplosion
 

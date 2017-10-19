@@ -58,9 +58,8 @@ chaindrop:
 
 +:  ld      (iy+OUSER),l
     ld      (iy+OUSER+1),h
-    xor     a
-    ld      (hl),a
+    ld      (hl),0
     set     7,h
     res     6,h
-    ld      (hl),a
+    ld      (hl),0
     jr      chaindrop

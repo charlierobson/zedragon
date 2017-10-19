@@ -57,8 +57,7 @@ mineloop:
     and     a
     jr      nz,rmp0
 
-    ld      a,$bf
-    ld      (hl),a
+    ld      (hl),$bf
 
 rmp0:
     inc     hl
