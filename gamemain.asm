@@ -1,3 +1,7 @@
+
+;               HEAD
+;    ...[mines][core][bullets][gamemain/attract][sub][explosions]...
+
 gamemain:
     call    cls
     call    resetscore
@@ -39,6 +43,8 @@ aliveloop:
 
     call    minerelease
 
+    ld      de,0
+    ld      (bulletHitX),de
     call    updatebullets
 
     ld      a,(FRAMES)              ; play ping sfx every so often
@@ -46,7 +52,7 @@ aliveloop:
     call    z,AFXPLAY
 
     ld      a,(fire)
-    cp      $7f
+    cp      1
     call    z,startbullet
 
     ld      a,(collision)

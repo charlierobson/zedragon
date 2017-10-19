@@ -25,7 +25,11 @@ minearise:
     ld      h,(iy+OUSER+1)
     ld      a,(iy+OUSER+2)      ; = y
     dec     a
-    ld      (iy+OUSER+3),a      ; keep Y around
+
+    ld      (iy+OUSER+3),a      ; keep X & (adjusted) Y around for various comparisons
+    ld      (iy+OUSER+4),l
+    ld      (iy+OUSER+5),h
+
     call    mulby600
     add     hl,de               ; hl = x + 600 * (y-1)
     ld      de,D_BUFFER
@@ -54,7 +58,19 @@ minearise:
 
     YIELD
 
-    ld      l,(iy+OUSER+0)
+    ld      hl,(bulletHitX)
+    ld      a,l
+    or      h
+    jr      z,{+}
+
+aaaa:
+    ld      e,(iy+OUSER+4)
+    ld      d,(iy+OUSER+5)
+    and     a
+    sbc     hl,de
+    jr      z,gobang
+
++:  ld      l,(iy+OUSER+0)
     ld      h,(iy+OUSER+1)
 
     inc     (iy+OUSER+2)

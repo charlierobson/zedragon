@@ -15,6 +15,17 @@ startbullet:
     ld      a,4-1
     call    AFXPLAY
 
+    ld      a,(subx)
+    add     a,8
+    srl     a
+    srl     a
+    srl     a
+    ld      l,a
+    ld      h,0
+    ld      de,(scrollpos)
+    add     hl,de
+    ld      (bulletX),hl
+
     ld      hl,(subaddress)     ; we always draw bullet in front of sub
     inc     hl
 
@@ -62,6 +73,10 @@ updatebullets:
 
     ret     z                   ; all done if lifetime became 0
 
+    ld      de,(bulletX)
+    inc     de
+    ld      (bulletX),de
+
     ld      de,$23f0
     call    copychar
     ld      a,(bltyoff)
@@ -94,6 +109,9 @@ bullethit:
     ; clear enemy from screen and mirror map
     cp      $20
     jr      nz,{+}
+
+    ld      de,(bulletX)
+    ld      (bulletHitX),de
 
     push    hl
     push    hl

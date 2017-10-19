@@ -116,6 +116,10 @@ subrowoff:
     .byte   0
 subcoloff:
     .byte   0
+bulletX:
+    .word   0
+bulletHitX:
+    .word   0
 
 airupdatecounter:
     .byte   0
