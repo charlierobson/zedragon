@@ -129,11 +129,23 @@ refreshmap:
 
 
 resetmines:
-    ld      hl,minetbl
+    ld      bc,minecount            ; remove the inactive bits from all entries
+    ld      hl,minetbl+3
+-:  res     7,(hl)
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    dec     bc
+    ld      a,b
+    or      c
+    jr      nz,{-}
+
+    ld      hl,minetbl              ; reset the 'first mine' pointer
     ld      (minebase),hl
 
 findfirstmine:
-    ld      hl,(minebase)
+    ld      hl,(minebase)           ; find the first mine on screen
     ld      de,(scrollpos)
 
 -:  push    hl
@@ -144,7 +156,7 @@ findfirstmine:
     sbc     hl,de
     pop     hl
     ld      (minebase),hl
-    ret     nc                  ; hl points to first CH_MINE on screen
+    ret     nc                  ; hl points to first on screen mine
 
     inc     hl
     inc     hl
@@ -154,7 +166,7 @@ findfirstmine:
 
 
     ;
-    ; return with carry set and hl = pointer to CH_MINE if a CH_MINE is considered for action
+    ; return with carry set and hl = pointer to a mine struct if considered for action
     ;
 findmine:
     ld      (consideration),hl

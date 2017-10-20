@@ -103,6 +103,31 @@ updatebullets:
     ret
 
 
+endmine:
+    push    hl
+    push    de
+    push    hl
+    ld      a,(hl)
+    inc     hl
+    ld      h,(hl)
+    ld      l,a
+    ld      de,(bulletHitX)
+    and     a
+    sbc     hl,de
+    pop     hl
+    jr      nz,{+}
+
+    inc     hl
+    inc     hl
+    inc     hl
+    set     7,(hl)
+
++:  pop     de
+    pop     hl
+    and     a
+    ret
+
+
 bullethit:
     ; a has the hit character, hl is the screen address
     ; clear enemy from screen and mirror map
@@ -119,6 +144,10 @@ bullethit:
     res     6,h                 ; point hl at mapcache in high memory
     set     7,h
     ld      (hl),0
+
+    ; nullify mine
+    ld      hl,endmine          ; mark mine as dead
+    call    findmine
 
 	call	getobject
 	ld		bc,explosion
