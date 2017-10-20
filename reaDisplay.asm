@@ -342,7 +342,7 @@ TOP_LINE:
 	RET
 
 D_BUFFER:
-	.incbin "map.bin"
+	.incbin "map-edited.bin"
 	RET
 
 	.align	32	; to assist in air display calculations
