@@ -70,7 +70,7 @@ fnmain:
 #include "displayfns.asm"
 #include "soundfns.asm"
 #include "mapfns.asm"
-;#include "stcplay.asm"
+#include "stcplay.asm"
 #include "ayfxplay.asm"
 #include "zxpand.asm"
 

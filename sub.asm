@@ -1,6 +1,5 @@
 subfunction:
-    ld      hl,$0600
-    ld      (subx),hl               ; sets subx = 0, suby = 1
+    ld      hl,$0000
     ld      (subaddress),hl         ; we'll sink the first sub drawing into the ROM
     ld      (oldsubaddress),hl
  

@@ -184,12 +184,6 @@ testevery8:
     ret
 
 
-resetscroll:
-    ld      hl,0
-    ld      (scrollpos),hl
-    ret
-
-
 scroll:
     ld      hl,scrolltick
     ld      c,23

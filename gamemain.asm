@@ -10,25 +10,57 @@ gamemain:
 	ld		a,r
 	ld		(rng+1),a
 
-    ;ld      a,(advance)
-    ;cp      1
-    ;ret     nz
+    xor     a
+    ld      (restartPoint),a
 
 resetafterdeath:
-    call    resetscroll
     call    refreshmap
     call    resetair
+
+    ld      hl,dofs
+    ld      a,(restartPoint)        ; reset scroll
+    rlca
+    rlca
+    add     a,l
+    ld      l,a
+    ld      a,0
+    adc     a,h
+    ld      h,a
+    ld      a,(hl)
+    inc     hl
+    push    hl
+    ld      h,(hl)
+    ld      l,a
+    ld      (restartScrollPos),hl
+    ld      (scrollpos),hl
+    ld      (BUFF_OFFSET),hl
+    pop     hl
+    inc     hl
+    ld      a,(hl)
+    ld      (subx),a
+    inc     hl
+    ld      a,(hl)
+    ld      (suby),a
+
+    call    scroll              ; to ensure sub background capture doesn't compensate
+
+    call    resetmines              ; find the first mine on screen wrt scroll position
 
 	call	getobject
 	ld		bc,subfunction
 	call	initobject
 	call	insertobject_afterthis
 
-    call    scroll
-
-    call    resetmines              ; find the first mine on screen wrt scroll position
-
 aliveloop:
+    ld      a,(advance)
+    cp      1
+    jr      nz,{+}
+
+    ld      a,(restartPoint)
+    inc     a
+    ld      (restartPoint),a
++:
+
     ld      hl,(gameframe)
     inc     hl
     ld      (gameframe),hl
@@ -39,8 +71,6 @@ aliveloop:
     YIELD
 
     call    updateair
-;    call    showsubcoords
-
     call    minerelease
 
     ld      de,0
@@ -69,7 +99,7 @@ aliveloop:
     inc     (iy+OUSER)
     jr      nz,{-}
 
-    jr      resetafterdeath
+    jp      resetafterdeath
 
     call    silencesound
 

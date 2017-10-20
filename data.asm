@@ -30,8 +30,8 @@ titlecreds:
 ;;	.asciimap ';', $19
 
 
-;titletune:
-;	.incbin	"title.stc"
+titletune:
+	.incbin	"title.stc"
 
 sfx:
 	.incbin	"zedragon.afb"
@@ -120,6 +120,32 @@ bulletX:
     .word   0
 bulletHitX:
     .word   0
+
+
+restartPoint:
+    .byte 0
+restartScrollPos:
+    .word   0
+
+    ; Restart scroll and sub positions
+dofs:
+    .word   $0000
+	.byte	0,6
+
+    .word   $004a
+	.byte	72,6
+
+    .word   $00aa
+	.byte	64,16
+
+    .word   $010b
+	.byte	72,16
+
+    .word   $0181
+	.byte	56,6
+
+    .word   $021a
+	.byte	80,6
 
 airupdatecounter:
     .byte   0
