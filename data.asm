@@ -123,8 +123,6 @@ bulletHitX:
 
 
 restartPoint:
-    .byte 0
-restartScrollPos:
     .word   0
 
     ; Restart scroll and sub positions
@@ -146,6 +144,8 @@ dofs:
 
     .word   $021a
 	.byte	80,6
+
+    .word   $ffff
 
 airupdatecounter:
     .byte   0

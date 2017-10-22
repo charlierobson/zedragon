@@ -10,28 +10,19 @@ gamemain:
 	ld		a,r
 	ld		(rng+1),a
 
-    xor     a
-    ld      (restartPoint),a
+    ld      hl,dofs
+    ld      (restartPoint),hl
 
 resetafterdeath:
     call    refreshmap
     call    resetair
 
-    ld      hl,dofs
-    ld      a,(restartPoint)        ; reset scroll
-    rlca
-    rlca
-    add     a,l
-    ld      l,a
-    ld      a,0
-    adc     a,h
-    ld      h,a
+    ld      hl,(restartPoint)
     ld      a,(hl)
     inc     hl
     push    hl
     ld      h,(hl)
     ld      l,a
-    ld      (restartScrollPos),hl
     ld      (scrollpos),hl
     ld      (BUFF_OFFSET),hl
     pop     hl
@@ -42,8 +33,7 @@ resetafterdeath:
     ld      a,(hl)
     ld      (suby),a
 
-    call    scroll              ; to ensure sub background capture doesn't compensate
-
+    call    scroll                  ; this pushes the scroll pos on 1 sub-pixel. is necessary
     call    resetmines              ; find the first mine on screen wrt scroll position
 
 	call	getobject
@@ -52,23 +42,36 @@ resetafterdeath:
 	call	insertobject_afterthis
 
 aliveloop:
-    ld      a,(advance)
-    cp      1
-    jr      nz,{+}
-
-    ld      a,(restartPoint)
-    inc     a
-    ld      (restartPoint),a
-+:
-
     ld      hl,(gameframe)
     inc     hl
     ld      (gameframe),hl
 
-    call    scroll
+    call    scroll              ; haven't scrolled the bg, so we don't need to update any pointers
+    jr      nz,{+}
+
     call    findfirstmine
 
-    YIELD
+    ld      hl,(restartPoint)
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    push    hl
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    ld      hl,(scrollpos)
+    and     a
+    sbc     hl,de
+    pop     hl
+    jr      nz,{+}
+
+    ld      (restartPoint),hl
+
+    ld      a,3
+    call    AFXPLAY
+
++:  YIELD
 
     call    updateair
     call    minerelease
@@ -88,6 +91,10 @@ aliveloop:
     ld      a,(collision)
     and     a
     jr      z,aliveloop
+
+
+    ; sub's dead
+
 
     xor     a
     ld      (iy+OUSER),a

@@ -184,25 +184,33 @@ testevery8:
     ret
 
 
+    ; return with Z set when we just scrolled or we've reached the end
+    ;
 scroll:
-    ld      hl,scrolltick
+    ld      hl,scrolltick           ; return if it's not time to scroll
     ld      c,23
     call    updatecounter
     ret     nz
 
-    ld      hl,(scrollpos)  
-    ld      a,l
+    ld      hl,(scrollpos)
+
+    ld      a,l                     ; check if we've hit the end. don't scroll if so
     cp      (600-32) & 255
     jr      nz,{+}
 
     ld      a,h
     cp      (600-32) / 256
-    ret     z
+    jr      nz,{+}
 
-+:  inc     hl
+    or      a                       ; clear Z flag
+    ret
+
++:  ; do scroll
+
+    inc     hl
     ld      (scrollpos),hl
-
     ld      (BUFF_OFFSET),hl
+    xor     a
     ret
 
 
