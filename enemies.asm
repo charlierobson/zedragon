@@ -21,6 +21,9 @@ minerelease:
 
 
 minearise:
+    ld      a,5
+    call    AFXPLAY
+
     ld      l,(iy+OUSER)        ; hl = x
     ld      h,(iy+OUSER+1)
     ld      a,(iy+OUSER+2)      ; = y

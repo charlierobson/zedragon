@@ -65,7 +65,7 @@ aliveloop:
 
     ld      (restartPoint),hl
 
-    ld      a,3
+    ld      a,12
     call    AFXPLAY
 
 +:  YIELD
