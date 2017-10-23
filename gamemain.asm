@@ -18,15 +18,12 @@ resetafterdeath:
     call    resetair
 
     ld      hl,(restartPoint)
-    ld      a,(hl)
+    ld      c,(hl)
     inc     hl
-    push    hl
-    ld      h,(hl)
-    ld      l,a
-    ld      (scrollpos),hl
-    ld      (BUFF_OFFSET),hl
-    pop     hl
+    ld      b,(hl)
     inc     hl
+    ld      (scrollpos),bc
+    ld      (BUFF_OFFSET),bc
     ld      a,(hl)
     ld      (subx),a
     inc     hl
