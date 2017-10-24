@@ -68,7 +68,12 @@ aliveloop:
     ld      a,12
     call    AFXPLAY
 
-+:  YIELD
++:  ld      a,(ocount)
+    ld      de,TOP_LINE
+    call    hexout
+    xor     a
+    ld      (ocount),a
+    YIELD
 
     call    updateair
     call    minerelease

@@ -50,6 +50,10 @@ resumenext:
 
 	; now resume executing at the object's saved address
 	;
+	ld		hl,ocount
+	inc		(hl)
+	
 	ld		l,(IY+OPC)
 	ld		h,(IY+OPC+1)
+
 	jp		(hl)

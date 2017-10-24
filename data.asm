@@ -121,6 +121,8 @@ bulletX:
 bulletHitX:
     .word   0
 
+ocount:
+    .byte   0
 
 restartPoint:
     .word   0
