@@ -317,16 +317,12 @@ chkidx2 = $+5
     djnz    {-}
 
     ;call    showcols
-    jp      substart
 
-
-testcollision:
-    ld      a,c
+    ld      a,(airlevel)
     and     a
-    ret     z
-    cp      $39
-    ret
+    jp      nz,substart
 
+    ; sub is dead, explo-o-o-o-ode
 
 collided:
     ld      a,1
@@ -356,6 +352,14 @@ collided:
     call    AFXPLAY
 
     DIE
+
+
+testcollision:
+    ld      a,c
+    and     a
+    ret     z
+    cp      $39
+    ret
 
 
 subsubexplo:

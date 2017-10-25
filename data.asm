@@ -104,6 +104,9 @@ bgchardata:
 basecharptr:
     .word   0
 
+lives:
+    .byte   0
+
 minebase:
     .word   0
 

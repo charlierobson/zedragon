@@ -13,6 +13,10 @@ gamemain:
     ld      hl,dofs
     ld      (restartPoint),hl
 
+    ld      a,4
+    ld      (lives),a
+    call    showlives
+
 resetafterdeath:
     call    refreshmap
     call    resetair
@@ -73,9 +77,11 @@ aliveloop:
     call    hexout
     xor     a
     ld      (ocount),a
+
     YIELD
 
     call    updateair
+
     call    minerelease
 
     ld      de,0
@@ -96,10 +102,14 @@ aliveloop:
 
 
     ; sub's dead
-
-
+deadsub:
     xor     a
     ld      (iy+OUSER),a
+
+    ld      a,(lives)
+    dec     a
+    ld      (lives),a
+    call    showlives
 
 -:  call    updatebullets
 
@@ -108,7 +118,9 @@ aliveloop:
     inc     (iy+OUSER)
     jr      nz,{-}
 
-    jp      resetafterdeath
+    ld      a,(lives)
+    and     a
+    jp      nz,resetafterdeath
 
     call    silencesound
 

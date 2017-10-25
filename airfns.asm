@@ -25,7 +25,7 @@ increaseair:
     call    updatecounter
     ret     nz                  ; not time to modify air value yet
 
-    ld      a,(airlevel)
+    ld      a,(airlevel)        ; don't overpressurise
     cp      AIR_MAX
     ret     z
 
@@ -34,7 +34,7 @@ increaseair:
     jr      displayair
 
 decreaseair:
-    ld      c,10                ; decrease air every 10 cycles
+    ld      c,9                 ; decrease air every 9 cycles
     call    updatecounter
     ret     nz                  ; not time to modify air value yet
 
@@ -46,6 +46,22 @@ decreaseair:
 
     dec     a
     ld      (airlevel),a
+
+    cp      32
+    jr      nc,displayair
+
+    bit     0,a
+    jr      nz,displayair
+
+    push    af
+    and     16
+    rrca
+    rrca
+    rrca
+    rrca
+    add     a,13
+    call    AFXPLAY
+    pop     af
 
 displayair:
     push    af
