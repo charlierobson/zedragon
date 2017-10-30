@@ -4,6 +4,7 @@ ZX81 (with UDG) conversion of Russ Wetmore's classic atari game Sea Dragon
 ### TODO
 * lasers
 * stalactites
+* depth charges
 * map cleanup
 * pixel movement torpedos
 * score

@@ -34,7 +34,7 @@ resetafterdeath:
     ld      a,(hl)
     ld      (suby),a
 
-    call    scroll                  ; this pushes the scroll pos on 1 sub-pixel. is necessary
+    call    scroll                  ; this pushes the scroll pos on 1 sub-pixel. is necessary>??????
     call    resetmines              ; find the first mine on screen wrt scroll position
 
 	call	getobject
@@ -43,16 +43,29 @@ resetafterdeath:
 	call	insertobject_afterthis
 
 aliveloop:
+    ld      a,(advance)
+    cp      1
+    jr      nz,{+}
+    ld      hl,(restartPoint)
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    ld      (restartPoint),hl
++:
+
     ld      hl,(gameframe)
     inc     hl
     ld      (gameframe),hl
 
     call    scroll              ; haven't scrolled the bg, so we don't need to update any pointers
-    jr      nz,{+}
+    ld      a,(scrolled)
+    and     a
+    jr      z,{+}
 
     call    findfirstmine
 
-    ld      hl,(restartPoint)
+    ld      hl,(restartPoint)   ; do something with a 'count till next restart point' ??
     inc     hl
     inc     hl
     inc     hl

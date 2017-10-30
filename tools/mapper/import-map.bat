@@ -1,3 +1,4 @@
-copy ..\..\map-edited.bin data\map.bin
+copy /y ..\..\map-edited.bin data\
+copy /y ..\..\charset.bin data\
 
 

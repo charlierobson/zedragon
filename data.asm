@@ -2,6 +2,8 @@
 
 CH_CHAIN = $32
 CH_EXPLODEBASE = $39
+CH_STALAC = $27
+CH_MINE = $2F
 
 scoreline:
 	.asc    "SCORE: 000000  HI: 000000  ^_: 4"
@@ -183,7 +185,20 @@ flagframe:
 flaganimation:
 	.byte		$1e,$de, $1e,$dc, $1c,$dc, $1c,$de
 
-    .align 512
+
+
+BIT_MINE   = 7
+BIT_STATIC = 6
+BIT_INACT  = 4
+
+enemyidx:
+    .incbin "enemyidx.bin"  ; needs 256 byte alignment
+
+    .align  256
+
+enemytbl:
+    .incbin "enemytbl.bin"  ; needs 256 byte alignment
+minecount = $-enemytbl
+
 charsets:
     .incbin "charset.bin"
-
