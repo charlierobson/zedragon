@@ -41,6 +41,7 @@ cls:
     ld      bc,6000
     call    zeromem
 
+    ld      (scrollpos),bc
     ld      (BUFF_OFFSET),bc    ; bc is 0 at thispoint
 
     ld      hl,TOP_LINE
@@ -187,6 +188,9 @@ testevery8:
     ; return with Z set when we just scrolled or we've reached the end
     ;
 scroll:
+    xor     a
+    ld      (scrolled),a
+
     ld      hl,scrolltick           ; return if it's not time to scroll
     ld      c,23
     call    updatecounter
@@ -209,7 +213,9 @@ scroll:
 
     inc     hl
     ld      (scrollpos),hl
-    ld      (BUFF_OFFSET),hl
+
+    ld      a,$ff
+    ld      (scrolled),a
     xor     a
     ret
 
@@ -227,6 +233,15 @@ showsubcoords:
     ld      a,(subx)
     and     7
     call    hexout
+    ret
+
+
+displayandresetocount:
+    ld      a,(ocount)
+    ld      de,TOP_LINE
+    call    hexout
+    xor     a
+    ld      (ocount),a
     ret
 
 

@@ -29,15 +29,7 @@ substart:
     ld      hl,600
     ld      de,(subaddress)
     add     hl,de
-
-    ld      a,(scrolltick)          ; because we draw one frame behind
-    and     a                       ; we need to bump (un)draw addresses when a scroll is due
-    jr      nz,{+}
-
-    inc     hl
-    inc     de
-
-+:  ld      (oldsubaddress),de
+    ld      (oldsubaddress),de
 
     ld      a,(gameframe)           ; $98 even frames, $b8 odd frames
     dec     a

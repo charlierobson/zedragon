@@ -48,10 +48,15 @@ starthere:
     ; here's the main loop, the root
 
 fnmain:
-    call    waitvsync
     call    animatecharacters
-    call    readjoy
+    call    readinput
+
+    ld      hl,(scrollpos)
+    ld      (BUFF_OFFSET),hl
+    call    waitvsync
+
     YIELD
+
     jr      fnmain
 
 

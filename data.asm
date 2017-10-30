@@ -89,6 +89,8 @@ scrolltick:
 	.byte	0
 scrollpos:
     .word   0
+scrolled:
+    .byte   0
 
 gameframe:
     .word   0
