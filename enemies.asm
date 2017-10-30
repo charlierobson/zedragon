@@ -3,19 +3,31 @@ minerelease:
     call    findmine
     ret     nc
 
+    ; hl -> enemytbl
+    ; de -> enemyidx
+
+    set     BIT_INACT,(hl)
+    ld      a,(hl)
+    and     $0f                     ; also clears carry
+    push    af
+
+    ld      hl,enemyidx             ; calc x pos
+    ex      de,hl
+    sbc     hl,de
     push    hl
 
 	call	getobject
 	ld		bc,minearise
 	call	initobject
-	call	insertobject_beforehead
+	call	insertobject_beforehead     ; eit with hl-> data area
 
     pop     de
-    ex      de,hl
-    ldi
-    ldi
-    ldi
-    set     7,(hl)
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    inc     hl
+    pop     af
+    ld      (hl),a
 
     ret
 
@@ -124,26 +136,24 @@ gobang:
 
     ; return with carry set when result is affirmative
     ;
-    ; release this mine if random number < 50
+    ; release this mine at random
     ;
 considermine:
-    push    hl
-    inc     hl
-    inc     hl
-    inc     hl
-    bit     7,(hl)
-    jr      nz,retnocarry   ; bit 7 set = active already
+    bit     BIT_INACT,(hl)
+    jr      nz,retnocarry       ; bit set = mine unavailable
 
-    ld      a,(hl)          ; is it actually a mine?
-    cp      CH_MINE
-    jr      nz,retnocarry
+    bit     BIT_STATIC,(hl)
+    jr      nz,retnocarry       ; bit set = mine unavailable
 
-    pop     hl
+    bit     BIT_MINE,(hl)       ; bit set = mine
+    jr      z,retnocarry
+
+    push    bc
     call    rng
+    pop     bc
     cp      1
-    ret                     ; return with C set if random number < 50
+    ret                         ; return with C set if mine should be chosen
 
 retnocarry:
-    pop     hl
     xor     a
     ret

@@ -16,7 +16,7 @@ initmap:
 
     ; reset mines and stalactites in the pure map
 
-    ld      b,minecount
+    ld      b,enemycount
     ld      hl,enemyidx
     ld      de,puremap
 
@@ -33,9 +33,9 @@ mineloop:
     ld      d,enemytbl / 256
     ld      e,a
     ld      a,(de)
+    ld      (crtenemy),a
 
-    push    af
-    and     $f0         ; get character
+    and     $80         ; get character
     rlca
     rlca
     rlca
@@ -43,7 +43,7 @@ mineloop:
     add     a,CH_STALAC
     ld      c,a
 
-    pop     af
+    ld      a,(crtenemy)
     and     $0f         ; get y
     call    mulby600    ; de = a * 600
     ex      de,hl
@@ -52,6 +52,9 @@ mineloop:
     add     hl,de
 
     ld      (hl),c      ; store enemy in pure map
+    ld      a,(crtenemy)
+    bit     BIT_STATIC,a
+    call    nz,drawchain
 
     pop     hl          ; retrieve enemy index table
 
@@ -82,6 +85,8 @@ rmp0:
     ret
 
 
+crtenemy:
+    .byte   0
 
 
 -:  xor     a
@@ -104,17 +109,17 @@ undrawchain:
 
 
 -:  ld      a,CH_CHAIN      ; draw a chain character into the map
-    ld      (de),a
+    ld      (hl),a
 
 drawchain:
     ld      a,$58           ; de += 600
-    add     a,e
-    ld      e,a
+    add     a,l
+    ld      l,a
     ld      a,$02
-    adc     a,d
-    ld      d,a
+    adc     a,h
+    ld      h,a
 
-    ld      a,(de)
+    ld      a,(hl)
     and     a
     jr      z,{-}
 
@@ -147,11 +152,6 @@ resetmines:
 -:  res     BIT_INACT,(hl)
     inc     hl
     djnz    {-}
-
-    ld      hl,scrollval            ; reset the 'first mine' pointer
-    ld      de,enemyidx
-    add     hl,de
-    ld      (minebase),hl
     ret
 
 
@@ -160,29 +160,28 @@ resetmines:
     ;
 findmine:
     ld      (consideration),hl
-    ld      hl,(scrollpos)
-    ld      de,32
+
+    ld      de,(scrollpos)      ; get the 'first mine' pointer
+    ld      hl,enemyidx
     add     hl,de
     ex      de,hl
+    ld      b,32
 
-    ld      hl,(minebase)
+-:  ld      a,(de)
+    cp      $ff
+    jr      z,_skipthis
 
--:  push    hl
-    ld      a,(hl)
-    inc     hl
-    ld      h,(hl)
+    ld      h,enemytbl / 256
     ld      l,a
-    sbc     hl,de
-    pop     hl
-    ret     nc                  ; no more mines on screen
 
     ; consider this mine
 consideration = $+1
     call    0
     ret     c                   ; this is our mine!
 
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    jr      {-}
+_skipthis:
+    inc     de
+    djnz    {-}
+
+    xor     a                   ; clear carry
+    ret

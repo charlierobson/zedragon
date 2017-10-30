@@ -106,25 +106,19 @@ updatebullets:
 endmine:
     push    hl
     push    de
-    push    hl
-    ld      a,(hl)
-    inc     hl
-    ld      h,(hl)
-    ld      l,a
+
     ld      de,(bulletHitX)
-    and     a
-    sbc     hl,de
-    pop     hl
-    jr      nz,{+}
+    ld      hl,enemyidx
+    add     hl,de
+    ld      e,(hl)
+    ld      d,enemytbl / 256
+    ex      de,hl
+    set     BIT_INACT,(hl)
 
-    inc     hl
-    inc     hl
-    inc     hl
-    set     7,(hl)
-
-+:  pop     de
+    pop     de
     pop     hl
     and     a
+    ccf
     ret
 
 

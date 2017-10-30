@@ -200,7 +200,7 @@ enemyidx:
 
 enemytbl:
     .incbin "enemytbl.bin"  ; needs 256 byte alignment
-minecount = $-enemytbl
+enemycount = $-enemytbl
 
 charsets:
     .incbin "charset.bin"

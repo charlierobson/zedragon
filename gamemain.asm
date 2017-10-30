@@ -62,8 +62,6 @@ aliveloop:
     and     a
     jr      z,{+}
 
-    call    findfirstmine
-
     ld      hl,(restartPoint)   ; do something with a 'count till next restart point' ??
     inc     hl
     inc     hl
