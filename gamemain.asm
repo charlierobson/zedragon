@@ -27,7 +27,6 @@ resetafterdeath:
     ld      b,(hl)
     inc     hl
     ld      (scrollpos),bc
-    ld      (BUFF_OFFSET),bc
     ld      a,(hl)
     ld      (subx),a
     inc     hl
@@ -72,11 +71,7 @@ aliveloop:
     ld      a,12
     call    AFXPLAY
 
-+:  ld      a,(ocount)
-    ld      de,TOP_LINE
-    call    hexout
-    xor     a
-    ld      (ocount),a
++:  ;call    displayandresetocount
 
     YIELD
 

@@ -2,7 +2,7 @@
 kbin:
     .fill   8
 
-readjoy:
+readinput:
     call    $1ffe
     or      %00000111
     ld      (LAST_J),a
