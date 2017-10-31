@@ -9,10 +9,9 @@
 	;...
 	OSTRUCTSIZE	.equ	$40
 
-	; object store - we'll allocate space for 24 objects
+	; object store - we'll allocate space for 16 objects
 	;
-	OSTORE		.equ	$9940
-	NSTRUCTS	.equ	$18
+	NSTRUCTS	.equ	$10
 
 	FREELIST	.equ	OSTORE+(NSTRUCTS*OSTRUCTSIZE)
 

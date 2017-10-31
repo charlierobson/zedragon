@@ -1,7 +1,6 @@
     BUFFER_WIDTH    .equ 600
     NUMBER_OF_ROWS  .equ 10
 
-
 setupdisplay:
 	CALL	cls
 	LD		HL,($400C)
@@ -339,10 +338,6 @@ JUST_TWO_BYTES:
 
 TOP_LINE:
 	.fill 32,0
-	RET
-
-D_BUFFER:
-	.incbin "map-edited.bin"
 	RET
 
 	.align	32	; to assist in air display calculations

@@ -1,3 +1,7 @@
+BIT_MINE   = 7
+BIT_STATIC = 6
+BIT_INACT  = 4
+s
 minerelease:
     ld      hl,considermine
     call    findmine
@@ -11,7 +15,7 @@ minerelease:
     and     $0f                     ; also clears carry
     push    af
 
-    ld      hl,enemyidx             ; calc x pos
+    ld      hl,ENEMYIDX             ; calc x pos
     ex      de,hl
     sbc     hl,de
     push    hl

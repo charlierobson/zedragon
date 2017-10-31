@@ -7,22 +7,45 @@
     .exportmode NO$GMB          ; xxxx:yyyy NAME
     .export
 
+D_BUFFER = $
+
+UDG      = $2000
+PUREMAP  = $2600
+D_MIRROR = D_BUFFER+$8000-$4000
+OSTORE   = $9800
+CHARSETS = $9C00
+
+maplz:      .incbin "map.binlz"
+charsetlz:	.incbin "charset.binlz"
+
+    .fill 6000-($-D_BUFFER)
+	RET
+
 #include "readisplay.asm"
 #include "yield.asm"
 
 ; ------------------------------------------------------------
 starthere:
-	out		($fd),a
+    out     ($fd),a
 
     call    golow
-	call	initostore
+
+    ld      hl,maplz
+    ld      de,PUREMAP
+    call    LZ48_decrunch
+
+    ld      hl,charsetlz
+    ld      de,UDG
+    call    LZ48_decrunch
+
+    call    initostore
     call    inittables
     call    initmap
 
     call    setupudg
     call    setupdisplay
 
-	out		($fe),a
+	out     ($fe),a
 
 	; create the head of the linked object list: the 'main' object.
 	; this waits for vsync, then proceeds along to the next object in the chain,
@@ -78,7 +101,7 @@ fnmain:
 #include "stcplay.asm"
 #include "ayfxplay.asm"
 #include "zxpand.asm"
-
+#include "lz48decrunch_v006.asm"
 #include "data.asm"
 
 endhere:

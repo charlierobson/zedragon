@@ -108,10 +108,10 @@ endmine:
     push    de
 
     ld      de,(bulletHitX)
-    ld      hl,enemyidx
+    ld      hl,ENEMYIDX
     add     hl,de
     ld      e,(hl)
-    ld      d,enemytbl / 256
+    ld      d,ENEMYTBL / 256
     ex      de,hl
     set     BIT_INACT,(hl)
 

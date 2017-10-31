@@ -1,8 +1,20 @@
 attract:
     call    cls
-    call    drawtitle
+
+    ld      hl,scrollpos
+    ld      (hl),32
+    YIELD
+
     call    resetcredits
     call    enabletitlesound
+
+    ld      hl,titlescreen
+    ld      de,D_BUFFER
+    call    LZ48_decrunch
+
+    ld      hl,scrollpos
+    ld      (hl),0
+    YIELD
 
 -:  ld      a,(FRAMES)
     and     127

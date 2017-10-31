@@ -131,6 +131,12 @@ bulletHitX:
 ocount:
     .byte   0
 
+airupdatecounter:
+    .byte   0
+airlevel:
+    .byte   0
+
+
 restartPoint:
     .word   0
 
@@ -156,21 +162,9 @@ dofs:
 
     .word   $ffff
 
-airupdatecounter:
-    .byte   0
-airlevel:
-    .byte   0
 
 titlescreen:
-	.byte		$bf,$bf,$bf,$bf,$bf,$bf,$bf,$bf,$bf,$bf,$bf,$bf,$bf,$bf,$bf,$1e,$1f,$bf,$0a,$11,$01,$01,$01,$01
-	.byte		$00,$00,$00,$07,$01,$01,$07,$01,$09,$0f,$01,$15,$00,$00,$00,$00,$00,$00,$0f,$01,$01,$01,$01,$01
-	.byte		$00,$00,$00,$01,$1a,$00,$01,$18,$01,$01,$18,$01,$00,$00,$00,$00,$00,$00,$1d,$30,$0d,$01,$01,$01
-	.byte		$00,$00,$00,$12,$1b,$09,$01,$19,$10,$01,$19,$01,$00,$00,$00,$00,$00,$00,$00,$00,$00,$05,$01,$01
-	.byte		$00,$00,$00,$01,$01,$0b,$0d,$01,$01,$01,$00,$01,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$12,$1b
-	.byte		$00,$00,$00,$01,$01,$09,$01,$01,$09,$0f,$01,$15,$07,$01,$01,$07,$01,$09,$01,$1c,$01,$00,$00,$00
-	.byte		$00,$00,$00,$01,$08,$01,$01,$18,$01,$01,$18,$01,$01,$06,$00,$01,$06,$01,$01,$15,$01,$00,$00,$00
-	.byte		$00,$00,$00,$01,$0a,$01,$01,$01,$19,$01,$19,$01,$01,$0c,$01,$01,$0a,$01,$01,$1d,$01,$00,$00,$03
-	.byte		$11,$13,$1a,$01,$01,$0b,$01,$05,$09,$01,$00,$01,$0d,$01,$0b,$0d,$01,$0b,$01,$14,$01,$18,$11,$01
+    .incbin  "titlescrn.binlz"
 
 shooterframe:
 	.byte		0
@@ -187,20 +181,11 @@ flagframe:
 flaganimation:
 	.byte		$1e,$de, $1e,$dc, $1c,$dc, $1c,$de
 
-
-
-BIT_MINE   = 7
-BIT_STATIC = 6
-BIT_INACT  = 4
-
-enemyidx:
-    .incbin "enemyidx.bin"  ; needs 256 byte alignment
+ENEMYIDX:
+    .incbin "enemyidx.bin"
 
     .align  256
 
-enemytbl:
+ENEMYTBL:
     .incbin "enemytbl.bin"  ; needs 256 byte alignment
-enemycount = $-enemytbl
-
-charsets:
-    .incbin "charset.bin"
+NUMENEMY = $-ENEMYTBL

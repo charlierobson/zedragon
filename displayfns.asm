@@ -1,30 +1,25 @@
+; copy udg into higher memory
+; invert the non-inverted half of the character set,
+; makes the subpixel rendering easier
+;
 setupudg:
-    ld      hl,charsets
-    ld      de,$2000
-    ld      bc,3*$200
+    ld      hl,UDG
+    ld      de,CHARSETS
+    push    de              ; save destination, this is where we start inverting
+    ld      bc,1024
     ldir
-    ld      a,$21
-    ld      i,a
-
-    ; invert the source character set in memory,
-    ; makes the subpixel rendering easier
-
-    ld      hl,charsets
-    ld      b,0
-
--:  ld      a,(hl)
-    xor     $ff
-    ld      (hl),a
-    inc     hl
+    pop     hl
+    ; bc is now 0, ready for djnz
+    ; call the inverter to do 256 bytes...
+    call    inverness
+    ; ...then drop straight back into it to do the next 256
+inverness:
     ld      a,(hl)
     xor     $ff
     ld      (hl),a
     inc     hl
-    djnz    {-}
-
+    djnz    inverness
     ret
-
-
 
 
 waitvsync:
@@ -58,24 +53,6 @@ zeromem:
     inc     de
     ld      (hl),a
     ldir
-    ret
-
-
-drawtitle:
-    ld      hl,titlescreen
-    ld      de,D_BUFFER + 604
-    ld      b,9
--:  push    bc
-    ld      bc,24
-    ldir
-    push    hl
-    ex      de,hl
-    ld      de,600-24
-    add     hl,de
-    ex      de,hl
-    pop     hl
-    pop     bc
-    djnz    {-}
     ret
 
 
@@ -137,20 +114,20 @@ animatecharacters:
     add     a,l
     ld      l,a
     ld      a,(hl)
-	ld      ($2000+$f8),a
+	ld      (UDG+$f8),a
     inc     hl
     ld      a,(hl)
-	ld      ($2000+$f8+1),a
+	ld      (UDG+$f8+1),a
 
-    ld      a,($2000+$181)
+    ld      a,(UDG+$181)
     xor     $66 ^ $7e
-    ld      ($2000+$181),a
+    ld      (UDG+$181),a
     and     $3c
-    ld      ($2000+$18e),a
+    ld      (UDG+$18e),a
 
-    ld      a,($2000+$189)
+    ld      a,(UDG+$189)
     xor     $a7 ^ $e5
-    ld      ($2000+$189),a
+    ld      (UDG+$189),a
 
     ld      a,(waterframe)
     inc     a
@@ -161,8 +138,8 @@ animatecharacters:
     ld      e,a
     add     hl,de
     ld      a,(hl)
-    ld      ($2000+$3ff),a
-    ld      (charsets+$3ff),a
+    ld      (UDG+$3ff),a
+    ld      (CHARSETS+$3ff),a
 
     xor     a
 
@@ -180,8 +157,8 @@ testevery8:
     add     a,e
     ld      e,a
     ld      a,(de)
-    ld      ($2000+$183),a
-    ld      ($2000+$18b),a
+    ld      (UDG+$183),a
+    ld      (UDG+$18b),a
     ret
 
 
@@ -303,7 +280,7 @@ copychar:
     jr      z,{+}
 
 ; todo - check this
-    ld      hl,charsets
+    ld      hl,CHARSETS
     ld      b,0             ; prep to receive carry
     sla     a               ; if this char is +64 (codes $80..$c0) then C is set
     rr      b               ; 0, or $80 if this was a +64 char

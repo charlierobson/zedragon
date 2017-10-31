@@ -33,8 +33,7 @@ resetafterdeath:
     ld      a,(hl)
     ld      (suby),a
 
-    call    scroll                  ; this pushes the scroll pos on 1 sub-pixel. is necessary>??????
-    call    resetmines              ; find the first mine on screen wrt scroll position
+    call    resetmines
 
 	call	getobject
 	ld		bc,subfunction
