@@ -13,8 +13,6 @@
 	;
 	NSTRUCTS	.equ	$10
 
-	FREELIST	.equ	OSTORE+(NSTRUCTS*OSTRUCTSIZE)
-
 	PSTORE		.equ	PRTBUF+0		; pointer to private data store
 	NEXTFREE	.equ	PRTBUF+2		; pointer to memory location holding address of next free object
 
@@ -47,7 +45,6 @@ initostore:
 	ldir
 
 	; point hl at the 1st byte past the last struct
-	; (== freelist in this case, but might not be in the future!)
 	;
 	; point de at the 1st entry in the freelist
 	;

@@ -17,7 +17,6 @@ updatecounter:
     ret                 ; we return with Z set when the counter has reached zero
 
 
-
 rng:
 	ld		a,0
 	ld		b,a

@@ -1,7 +1,7 @@
 BIT_MINE   = 7
 BIT_STATIC = 6
 BIT_INACT  = 4
-s
+
 minerelease:
     ld      hl,considermine
     call    findmine
