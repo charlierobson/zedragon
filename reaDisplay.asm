@@ -320,17 +320,17 @@ SOUNDFN = $+1
 	POP		IY
 
 	ld		hl,laserframe
+	xor		a
 	inc		(hl)
-	jr		nz,{+}
+	jp		m,{+}
 
-	inc		hl
-	inc		(hl)
+	ld		l,(hl)
+	ld		h,1
 	ld		a,(hl)
-	and		1
-	rlca
-	rlca
-	rlca
-	xor		$ff
+	and		$18
+
++:	xor		$ff
+
 	ld		($2380),a
 	ld		($2381),a
 	ld		($2382),a
@@ -340,7 +340,7 @@ SOUNDFN = $+1
 	ld		($2386),a
 	ld		($2387),a
 
-+:	POP		HL
+	POP		HL
 	POP		DE
 	POP		BC
 	POP		AF
