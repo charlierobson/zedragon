@@ -319,7 +319,28 @@ SOUNDFN = $+1
 	CALL	nz,0
 	POP		IY
 
-	POP		HL
+	ld		hl,laserframe
+	inc		(hl)
+	jr		nz,{+}
+
+	inc		hl
+	inc		(hl)
+	ld		a,(hl)
+	and		1
+	rlca
+	rlca
+	rlca
+	xor		$ff
+	ld		($2380),a
+	ld		($2381),a
+	ld		($2382),a
+	ld		($2383),a
+	ld		($2384),a
+	ld		($2385),a
+	ld		($2386),a
+	ld		($2387),a
+
++:	POP		HL
 	POP		DE
 	POP		BC
 	POP		AF
@@ -327,6 +348,8 @@ SOUNDFN = $+1
 	;VIDEO GENERATION TOOK PLACE
 	RET
 
+laserframe:
+	.word	0
 
 VID_STACK:
 	.word	NXT_ROW

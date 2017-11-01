@@ -1,10 +1,10 @@
-    .asciimap ' ', '_', {*}-' '
+    CH_CHAIN = $32
+    CH_EXPLODEBASE = $39
+    CH_STALAC = $27
+    CH_MINE = $2F
+    CH_BULLET = $be
 
-CH_CHAIN = $32
-CH_EXPLODEBASE = $39
-CH_STALAC = $27
-CH_MINE = $2F
-CH_BULLET = $be
+    .asciimap ' ', '_', {*}-' '
 
 scoreline:
 	.asc    "SCORE: 000000  HI: 000000  ^_: 4"
@@ -25,12 +25,6 @@ titlecreds:
     .asc    "   AYFX DRIVER:  ALEX SEMENOV   "
     .asc    "ORIGINAL CODE/GFX:  RUSS WETMORE"
     .asc    "      P R E S S    F I R E      "
-
-
-;;	.asciimap 'A','Z', {*}-'A'+$26
-;;	.asciimap '0','9', {*}-'0'+$1c
-;;	.asciimap '.', $1b
-;;	.asciimap ';', $19
 
 
 titletune:
@@ -168,8 +162,6 @@ shooterframe:
 	.byte		0
 shooteranimation:
 	.byte		$5a,$4e,$46,$42,$62,$72
-
-
 
 waterframe:
 	.byte		0
