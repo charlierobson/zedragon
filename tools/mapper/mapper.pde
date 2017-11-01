@@ -98,6 +98,8 @@ void draw()
   }
 
   image(characterSet.get(selectedTile), 600, 178, 16, 16);
+  
+  text("x = " + ((mouseX / 16) + scrollpos) + ".", 600, 220);
 }
 
 void setMap(int x, int y, int c)

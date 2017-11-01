@@ -13,13 +13,22 @@
 initmap:
     ld      hl,maplz
     ld      de,PUREMAP
+    ld      bc,maplzsz
+    ldir
+    ret
+
+fillmap:
+    ; decompress map into the mirror
+    ;
+    ld      hl,PUREMAP
+    ld      de,D_MIRROR
     call    LZ48_decrunch
 
-    ; create mines and stalactites in the pure map
-
-    ld      b,NUMENEMY
+    ; create mines and stalactites in the mirror
+    ;
+    ld      bc,600
     ld      hl,ENEMYIDX
-    ld      de,PUREMAP
+    ld      de,D_MIRROR
 
 -:  ld      a,(hl)
     cp      $ff
@@ -27,11 +36,14 @@ initmap:
 
     inc     de
     inc     hl
-    djnz    {-}
+    dec     bc
+    ld      a,b
+    or      c
+    jr      nz,{-}
 
     ; set up the water
 
-    ld      hl,PUREMAP
+    ld      hl,D_MIRROR
     ld      bc,600
 
 -:  ld      a,(hl)

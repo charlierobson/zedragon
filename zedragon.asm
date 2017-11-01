@@ -17,7 +17,9 @@ OSTORE   = $9800
 CHARSETS = $9C00
 
 maplz:      .incbin "map.binlz"
+maplzsz     = $-maplz
 charsetlz:	.incbin "charset.binlz"
+charsetlzsz = $ - charsetlz
     ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)
 	RET
@@ -32,6 +34,7 @@ starthere:
     call    golow
 
     call    initmap
+    call    fillmap
     call    initostore
     call    initcharsets
     call    setupdisplay

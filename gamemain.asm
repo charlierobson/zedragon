@@ -17,6 +17,9 @@ gamemain:
     ld      (lives),a
     call    showlives
 
+    ld      a,(laserframe)
+    ld      (laserframe+1),a
+
 resetafterdeath:
     call    refreshmap
     call    resetair
@@ -56,7 +59,21 @@ aliveloop:
     inc     hl
     ld      (gameframe),hl
 
-    call    scroll              ; haven't scrolled the bg, so we don't need to update any pointers
+    ld      hl,laserframe
+    ld      a,(hl)
+    and     $80
+    inc     hl
+    cp      (hl)
+    jr      z,{+}
+
+    ld      (hl),a
+    and     a
+    jr      nz,{+}
+
+    ld      a,15
+    call    AFXPLAY
+
++:  call    scroll              ; haven't scrolled the bg, so we don't need to update any pointers
     ld      a,(scrolled)
     and     a
     jr      z,{+}

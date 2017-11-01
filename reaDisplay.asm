@@ -331,14 +331,22 @@ SOUNDFN = $+1
 
 +:	xor		$ff
 
-	ld		($2380),a
-	ld		($2381),a
-	ld		($2382),a
-	ld		($2383),a
-	ld		($2384),a
-	ld		($2385),a
-	ld		($2386),a
-	ld		($2387),a
+	ld		hl,$2380
+	ld		(hl),a
+	inc		hl
+	ld		(hl),a
+	inc		hl
+	ld		(hl),a
+	inc		hl
+	ld		(hl),a
+	inc		hl
+	ld		(hl),a
+	inc		hl
+	ld		(hl),a
+	inc		hl
+	ld		(hl),a
+	inc		hl
+	ld		(hl),a
 
 	POP		HL
 	POP		DE
