@@ -34,7 +34,6 @@ starthere:
     call    golow
 
     call    initmap
-    call    fillmap
     call    initostore
     call    initcharsets
     call    setupdisplay
