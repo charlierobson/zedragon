@@ -1,3 +1,4 @@
+    .module DISPLAYFNS
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	;
@@ -23,7 +24,7 @@ initcharsets:
     ;
     ld     hl,CHARSETS
     call   _inverness
-
+    ;
     ; ...then drop straight back into it to do the next 256
     ;
 _inverness:
@@ -35,6 +36,12 @@ _inverness:
     ret
 
 
+	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	;
+    ; Kill time until we notice the FRAMES variable change
+    ;
+    ; A display has just been produced, and now we can continue.
+    ;
 waitvsync:
     ld      hl,FRAMES
     ld      a,(hl)
@@ -43,14 +50,19 @@ waitvsync:
     ret
 
 
+	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	;
+    ; Clear the display to white. Reset scroll pointers.
+    ;
 cls:
     xor     a
+
     ld      hl,D_BUFFER
     ld      bc,6000
     call    fillmem
 
-    ld      (scrollpos),bc
-    ld      (BUFF_OFFSET),bc    ; bc is 0 at thispoint
+    ld      (scrollpos),bc          ; bc is 0 at thispoint
+    ld      (BUFF_OFFSET),bc
 
     ld      hl,TOP_LINE
     ld      bc,32
@@ -58,7 +70,13 @@ cls:
 
     ld      hl,BOTTOM_LINE
     ld      bc,32
+    ;
+    ; falls in to ...
 
+	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	;
+    ; Fill BC bytes of memory at HL with value in A register.
+    ;
 fillmem:
     dec     bc
     ld      d,h
@@ -69,11 +87,20 @@ fillmem:
     ret
 
 
+    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ;
+    ; Start displaying the credits at the 0th item.
+    ;
 resetcredits:
     xor     a
     jr      {+}
 
 
+    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ;
+    ; Cycle through the credits, showing 'press fire' every other
+    ; time. The new credit goes in the bottom line of the display.
+    ;
 updatecredits:
     ld      a,(titlecredidx)
     inc     a
@@ -109,7 +136,6 @@ updatecredits:
 
 
 animatecharacters:
-    ; animate shooters
     ld      a,(FRAMES)
     and     15
     jr      nz,testevery8
@@ -175,8 +201,7 @@ testevery8:
     ret
 
 
-    ; return with Z set when we just scrolled or we've reached the end
-    ;
+
 scroll:
     xor     a
     ld      (scrolled),a
@@ -292,7 +317,6 @@ copychar:
     and     a
     jr      z,{+}
 
-; todo - check this
     ld      hl,CHARSETS
     ld      b,0             ; prep to receive carry
     sla     a               ; if this char is +64 (codes $80..$c0) then C is set
