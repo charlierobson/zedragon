@@ -4,6 +4,7 @@ CH_CHAIN = $32
 CH_EXPLODEBASE = $39
 CH_STALAC = $27
 CH_MINE = $2F
+CH_BULLET = $be
 
 scoreline:
 	.asc    "SCORE: 000000  HI: 000000  ^_: 4"
@@ -114,9 +115,6 @@ lives:
 minebase:
     .word   0
 
-mul600:
-    .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
-
 collision:
     .byte   0
 subrowoff:
@@ -171,6 +169,8 @@ shooterframe:
 shooteranimation:
 	.byte		$5a,$4e,$46,$42,$62,$72
 
+
+
 waterframe:
 	.byte		0
 wateranimation:
@@ -186,6 +186,13 @@ ENEMYIDX:
 
     .align  256
 
+; needs to start on a 256 byte page boundary and be contained wholly within it
+;
 ENEMYTBL:
-    .incbin "enemytbl.bin"  ; needs 256 byte alignment
+    .incbin "enemytbl.bin"
 NUMENEMY = $-ENEMYTBL
+
+; this needs to be wholly within a 256 byte page too
+;
+mul600tab:
+    .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400

@@ -1,24 +1,37 @@
-; copy udg into higher memory
-; invert the non-inverted half of the character set,
-; makes the subpixel rendering easier
-;
-setupudg:
+
+	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	;
+    ; Depack udg into its home at 8K.
+    ;
+    ; Copy the first 128 chars up to higher memory, inverting the
+    ; non-inverted half as we go. This  makes the sub rendering easier.
+    ;
+initcharsets:
+    ld      hl,charsetlz
+    ld      de,UDG
+    call    LZ48_decrunch
+
+    ; copy game character set up high
+
     ld      hl,UDG
     ld      de,CHARSETS
-    push    de              ; save destination, this is where we start inverting
     ld      bc,1024
     ldir
-    pop     hl
-    ; bc is now 0, ready for djnz
+
+    ; bc is 0 from the ldir, ready for djnz
     ; call the inverter to do 256 bytes...
-    call    inverness
+    ;
+    ld     hl,CHARSETS
+    call   _inverness
+
     ; ...then drop straight back into it to do the next 256
-inverness:
+    ;
+_inverness:
     ld      a,(hl)
     xor     $ff
     ld      (hl),a
     inc     hl
-    djnz    inverness
+    djnz    _inverness
     ret
 
 
@@ -34,19 +47,19 @@ cls:
     xor     a
     ld      hl,D_BUFFER
     ld      bc,6000
-    call    zeromem
+    call    fillmem
 
     ld      (scrollpos),bc
     ld      (BUFF_OFFSET),bc    ; bc is 0 at thispoint
 
     ld      hl,TOP_LINE
     ld      bc,32
-    call    zeromem
+    call    fillmem
 
     ld      hl,BOTTOM_LINE
     ld      bc,32
 
-zeromem:
+fillmem:
     dec     bc
     ld      d,h
     ld      e,l
@@ -58,21 +71,20 @@ zeromem:
 
 resetcredits:
     xor     a
-    ld      (FRAMES),a
     jr      {+}
 
- 
+
 updatecredits:
     ld      a,(titlecredidx)
     inc     a
-    cp      12          ; reset counter every complete cycle
+    cp      12              ; reset counter every complete cycle
     jr      nz,{+}
 
     xor     a
 
 +:  ld      (titlecredidx),a
 
-    bit     0,a         ; if bit 1 is set show one of the two repeated items 
+    bit     0,a             ; if bit 1 is set show one of the two repeated items 
     jr      z,{+}
 
     ld      a,6*2
@@ -83,7 +95,8 @@ updatecredits:
     sla     a
     sla     a
     ld      hl,titlecreds
-    add     a,l         ; add A to HL
+
+    add     a,l             ; add A to HL
     ld      l,a
     adc     a,h
     sub     l

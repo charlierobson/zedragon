@@ -391,7 +391,7 @@ showcols:
     ld      hl,TOP_LINE
     ld      bc,32
     xor     a
-    call    zeromem
+    call    fillmem
     ld      a,(iy+OUSER+0)
     ld      de,TOP_LINE
     call    hexout

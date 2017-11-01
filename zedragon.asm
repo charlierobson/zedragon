@@ -11,13 +11,13 @@ D_BUFFER = $
 
 UDG      = $2000
 PUREMAP  = $2600
-D_MIRROR = D_BUFFER+$8000-$4000
+D_MIRROR = D_BUFFER+$4000
 OSTORE   = $9800
 CHARSETS = $9C00
 
 maplz:      .incbin "map.binlz"
 charsetlz:	.incbin "charset.binlz"
-
+    ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)
 	RET
 
@@ -30,19 +30,9 @@ starthere:
 
     call    golow
 
-    ld      hl,maplz
-    ld      de,PUREMAP
-    call    LZ48_decrunch
-
-    ld      hl,charsetlz
-    ld      de,UDG
-    call    LZ48_decrunch
-
-    call    initostore
-    call    inittables
     call    initmap
-
-    call    setupudg
+    call    initostore
+    call    initcharsets
     call    setupdisplay
 
 	out     ($fe),a

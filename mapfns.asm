@@ -2,16 +2,18 @@
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	;
-	; copy the map from its load position in screen ram down to its
-	; resting place in the 8k block after the character sets. this
-    ; map at 8k is known as the 'pure' map. it is used to reset
+	; The map doesn't contain any enemy data. Use the enemy tables
+	; to initialise the nasties.
+    ;
+    ; While we're here, draw a water layer in the top row.
+    ;
+    ; The map at 8k is known as the 'pure' map. it is used to reset
     ; the collison map which shadows the display in upper memory. 
 	;
 initmap:
-    ld      hl,D_BUFFER
+    ld      hl,maplz
     ld      de,PUREMAP
-    ld      bc,6000
-    ldir
+    call    LZ48_decrunch
 
     ; create mines and stalactites in the pure map
 
@@ -34,7 +36,7 @@ initmap:
 
 -:  ld      a,(hl)
     and     a
-    jr      nz,{++}
+    jr      nz,{++}     ; for some reason a single + doesn't work here
 
     ld      (hl),$bf
 
@@ -45,9 +47,6 @@ initmap:
     jr      nz,{-}
 
     ret
-
-
-
 
 
 processenemy:
@@ -62,7 +61,7 @@ processenemy:
     ld      a,(de)
     ld      b,a
 
-    and     $80         ; get character
+    and     $80         ; get enemy type, either mine or stalac
     rlca
     rlca
     rlca
@@ -71,16 +70,16 @@ processenemy:
     ld      c,a
 
     ld      a,b
-    and     $0f         ; get y
-    call    mulby600    ; de = a * 600
+    and     $0f             ; get y
+    call    mulby600        ; de = y * 600
     ex      de,hl
 
-    pop     de          ; retrieve puremap + x
+    pop     de              ; retrieve puremap + x
     add     hl,de
 
-    ld      (hl),c      ; store enemy in pure map
+    ld      (hl),c          ; store enemy in pure map
 
-    bit     BIT_STATIC,b
+    bit     BIT_STATIC,b    ; if it's a chained mine then draw the chain
     call    nz,drawchain
 
     pop     bc
