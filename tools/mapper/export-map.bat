@@ -1,2 +1,2 @@
-copy /y data\map-edited.bin ..\..\map.bin
+copy /y map-edited.bin ..\..\map.bin
 pause

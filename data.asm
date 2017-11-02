@@ -149,6 +149,9 @@ dofs:
     .word   $0181
 	.byte	56,6
 
+    .word   $01dd
+	.byte	56,8
+
     .word   $021a
 	.byte	80,6
 

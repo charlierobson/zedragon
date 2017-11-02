@@ -73,7 +73,7 @@ aliveloop:
     ld      a,15
     call    AFXPLAY
 
-+:  call    scroll              ; haven't scrolled the bg, so we don't need to update any pointers
++: ; call    scroll              ; haven't scrolled the bg, so we don't need to update any pointers
     ld      a,(scrolled)
     and     a
     jr      z,{+}
