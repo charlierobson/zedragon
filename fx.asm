@@ -22,7 +22,7 @@ explosion:
 becomeexplosion:
     ld      a,(iy+OUSER+2)
     inc     a
-    cp      24
+    cp      28
     jr      nz,{-}
 
     ld      l,(iy+OUSER)        ; clear explosion from the screen

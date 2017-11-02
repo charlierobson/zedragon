@@ -16,6 +16,7 @@ startbullet:
     call    AFXPLAY
 
     ld      a,(subx)
+    rrca
     add     a,8
     srl     a
     srl     a
@@ -46,6 +47,7 @@ startbullet:
     ld      (bltdrawaddr),hl    ; where bullet got drawn
 
     ld      a,(subx)            ; work out blt maximum lifespan
+    rrca
     add     a,16
     neg
     srl     a

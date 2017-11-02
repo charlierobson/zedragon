@@ -97,6 +97,7 @@ substart:
     cp      $a0
     jr      nc,{+}
     inc     (hl)
+    inc     (hl)
 
     ;
     ; render sub
@@ -105,6 +106,7 @@ substart:
 +:  ; calculate address of sub in the map, relative to the current scroll position
 
     ld      a,(subx)            ; pixel -> char conversion
+    srl     a
     srl     a
     srl     a
     srl     a
@@ -193,6 +195,7 @@ substart:
     ; choose which set of 3 pre-scrolled sub tiles to use.
 
     ld      a,(subx)        ; pixel offset 0..7
+    srl     a
     and     7
     ld      c,a
     add     a,a

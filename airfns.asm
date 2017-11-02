@@ -21,7 +21,7 @@ updateair:
 
 
 increaseair:
-    ld      c,3                 ; increase air every 3 cycles
+    ld      c,5                 ; increase air every 5 cycles
     call    updatecounter
     ret     nz                  ; not time to modify air value yet
 
@@ -34,7 +34,7 @@ increaseair:
     jr      displayair
 
 decreaseair:
-    ld      c,9                 ; decrease air every 9 cycles
+    ld      c,11                 ; decrease air every 11 cycles
     call    updatecounter
     ret     nz                  ; not time to modify air value yet
 
