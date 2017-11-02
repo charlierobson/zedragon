@@ -13,6 +13,7 @@ BIT_INACT  = 4      ; busy or dead
     ;
 stalacrelease:
     ld      hl,considerstal
+    ld      bc,stalfall
     jr      _considerator
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -24,9 +25,12 @@ stalacrelease:
     ;
 minerelease:
     ld      hl,considermine
+    ld      bc,minearise
 
 _considerator:
+    push    bc
     call    findmine
+    pop     bc
     ret     nc
 
     ; on return from findmine:
@@ -73,9 +77,10 @@ considermine:
     bit     BIT_MINE,(hl)               ; bit set = mine
     jr      z,_retnocarry
 
+    push    bc
     call    rng
+    pop     bc
     cp      1
-    ld      bc,minearise
     ret                                 ; return with C set to choose this enemy
 
 _retnocarry:
@@ -93,7 +98,6 @@ considerstal:
     call    rng
     pop     bc
     cp      8
-    ld      bc,stalfall
     ret                                 ; return with C set to choose this enemy
 
 
