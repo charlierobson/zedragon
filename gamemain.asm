@@ -104,7 +104,8 @@ aliveloop:
 
     call    updateair
 
-    call    minerelease
+    call    minerelease     ; todo - combine these cleverly?
+    call    stalacrelease   ;
 
     ld      de,0
     ld      (bulletHitX),de

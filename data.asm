@@ -72,13 +72,13 @@ inputstates:
     .byte	btb0,0,$00000101,0        ; quit    (SH-X)
 
 ; calculate actual input impulse addresses
-up    = inputstates + 3
-down  = inputstates + 7
-left  = inputstates + 11
-right = inputstates + 15
-fire  = inputstates + 19
+up      = inputstates + 3
+down    = inputstates + 7
+left    = inputstates + 11
+right   = inputstates + 15
+fire    = inputstates + 19
 advance = inputstates + 23
-quit  = inputstates + 27
+quit    = inputstates + 27
 
 scrolltick:
 	.byte	0

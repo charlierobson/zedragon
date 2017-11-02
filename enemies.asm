@@ -1,39 +1,107 @@
-BIT_MINE   = 7
-BIT_STATIC = 6
-BIT_INACT  = 4
+    .module ENEMIES
 
+BIT_MINE   = 7      ; 1 = mine, 0 = stalactite
+BIT_STATIC = 6      ; chained mine, won't rise
+BIT_INACT  = 4      ; busy or dead
+
+	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	;
+    ; Stalactite release.
+    ;
+    ; Scan the list of on-screen enemies and if a stalactite is
+    ; found, and not busy, then it gets a chance of being released.
+    ;
+stalacrelease:
+    ld      hl,considerstal
+    jr      _considerator
+
+	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	;
+    ; Mine release.
+    ;
+    ; Scan the list of on-screen enemies and if a mine is found,
+    ; and not busy or chained, then it gets a chance of being released.
+    ;
 minerelease:
     ld      hl,considermine
+
+_considerator:
     call    findmine
     ret     nc
 
+    ; on return from findmine:
     ; hl -> enemytbl
     ; de -> enemyidx
+    ; bc = exe function
 
     set     BIT_INACT,(hl)
     ld      a,(hl)
-    and     $0f                     ; also clears carry
+    and     $0f                         ; isolate Y - also clears carry for SBC below
     push    af
 
-    ld      hl,ENEMYIDX             ; calc x pos
+    ld      hl,ENEMYIDX                 ; calculate X
     ex      de,hl
     sbc     hl,de
     push    hl
 
-	call	getobject
-	ld		bc,minearise
-	call	initobject
-	call	insertobject_beforehead     ; eit with hl-> data area
+    call    getobject
+    call    initobject
+    call    insertobject_beforehead     ; exits with hl-> data area
 
-    pop     de
+    pop     de                          ; retrieve X
     ld      (hl),e
     inc     hl
     ld      (hl),d
     inc     hl
-    pop     af
+    pop     af                          ; retrieve Y
     ld      (hl),a
 
     ret
+
+
+    ; return with carry set when result is affirmative
+    ;
+    ; release this mine at random
+    ;
+considermine:
+    bit     BIT_INACT,(hl)
+    jr      nz,_retnocarry              ; bit set = mine unavailable
+
+    bit     BIT_STATIC,(hl)
+    jr      nz,_retnocarry              ; bit set = mine unavailable
+
+    bit     BIT_MINE,(hl)               ; bit set = mine
+    jr      z,_retnocarry
+
+    call    rng
+    cp      1
+    ld      bc,minearise
+    ret                                 ; return with C set to choose this enemy
+
+_retnocarry:
+    xor     a
+    ret
+
+considerstal:
+    bit     BIT_INACT,(hl)
+    jr      nz,_retnocarry              ; bit set = mine unavailable
+
+    bit     BIT_MINE,(hl)               ; bit set = mine
+    jr      nz,_retnocarry
+
+    push    bc
+    call    rng
+    pop     bc
+    cp      8
+    ld      bc,stalfall
+    ret                                 ; return with C set to choose this enemy
+
+
+
+stalfall:
+    DIE
+
+
 
 
 minearise:
@@ -83,15 +151,16 @@ minearise:
     ld      hl,(bulletHitX)
     ld      a,l
     or      h
-    jr      z,{+}               ; skip column check if no x position reported
+    jr      z,_scc              ; skip column check if no x position reported
 
     ld      e,(iy+OUSER+4)      ; column check
     ld      d,(iy+OUSER+5)
     and     a
     sbc     hl,de
-    jr      z,gobang
+    jr      z,_gobang
 
-+:  ld      l,(iy+OUSER+0)      ; restore screen pointer
+_scc:
+    ld      l,(iy+OUSER+0)      ; restore screen pointer
     ld      h,(iy+OUSER+1)
 
     inc     (iy+OUSER+2)        ; only move mine up when frame = 0
@@ -100,7 +169,7 @@ minearise:
     jr      nz,{-}
 
     dec     (iy+OUSER+3)        ; explode when mine hits the top
-    jr      z,gobang
+    jr      z,_gobang
 
     ld      de,600              ; move mine up
     and     a
@@ -115,10 +184,8 @@ minearise:
 
     ; all done - become an explosion
 
-gobang:
-    ; remove characters from screen
-
-    ld      l,(iy+OUSER)
+_gobang:
+    ld      l,(iy+OUSER)        ; remove characters from the screen
     ld      h,(iy+OUSER+1)
     ld      d,h
     ld      e,l
@@ -134,30 +201,5 @@ gobang:
     ld      (hl),a
     ld      (de),a
 
-    ld      (iy+OUSER+2),a
+    ld      (iy+OUSER+2),a      ; swap to explosion coroutine
     jp      becomeexplosion
-
-
-    ; return with carry set when result is affirmative
-    ;
-    ; release this mine at random
-    ;
-considermine:
-    bit     BIT_INACT,(hl)
-    jr      nz,retnocarry       ; bit set = mine unavailable
-
-    bit     BIT_STATIC,(hl)
-    jr      nz,retnocarry       ; bit set = mine unavailable
-
-    bit     BIT_MINE,(hl)       ; bit set = mine
-    jr      z,retnocarry
-
-    push    bc
-    call    rng
-    pop     bc
-    cp      1
-    ret                         ; return with C set if mine should be chosen
-
-retnocarry:
-    xor     a
-    ret
