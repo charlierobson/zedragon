@@ -31,7 +31,6 @@ resetafterdeath:
     inc     hl
     ld      (scrollpos),bc
     ld      a,(hl)
-    rlca
     ld      (subx),a
     inc     hl
     ld      a,(hl)
@@ -100,13 +99,13 @@ aliveloop:
     call    AFXPLAY
 
 +:  ;call    displayandresetocount
-
     YIELD
 
     call    updateair
 
     call    minerelease     ; todo - combine these cleverly?
     call    stalacrelease   ;
+    call    shooterstart    ;
 
     ld      de,0
     ld      (bulletHitX),de
@@ -122,7 +121,7 @@ aliveloop:
 
     ld      a,(collision)
     and     a
-    jr      z,aliveloop
+    jp      z,aliveloop
 
 
     ; sub's dead

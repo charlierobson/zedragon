@@ -2,7 +2,21 @@
 
 BIT_MINE   = 7      ; 1 = mine, 0 = stalactite
 BIT_STATIC = 6      ; chained mine, won't rise
+BIT_SHOOT  = 5      ; shooter type
 BIT_INACT  = 4      ; busy or dead
+
+	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	;
+    ; Shooter start.
+    ;
+    ; Scan the list of on-screen enemies and start any non-started
+    ; shooters
+    ;
+shooterstart:
+    ld      hl,considershooter
+    ld      bc,shootemup
+    jr      _considerator
+
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	;
@@ -26,6 +40,8 @@ stalacrelease:
 minerelease:
     ld      hl,considermine
     ld      bc,minearise
+
+    ;
 
 _considerator:
     push    bc
@@ -66,12 +82,25 @@ _considerator:
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
     ;
+considershooter:
+    bit     BIT_INACT,(hl)
+    jr      nz,_retnocarry
+    
+    bit     BIT_SHOOT,(hl)
+    jr      z,_retnocarry
+
+    scf                        ; start a shooter
+     ret
+
+    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ;
+    ;
 considermine:
     bit     BIT_INACT,(hl)
     jr      nz,_retnocarry              ; bit set = mine unavailable
 
     bit     BIT_STATIC,(hl)
-    jr      nz,_retnocarry              ; bit set = mine unavailable
+    jr      nz,_retnocarry              ; bit set = mine unavailable for rising
 
     bit     BIT_MINE,(hl)               ; bit set = mine
     jr      z,_retnocarry
@@ -90,10 +119,8 @@ _retnocarry:
     ;
     ;
 considerstal:
-    bit     BIT_INACT,(hl)
-    jr      nz,_retnocarry              ; bit set = mine unavailable
-
-    bit     BIT_MINE,(hl)               ; bit set = mine
+    ld      a,(hl)
+    and     %11110000
     jr      nz,_retnocarry
 
     push    bc
@@ -103,7 +130,10 @@ considerstal:
     ret                                 ; return with C set to choose this enemy
 
 
-
+    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ;
+    .module stalactite
+    ;
 stalfall:
     ld      a,5
     call    AFXPLAY
@@ -171,7 +201,10 @@ stalfall:
 
 
 
-
+    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ;
+    .module mine
+    ;
 minearise:
     ld      a,5
     call    AFXPLAY
@@ -271,3 +304,70 @@ _gobang:
 
     ld      (iy+OUSER+2),a      ; swap to explosion coroutine
     jp      becomeexplosion
+
+
+    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ;
+    .module shooter 
+    ;
+shootemup:
+;    0 0 0 0 0 0
+;    1 0 0 0 0 0
+;    2 1 0 0 0 0
+;    3 2 1 0 0 0
+;    2 3 2 1 0 0
+;    3 2 3 2 1 0
+;    2 3 2 3 2 1
+;
+;    3 2 3 2 3 2
+;    2 3 2 3 2 3
+;
+;    3 2 3 2 3 2
+;    4 3 2 3 2 3
+;    5 4 3 2 3 2
+;    0 5 4 3 2 3
+;    0 0 5 4 3 2
+;    0 0 0 5 4 3
+;    0 0 0 0 5 4
+;    0 0 0 0 0 5
+
+CH_SHOOTBASE = $33
+
+    ld      l,(iy+OUSER)    ; x
+    ld      h,(iy+OUSER+1)
+    ld      a,(iy+OUSER+2)
+    call    mulby600
+    add     hl,de
+    ld      de,D_BUFFER+601
+    add     hl,de
+    ld      (iy+OUSER+3),l
+    ld      (iy+OUSER+4),h
+
+    ld      a,CH_SHOOTBASE
+    ld      (hl),a
+
+_shootloop:
+    ld      l,(iy+OUSER+3)
+    ld      h,(iy+OUSER+4)
+
+-:  inc     (hl)
+    ld      a,(hl)
+    cp      CH_SHOOTBASE+4
+    jr      nz,_done
+
+    dec     a
+    dec     a
+    ld      (hl),a
+
+    ld      de,601
+    add     hl,de
+    ld      a,(de)
+    and     a
+    jr      z,{-}
+
+_done:
+    YIELD
+    ld      a,(advance)
+    cp      1
+    jr      nz,_done
+    jr      _shootloop
