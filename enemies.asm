@@ -310,65 +310,99 @@ _gobang:
     ;
     .module shooter 
     ;
-shootemup:
-;    0 0 0 0 0 0
-;    1 0 0 0 0 0
-;    2 1 0 0 0 0
-;    3 2 1 0 0 0
-;    2 3 2 1 0 0
-;    3 2 3 2 1 0
-;    2 3 2 3 2 1
-;
-;    3 2 3 2 3 2
-;    2 3 2 3 2 3
-;
-;    3 2 3 2 3 2
-;    4 3 2 3 2 3
-;    5 4 3 2 3 2
-;    0 5 4 3 2 3
-;    0 0 5 4 3 2
-;    0 0 0 5 4 3
-;    0 0 0 0 5 4
-;    0 0 0 0 0 5
+    ; possible shooter sequences
+_sseq:
+    .byte   1,0,0,0,0,0,0,0,0,0,0
+    .byte   2,1,0,0,0,0,0,0,0,0,0
+    .byte   3,2,1,0,0,0,0,0,0,0,0
+    .byte   2,3,2,1,0,0,0,0,0,0,0
+    .byte   3,2,3,2,1,0,0,0,0,0,0
+    .byte   2,3,2,3,2,1,0,0,0,0,0
+    .byte   3,2,3,2,3,2,1,0,0,0,0
+    .byte   2,3,2,3,2,3,2,1,0,0,0
+    .byte   3,2,3,2,3,2,3,2,1,0,0
+    .byte   2,3,2,3,2,3,2,3,2,1,0
+    .byte   3,2,3,2,3,2,3,2,3,2,1
+
+    .byte   2,3,2,3,2,3,2,3,2,3,2
+    .byte   3,2,3,2,3,2,3,2,3,2,3
+
+    .byte   4,3,2,3,2,3,2,3,2,3,2
+    .byte   5,4,3,2,3,2,3,2,3,2,3
+    .byte   0,5,4,3,2,3,2,3,2,3,2
+    .byte   0,0,5,4,3,2,3,2,3,2,3
+    .byte   0,0,0,5,4,3,2,3,2,3,2
+    .byte   0,0,0,0,5,4,3,2,3,2,3
+    .byte   0,0,0,0,0,5,4,3,2,3,2
+    .byte   0,0,0,0,0,0,5,4,3,2,3
+    .byte   0,0,0,0,0,0,0,5,4,3,2
+    .byte   0,0,0,0,0,0,0,0,5,4,3
+    .byte   0,0,0,0,0,0,0,0,0,5,4
+    .byte   0,0,0,0,0,0,0,0,0,0,5
+    .byte   0,0,0,0,0,0,0,0,0,0,0
 
 CH_SHOOTBASE = $33
 
-    ld      l,(iy+OUSER)    ; x
+shootemup:
+    ld      l,(iy+OUSER)        ; x
     ld      h,(iy+OUSER+1)
-    ld      a,(iy+OUSER+2)
+    ld      a,(iy+OUSER+2)      ; y
     call    mulby600
     add     hl,de
     ld      de,D_BUFFER+601
     add     hl,de
     ld      (iy+OUSER+3),l
     ld      (iy+OUSER+4),h
-    ld      (iy+OUSER+5),10
+    ld      (iy+OUSER+5),0
+    ld      (iy+OUSER+6),10
+    ld      (iy+OUSER+7),_sseq & 255
+    ld      (iy+OUSER+8),_sseq / 256
 
-    ld      a,CH_SHOOTBASE
-    ld      (hl),a
+    ; search the shooter space to find the required length
+    ld      de,601
+
+-:  ld      a,(hl)
+    and     a
+    jr      nz,_shootloop
+
+    inc     (iy+OUSER+5)        ; shooter length
+    add     hl,de
+    jr      {-}
 
 _shootloop:
-    ld      l,(iy+OUSER+3)
-    ld      h,(iy+OUSER+4)
-
--:  inc     (hl)
-    ld      a,(hl)
-    cp      CH_SHOOTBASE+4
-    jr      nz,_done
-
-    dec     a
-    dec     a
-    ld      (hl),a
-
-    ld      de,601
-    add     hl,de
-    ld      a,(de)
-
-...
-
-_done:
     YIELD
     dec     (iy+OUSER+5)
-    jr      nz,_done
-    ld      (iy+OUSER+5),10
+    jr      nz,_shootloop
+
+    ld      (iy+OUSER+5),10     ; reset delay counter
+
+    ld      bc,601              ; offset to next shot posn on screen
+
+    ld      a,(iy+OUSER+5)      ; shot stream length
+    ld      (iy+OUSER+9),a
+
+    ld      l,(iy+OUSER+3)      ; screen position
+    ld      h,(iy+OUSER+4)
+    ld      e,(iy+OUSER+7)      ; update table
+    ld      d,(iy+OUSER+8)
+
+-:  ld      a,(de)
+    or      a
+    jr      z,{+}
+
+    add     a,CH_SHOOTBASE-1
+
++:  ld      (hl),a
+    add     hl,bc
+    inc     de
+    dec     (iy+OUSER+9)
+    jr      nz,{-}
+
+    ld      l,(iy+OUSER+7)      ; next step in the table
+    ld      h,(iy+OUSER+8)
+    ld      de,10
+    add     hl,de
+    ld      (iy+OUSER+7),l
+    ld      (iy+OUSER+8),h
+
     jr      _shootloop
