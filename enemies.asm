@@ -311,7 +311,7 @@ _gobang:
     .module shooter 
 
 CH_SHOOTBASE = $33
-SHOOTPERIOD = 9
+SHOOTPERIOD = 3
 SHOOTITERS = 10
 
 shootemup:
@@ -324,10 +324,10 @@ shootemup:
     add     hl,de
     ld      (iy+OUSER+3),l
     ld      (iy+OUSER+4),h
-
-    ld      (iy+OUSER+7),SHOOTITERS
-
     ld      (iy+OUSER+5),0              ; shooter length
+    ld      (iy+OUSER+7),SHOOTITERS
+    ld      (iy+OUSER+8),0
+    ld      (iy+OUSER+12),0
 
     ; search the shooter space to find the required length
     ld      de,601
@@ -340,146 +340,128 @@ shootemup:
     and     a
     jr      z,{-}
 
-_shoot_on_loop:
-    ld      bc,601              ; offset to next shot posn on screen
+    ; shooting on
+_pewpew:
+    ld      de,ontab
+    ld      (iy+OUSER+10),e
+    ld      (iy+OUSER+11),d
+    ld      (iy+OUSER+7),SHOOTITERS
 
-    ld      a,(iy+OUSER+5)      ; shot stream length
-    ld      (iy+OUSER+9),a
+_shoot_on_main:
+    call    shootahoopa
+    inc     (iy+OUSER+8)
 
-    ld      l,(iy+OUSER+3)      ; screen position
-    ld      h,(iy+OUSER+4)
+    call    shootahoopa
+    dec     (iy+OUSER+8)
 
--:  ld      a,(hl)
-    cp      0
-    jr      z,_set1quit
-    cp      CH_SHOOTBASE
-    jr      z,_incquit1
-    cp      CH_SHOOTBASE+1
-    jr      z,_incadvance1
-    cp      CH_SHOOTBASE+2
-    jr      z,_incadvance1
+    call    nextframe
 
-    ; is +3, or unknown character so set to CH_SHOOTBASE+2, taking INC into account
-    ; this should account for bullets or sub in the stream
-
-    ld      (hl),CH_SHOOTBASE+1
-
-_incadvance1:
-    inc     (hl)
-    add     hl,bc
-    dec     (iy+OUSER+9)
-    jr      nz,{-}
-    jr      _onone
-
-_set1quit:
-    ld      (hl),CH_SHOOTBASE-1
-
-_incquit1:
-    inc     (hl)
-
-_onone:
-    YIELD
-    dec     (iy+OUSER+6)
-    jr      nz,_onone
-
-    ld      (iy+OUSER+6),SHOOTPERIOD        ; reset delay counter
-
-    dec     (iy+OUSER+7)                    ; shooting on time
-    jr      nz,_shoot_on_loop
+    dec     (iy+OUSER+7)                    ; number of positions in offtabs
+    jr      nz,_shoot_on_main
 
     ; shooting off
 
-    ld      (iy+OUSER+7),SHOOTITERS
-    ld      de,offtab2
+    ld      de,offtab
     ld      (iy+OUSER+10),e
     ld      (iy+OUSER+11),d
-    ld      de,offtab3
-    ld      (iy+OUSER+12),e
-    ld      (iy+OUSER+13),d
-
     ld      (iy+OUSER+7),SHOOTITERS
 
-_shoot_off_loop:
-    ld      l,(iy+OUSER+3)      ; screen position
-    ld      h,(iy+OUSER+4)
-    ld      bc,601              ; offset to next shot posn on screen
+_shoot_off_main:
+    call    shootahoopa
+    inc     (iy+OUSER+8)
 
-    ld      a,(iy+OUSER+5)      ; shot stream length
-    ld      (iy+OUSER+9),a
+    call    shootahoopa
+    dec     (iy+OUSER+8)
 
-    ld      e,(iy+OUSER+10)
-    ld      d,(iy+OUSER+11)
-
--:  ld      a,(de)
-    ld      (hl),a
-    add     hl,bc
-    dec     (iy+OUSER+9)
-    jr      nz,{-}
-
--:  YIELD
-    dec     (iy+OUSER+6)
-    jr      nz,{-}
-
-    ld      e,(iy+OUSER+10)
-    ld      d,(iy+OUSER+11)
-    dec     de
-    ld      (iy+OUSER+10),e
-    ld      (iy+OUSER+11),d
-
-;   
-
-    ld      l,(iy+OUSER+3)      ; screen position
-    ld      h,(iy+OUSER+4)
-    ld      bc,601              ; offset to next shot posn on screen
-
-    ld      a,(iy+OUSER+5)      ; shot stream length
-    ld      (iy+OUSER+9),a
-
-    ld      e,(iy+OUSER+12)
-    ld      d,(iy+OUSER+13)
-
--:  ld      a,(de)
-    ld      (hl),a
-    add     hl,bc
-    dec     (iy+OUSER+9)
-    jr      nz,{-}
-
-    ld      (iy+OUSER+6),SHOOTPERIOD        ; reset delay counter
-
--:  YIELD
-    dec     (iy+OUSER+6)
-    jr      nz,{-}
-
-    ld      e,(iy+OUSER+12)
-    ld      d,(iy+OUSER+13)
-    dec     de
-    ld      (iy+OUSER+12),e
-    ld      (iy+OUSER+13),d
+    call    nextframe
 
     dec     (iy+OUSER+7)                    ; number of positions in offtabs
-    jr      nz,_shoot_off_loop
+    jr      nz,_shoot_off_main
 
     ; shoot sequence finished, wait a couple of seconds
 
-    ld      (iy+OUSER+6),100     ; delay counter
+    ld      (iy+OUSER+6),50                 ; delay counter
 
 -:  YIELD
+
+    ld      a,(collision)                   ; die if sub died
+    or      (iy+OUSER+12)
+    jr      nz,_die
+osc:
+    ld      hl,(scrollpos)                  ; die when off screen
+    ld      e,(iy+OUSER)                    ; x
+    ld      d,(iy+OUSER+1)
+    and     a
+    sbc     hl,de
+    jr      nc,_die
+
     dec     (iy+OUSER+6)
     jr      nz,{-}
 
-    ld      (iy+OUSER+6),SHOOTPERIOD     ; reset delay counter
-    ld      (iy+OUSER+7),SHOOTITERS
+    jp      _pewpew
 
-    jp      _shoot_on_loop
+_die:
+    DIE
 
 
-    .byte   0,0,0,0,0,0,0,0,0,0,CH_SHOOTBASE+4
-offtab2:
+nextframe:
+    ld      e,(iy+OUSER+10)
+    ld      d,(iy+OUSER+11)
+    dec     de
+    ld      (iy+OUSER+10),e
+    ld      (iy+OUSER+11),d
+    ret
+
+
+shootahoopa:
+    ld      (iy+OUSER+6),SHOOTPERIOD
+
+--: ld      l,(iy+OUSER+3)      ; screen position
+    ld      h,(iy+OUSER+4)
+    ld      bc,601              ; offset to next shot posn on screen
+
+    ld      a,(iy+OUSER+5)      ; shot stream length
+    ld      (iy+OUSER+9),a
+
+    ld      e,(iy+OUSER+10)
+    ld      d,(iy+OUSER+11)
+
+-:  ld      a,(de)
+    and     a
+    jr      z,{+}
+    add     a,(iy+OUSER+8)
++:  ld      (hl),a
+    set     7,h
+    res     6,h
+    ld      (hl),a
+    res     7,h
+    set     6,h
+    inc     de
+    add     hl,bc
+    dec     (iy+OUSER+9)
+    jr      nz,{-}
+
+    YIELD
+    dec     (iy+OUSER+6)
+    jr      nz,{--}
+
+    ld      a,(collision)
+    or      (iy+OUSER+12)
+    ld      (iy+OUSER+12),a
+
+    ret
+
+
     .byte   CH_SHOOTBASE+2,CH_SHOOTBASE+2,CH_SHOOTBASE+2,CH_SHOOTBASE+2,CH_SHOOTBASE+2
     .byte   CH_SHOOTBASE+2,CH_SHOOTBASE+2,CH_SHOOTBASE+2,CH_SHOOTBASE+2,CH_SHOOTBASE+2
+    .byte   CH_SHOOTBASE
+ontab:
+    .byte   0,0,0,0,0
+    .byte   0,0,0,0,0
 
-    .byte   0,0,0,0,0,0,0,0,0,0,,CH_SHOOTBASE+5
-offtab3:
-    .byte   CH_SHOOTBASE+3,CH_SHOOTBASE+3,CH_SHOOTBASE+3,CH_SHOOTBASE+3,CH_SHOOTBASE+3
-    .byte   CH_SHOOTBASE+3,CH_SHOOTBASE+3,CH_SHOOTBASE+3,CH_SHOOTBASE+3,CH_SHOOTBASE+3
-
+    .byte   0,0,0,0,0
+    .byte   0,0,0,0,0
+    .byte   CH_SHOOTBASE+4
+offtab:
+    .byte   CH_SHOOTBASE+2,CH_SHOOTBASE+2,CH_SHOOTBASE+2,CH_SHOOTBASE+2,CH_SHOOTBASE+2
+    .byte   CH_SHOOTBASE+2,CH_SHOOTBASE+2,CH_SHOOTBASE+2,CH_SHOOTBASE+2,CH_SHOOTBASE+2

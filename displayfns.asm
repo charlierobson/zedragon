@@ -224,10 +224,11 @@ scroll:
     cp      (600-32) / 256
     ret     z
 
-    ; do actual scroll
++:  ; do actual scroll
 
     inc     hl
     ld      (scrollpos),hl
+    ld      hl,scrollflags
     set     7,(hl)                  ; scrollflag.7 = 1 when scrolled
     ret
 

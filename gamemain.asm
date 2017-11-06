@@ -15,13 +15,11 @@ gamemain:
 	ld		(rng+1),a
 
     ld      hl,scrollflags          ; enable scrolling
-;    set     0,(hl)
+    set     0,(hl)
 
     ld      hl,dofs
-    ld      hl,dofspecial
+    ;ld      hl,dofspecial
     ld      (restartPoint),hl
-
-
 
     ld      a,4
     ld      (lives),a
