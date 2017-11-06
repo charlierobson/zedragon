@@ -342,6 +342,7 @@ CH_SHOOTBASE = $33
     add     hl,de
     ld      (iy+OUSER+3),l
     ld      (iy+OUSER+4),h
+    ld      (iy+OUSER+5),10
 
     ld      a,CH_SHOOTBASE
     ld      (hl),a
@@ -362,12 +363,12 @@ _shootloop:
     ld      de,601
     add     hl,de
     ld      a,(de)
-    and     a
-    jr      z,{-}
+
+...
 
 _done:
     YIELD
-    ld      a,(advance)
-    cp      1
+    dec     (iy+OUSER+5)
     jr      nz,_done
+    ld      (iy+OUSER+5),10
     jr      _shootloop
