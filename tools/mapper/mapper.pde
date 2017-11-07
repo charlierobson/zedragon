@@ -123,11 +123,10 @@ void draw()
 
 int enemyType(int c)
 {
-  if (c == 0x27) return 0;
-  if (c == 0x2f) return 1;
-  // static mine??!!!
-  if (c == 0x30) return 3;
-  if (c == 0x1f) return 4;
+  if (c == 0x27) return 0; // stal
+  if (c == 0x2f) return 1; // mine
+  if (c == 0x30) return 3; // depth
+  if (c == 0x1f) return 4; // shooter
 
   return -1;
 }

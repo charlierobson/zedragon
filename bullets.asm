@@ -140,8 +140,8 @@ bullethit:
     ld      (hl),0
 
     ; nullify mine
-    ld      hl,endmine          ; mark mine as dead
-    call    findmine
+    ld      hl,endmine          ; mark enemy as dead
+    call    findenemy
 
 	call	getobject
 	ld		bc,explosion

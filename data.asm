@@ -184,7 +184,7 @@ ENEMYIDX:
 ; needs to start on a 256 byte page boundary and be contained wholly within it
 ;
 ENEMYTBL:
-    .incbin "enemytbl.bin"
+    .incbin "enemydat.bin"
 NUMENEMY = $-ENEMYTBL
 
 ; this needs to be wholly within a 256 byte page too

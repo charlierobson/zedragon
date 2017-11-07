@@ -1,9 +1,12 @@
     .module ENEMIES
 
-BIT_MINE   = 7      ; 1 = mine, 0 = stalactite
-BIT_STATIC = 6      ; chained mine, won't rise
-BIT_SHOOT  = 5      ; shooter type
-BIT_INACT  = 4      ; busy or dead
+BIT_INACT    = 7      ; busy or dead
+
+NME_STAL     = $00
+NME_MINE     = $10
+NME_STATMINE = $20
+NME_DEPTH    = $30
+NME_SHOOT    = $40
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	;
@@ -45,7 +48,7 @@ minerelease:
 
 _considerator:
     push    bc
-    call    findmine
+    call    findenemy
     pop     bc
     ret     nc
 
@@ -83,11 +86,8 @@ _considerator:
     ;
     ;
 considershooter:
-    bit     BIT_INACT,(hl)
+    cp      NME_SHOOT
     jr      nz,_retnocarry
-
-    bit     BIT_SHOOT,(hl)
-    jr      z,_retnocarry
 
     scf                        ; start a shooter
     ret
@@ -96,14 +96,8 @@ considershooter:
     ;
     ;
 considermine:
-    bit     BIT_INACT,(hl)
-    jr      nz,_retnocarry              ; bit set = mine unavailable
-
-    bit     BIT_STATIC,(hl)
-    jr      nz,_retnocarry              ; bit set = mine unavailable for rising
-
-    bit     BIT_MINE,(hl)               ; bit set = mine
-    jr      z,_retnocarry
+    cp      NME_MINE
+    jr      nz,_retnocarry
 
     push    bc
     call    rng
@@ -119,8 +113,7 @@ _retnocarry:
     ;
     ;
 considerstal:
-    ld      a,(hl)
-    and     %11110000
+    cp      NME_STAL
     jr      nz,_retnocarry
 
     push    bc

@@ -50,14 +50,14 @@ resetmines:
 
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
-    ; using a supplied methos we will consider each of the mines
+    ; using a supplied method we will consider each of the enemies
     ; currently on screen. if the consideration function returns
-    ; with C set, that mine is considered to be usable.
+    ; with C set, that enemy is considered as selected.
     ;
-findmine:
+findenemy:
     ld      (consideration),hl
 
-    ld      de,(scrollpos)      ; find the first mine on screen
+    ld      de,(scrollpos)      ; find the first enemy on screen
     ld      hl,ENEMYIDX
     add     hl,de
     ex      de,hl
@@ -69,6 +69,12 @@ findmine:
 
     ld      h,ENEMYTBL / 256    ; make pointer into enemy data table
     ld      l,a
+
+    ld      a,(hl)              ; get enemy type
+    bit     BIT_INACT,a         ; skip inactive enemies
+    jr      nz,_skipthis
+
+    and     $f0                 ; isolate type
 
 consideration = $+1
     call    0
