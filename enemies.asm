@@ -8,55 +8,68 @@ NME_STATMINE = $20
 NME_DEPTH    = $30
 NME_SHOOT    = $40
 
-	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	;
-    ; Shooter start.
-    ;
-    ; Scan the list of on-screen enemies and start any non-started
-    ; shooters
-    ;
-shooterstart:
-    ld      hl,considershooter
-    ld      bc,shootemup
-    jr      _considerator
+    .align  16
+_considertable:
+    .word   considerstal, stalfall
+    .word   considermine, minearise
+    .word   _considernull, 0
+    .word   _considernull, 0 ; considerdepth
+    .word   considershooter, shootemup
 
 
-	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	;
-    ; Stalactite release.
-    ;
-    ; Scan the list of on-screen enemies and if a stalactite is
-    ; found, and not busy, then it gets a chance of being released.
-    ;
-stalacrelease:
-    ld      hl,considerstal
-    ld      bc,stalfall
-    jr      _considerator
 
-	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	;
-    ; Mine release.
-    ;
-    ; Scan the list of on-screen enemies and if a mine is found,
-    ; and not busy or chained, then it gets a chance of being released.
-    ;
-minerelease:
-    ld      hl,considermine
-    ld      bc,minearise
+enemyinitiator:
+    ld      de,(scrollpos)      ; find the first enemy on screen
+    ld      hl,ENEMYIDX
+    add     hl,de
+    ex      de,hl
+    ld      b,32                ; and check up to 32 screen x positions from there
 
-    ;
+_search:
+    ld      a,(de)              ; get enemy table index, or ff if no enemy at this x pos
+    cp      $ff
+    jr      nz,_possibly
+
+_nope:
+    inc     de
+    djnz    _search
+
+_considernull:
+    ret
+
+
+_possibly:
+    ld      h,ENEMYTBL / 256    ; make pointer into enemy data table
+    ld      l,a
+
+    ld      a,(hl)              ; get enemy type
+    bit     BIT_INACT,a
+    jr      nz,_nope
+
+    push    hl
+
+    and     $f0                 ; isolate type
+    rrca
+    rrca
+    ld      hl,_considertable   ; index into consideration table
+    or      l
+    ld      l,a
+
+    push    de
+    ld      de,_considerator+1
+    ldi
+    ldi
+    ld      de,_starterator+1
+    ldi
+    ldi
+    pop     de
 
 _considerator:
-    push    bc
-    call    findenemy
-    pop     bc
-    ret     nc
+    call    0
+    pop     hl
+    jr      nc,_nope
 
-    ; on return from findenemy:
-    ; hl -> enemytbl [0..255]
-    ; de -> enemyidx [0..599]
-    ; bc = exe function
-_gotnme:
+_yep:
     set     BIT_INACT,(hl)              ; setting the inactive bit will change the enemy id
     ld      a,(hl)
     and     $0f                         ; isolate Y - also clears carry for SBC below
@@ -66,6 +79,9 @@ _gotnme:
     ex      de,hl
     sbc     hl,de
     push    hl
+
+_starterator:
+    ld      bc,0
 
     call    getobject
     call    initobject
@@ -79,55 +95,37 @@ _gotnme:
     pop     af                          ; retrieve Y
     ld      (hl),a
 
-    ret
+    ret                                 ; remove this to check multiple enemies per frame
+
 
 
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
+    ; consideration functions - return with carry set to go with
+    ; this object.
     ;
 considershooter:
-    cp      NME_SHOOT
-    jr      nz,_retnocarry
-_gotshooter:
-    scf                        ; start a shooter
+    scf                 ; start a shooter
     ret
 
-    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    ;
-    ;
 considermine:
-    cp      NME_MINE
-    jr      nz,_retnocarry
-
-_gotmine:
     push    bc
     call    rng
     pop     bc
     cp      1
-    ret                                 ; return with C set to choose this enemy
+    ret                 ; return with C set to choose this enemy
 
-_retnocarry:
-    xor     a
+considerstal:
+    push    bc
+    call    rng
+    pop     bc
+    cp      1
     ret
 
-    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    ;
-    ;
-considerstal:
-    cp      NME_STAL
-    jr      nz,_retnocarry
-
-_gotstal:
-    push    bc
-    call    rng
-    pop     bc
-    cp      1
-    ret                                 ; return with C set to choose this enemy
-
 
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
-    .module stalactite
+    .module STALAC
     ;
 stalfall:
     ld      a,5
@@ -198,7 +196,7 @@ stalfall:
 
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
-    .module mine
+    .module MINE
     ;
 minearise:
     ld      a,5
@@ -303,7 +301,7 @@ _gobang:
 
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
-    .module shooter 
+    .module SHOOTER 
 
 SHOOTPERIOD = 3
 SHOOTITERS = 10
@@ -349,10 +347,10 @@ _pewpew:
     ld      (iy+OUSER+ITERS),SHOOTITERS
 
 _shoot_on_main:
-    call    shootahoopa
+    call    _shootahoopa
     inc     (iy+OUSER+FFLOP)
 
-    call    shootahoopa
+    call    _shootahoopa
     dec     (iy+OUSER+FFLOP)
 
     call    nextframe
@@ -368,10 +366,10 @@ _shoot_on_main:
     ld      (iy+OUSER+ITERS),SHOOTITERS
 
 _shoot_off_main:
-    call    shootahoopa
+    call    _shootahoopa
     inc     (iy+OUSER+FFLOP)
 
-    call    shootahoopa
+    call    _shootahoopa
     dec     (iy+OUSER+FFLOP)
 
     call    nextframe
@@ -415,7 +413,7 @@ nextframe:
     ret
 
 
-shootahoopa:
+_shootahoopa:
     pop     hl
     ld      (iy+OUSER+16),l
     ld      (iy+OUSER+17),h

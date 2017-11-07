@@ -112,10 +112,7 @@ aliveloop:
     YIELD
 
     call    updateair
-
-   ;call    minerelease     ; todo - combine these cleverly?
-   ;call    stalacrelease   ;
-    call    shooterstart    ;
+    call    enemyinitiator
 
     ld      de,0
     ld      (bulletHitX),de
