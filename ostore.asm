@@ -11,7 +11,7 @@
 
 	; object store - we'll allocate space for 16 objects
 	;
-	NSTRUCTS	.equ	$10
+	NSTRUCTS	.equ	$20
 
 	PSTORE		.equ	PRTBUF+0		; pointer to private data store
 	NEXTFREE	.equ	PRTBUF+2		; pointer to memory location holding address of next free object

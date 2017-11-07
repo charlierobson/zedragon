@@ -10,10 +10,6 @@ start = 0x808A
 end = start + 6000
 print(hex(start) + " - " + hex(end) + " : mirror map")
 
-start = roundup(end)
-end = start + 16*64
-print(hex(start) + " - " + hex(end) + " : ostore")
-
 start = end
 end = start + 1024
 print(hex(start) + " - " + hex(end) + " : charsets")
@@ -27,6 +23,10 @@ print(hex(start) + " - " + hex(end) + " : udg")
 start = end
 end = int(roundup(start + mapstat.st_size))
 print(hex(start) + " - " + hex(end) + " : pure map")
+
+start = end
+end = start + 63*32
+print(hex(start) + " - " + hex(end) + " : ostore")
 
 start = end
 remaining = 0x4000 - start

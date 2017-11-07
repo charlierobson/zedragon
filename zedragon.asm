@@ -11,9 +11,9 @@ D_BUFFER = $
 
 UDG      = $2000
 PUREMAP  = $2600
+OSTORE   = $2d00
 D_MIRROR = D_BUFFER+$4000
 FREELIST = $8000
-OSTORE   = $9800
 CHARSETS = $9C00
 
 maplz:       .incbin "map.binlz"
