@@ -97,6 +97,8 @@ void draw()
 
   if (yc < 10) {
     rect(xc * 16, yc * 16, 15, 15);
+    text("Cursor over : $" + hex(getMap(xc, yc), 2), 600,200,200,17);
+    image(characterSet.get(getMap(xc, yc)), 720, 200, 16, 16);
   }
   if (yc > 10 && yc < 26 && xc < 32)
   {
@@ -105,12 +107,18 @@ void draw()
 
     stroke(color(0, 255, 0));
     rect(cx * 32 + 7, 160 + cy * 32 + 7, 17, 17);
+    text("Cursor over : $" + hex(cx + cy * 16, 2), 600,200,200,17);
+    image(characterSet.get(cx + cy * 16), 720, 200, 16, 16);
   }
 
-  image(characterSet.get(selectedTile), 600, 178, 16, 16);
-  text(hex(selectedTile), 632, 178);
+  text("Selected: " + hex(selectedTile,2), 600, 178,200,17);
+  image(characterSet.get(selectedTile), 720, 178, 16, 16);
 
-  text("x = " + ((mouseX / 16) + scrollpos) + ".", 600, 220);
+  int y = mouseY / 16;
+  if (y < 10)
+    text("x = " + ((mouseX / 16) + scrollpos) + ", y = " + ((mouseY / 16)) + ".", 600, 232);
+   else
+    text("x = " + ((mouseX / 16) + scrollpos) + ".", 600, 232);
 }
 
 int enemyType(int c)
