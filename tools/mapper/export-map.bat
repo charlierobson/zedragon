@@ -1,2 +1,3 @@
-copy /y map-edited.bin ..\..\map.bin
+copy /y %~dp0data\map.bin %~dp0..\..\
+copy /y %~dp0data\enemy* %~dp0..\..\
 pause

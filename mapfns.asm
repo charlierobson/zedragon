@@ -71,9 +71,6 @@ findenemy:
     ld      l,a
 
     ld      a,(hl)              ; get enemy type
-    bit     BIT_INACT,a         ; skip inactive enemies
-    jr      nz,_skipthis
-
     and     $f0                 ; isolate type
 
 consideration = $+1

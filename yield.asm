@@ -48,12 +48,13 @@ resumenext:
 	add		hl,bc
 	ld		(PSTORE),hl
 
-	; now resume executing at the object's saved address
+	; keep count of the number of objects which have YIELDed
 	;
 	ld		hl,ocount
 	inc		(hl)
-	
+
+	; now resume executing at the object's saved address
+	;
 	ld		l,(IY+OPC)
 	ld		h,(IY+OPC+1)
-
 	jp		(hl)

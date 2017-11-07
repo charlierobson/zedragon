@@ -106,13 +106,15 @@ aliveloop:
     ld      a,12
     call    AFXPLAY
 
-+:  ;call    displayandresetocount
++:  call    displayocount
+    xor     a
+    ld      (ocount),a
     YIELD
 
     call    updateair
 
-    call    minerelease     ; todo - combine these cleverly?
-    call    stalacrelease   ;
+   ;call    minerelease     ; todo - combine these cleverly?
+   ;call    stalacrelease   ;
     call    shooterstart    ;
 
     ld      de,0
@@ -144,9 +146,16 @@ deadsub:
 
 -:  call    updatebullets
 
+    call    displayocount
+    xor     a
+    ld      (ocount),a
     YIELD
 
     inc     (iy+OUSER)
+    jr      nz,{-}
+
+    ld      a,(ocount)              ; wait until all objects apart from MAIN and GAMEMAIN are dead
+    cp      2
     jr      nz,{-}
 
     ld      a,(lives)

@@ -16,9 +16,9 @@ FREELIST = $8000
 OSTORE   = $9800
 CHARSETS = $9C00
 
-maplz:      .incbin "map.binlz"
-maplzsz     = $-maplz
-charsetlz:	.incbin "charset.binlz"
+maplz:       .incbin "map.binlz"
+maplzsz  =    $-maplz
+charsetlz:	 .incbin "charset.binlz"
 charsetlzsz = $ - charsetlz
     ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)
@@ -60,6 +60,9 @@ starthere:
     ld      bc,attract
     call    initobject
 	call	insertobject_afterhead
+
+    xor     a
+    ld      (ocount),a
 
     ; here's the main loop, the root
 

@@ -249,12 +249,10 @@ showsubcoords:
     ret
 
 
-displayandresetocount:
+displayocount:
     ld      a,(ocount)
     ld      de,TOP_LINE
     call    hexout
-    xor     a
-    ld      (ocount),a
     ret
 
 

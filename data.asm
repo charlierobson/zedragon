@@ -3,6 +3,7 @@
     CH_STALAC = $27
     CH_MINE = $2F
     CH_BULLET = $be
+    CH_SHOOTBASE = $33
 
     .asciimap ' ', '_', {*}-' '
 

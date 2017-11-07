@@ -52,12 +52,12 @@ _considerator:
     pop     bc
     ret     nc
 
-    ; on return from findmine:
-    ; hl -> enemytbl
-    ; de -> enemyidx
+    ; on return from findenemy:
+    ; hl -> enemytbl [0..255]
+    ; de -> enemyidx [0..599]
     ; bc = exe function
-
-    set     BIT_INACT,(hl)
+_gotnme:
+    set     BIT_INACT,(hl)              ; setting the inactive bit will change the enemy id
     ld      a,(hl)
     and     $0f                         ; isolate Y - also clears carry for SBC below
     push    af
@@ -88,7 +88,7 @@ _considerator:
 considershooter:
     cp      NME_SHOOT
     jr      nz,_retnocarry
-
+_gotshooter:
     scf                        ; start a shooter
     ret
 
@@ -99,6 +99,7 @@ considermine:
     cp      NME_MINE
     jr      nz,_retnocarry
 
+_gotmine:
     push    bc
     call    rng
     pop     bc
@@ -116,6 +117,7 @@ considerstal:
     cp      NME_STAL
     jr      nz,_retnocarry
 
+_gotstal:
     push    bc
     call    rng
     pop     bc
@@ -303,9 +305,11 @@ _gobang:
     ;
     .module shooter 
 
-CH_SHOOTBASE = $33
 SHOOTPERIOD = 3
 SHOOTITERS = 10
+
+FFLOP = 8
+ITERS = 7
 
 shootemup:
     ld      l,(iy+OUSER)        ; x
@@ -318,9 +322,8 @@ shootemup:
     ld      (iy+OUSER+3),l
     ld      (iy+OUSER+4),h
     ld      (iy+OUSER+5),0              ; shooter length
-    ld      (iy+OUSER+7),SHOOTITERS
-    ld      (iy+OUSER+8),0
-    ld      (iy+OUSER+12),0
+    ld      (iy+OUSER+12),0             ; collision cache
+    ld      (iy+OUSER+FFLOP),0
 
     ; search the shooter space to find the required length
     ld      de,601
@@ -338,14 +341,14 @@ _pewpew:
     ld      de,ontab
     ld      (iy+OUSER+10),e
     ld      (iy+OUSER+11),d
-    ld      (iy+OUSER+7),SHOOTITERS
+    ld      (iy+OUSER+ITERS),SHOOTITERS
 
 _shoot_on_main:
     call    shootahoopa
-    inc     (iy+OUSER+8)
+    inc     (iy+OUSER+FFLOP)
 
     call    shootahoopa
-    dec     (iy+OUSER+8)
+    dec     (iy+OUSER+FFLOP)
 
     call    nextframe
 
@@ -361,10 +364,10 @@ _shoot_on_main:
 
 _shoot_off_main:
     call    shootahoopa
-    inc     (iy+OUSER+8)
+    inc     (iy+OUSER+FFLOP)
 
     call    shootahoopa
-    dec     (iy+OUSER+8)
+    dec     (iy+OUSER+FFLOP)
 
     call    nextframe
 
@@ -422,7 +425,7 @@ shootahoopa:
 -:  ld      a,(de)
     and     a
     jr      z,{+}
-    add     a,(iy+OUSER+8)
+    add     a,(iy+OUSER+FFLOP)
 +:  ld      (hl),a
     set     7,h
     res     6,h
@@ -438,7 +441,7 @@ shootahoopa:
     dec     (iy+OUSER+6)
     jr      nz,{--}
 
-    ld      a,(collision)
+    ld      a,(collision)           ; collision cache
     or      (iy+OUSER+12)
     ld      (iy+OUSER+12),a
 
