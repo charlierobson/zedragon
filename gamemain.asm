@@ -2,6 +2,10 @@
 ;               HEAD
 ;    ...[mines][core][bullets][gamemain/attract][sub][explosions]...
 
+dofspecial:
+    .word   $70
+	.byte	$78,$28
+
 gamemain:
     call    cls
     call    resetscore
@@ -10,7 +14,11 @@ gamemain:
 	ld		a,r
 	ld		(rng+1),a
 
+    ld      hl,scrollflags          ; enable scrolling
+    set     0,(hl)
+
     ld      hl,dofs
+    ;ld      hl,dofspecial
     ld      (restartPoint),hl
 
     ld      a,4
@@ -73,10 +81,10 @@ aliveloop:
     ld      a,15
     call    AFXPLAY
 
-+:  call    scroll              ; haven't scrolled the bg, so we don't need to update any pointers
-    ld      a,(scrolled)
-    and     a
-    jr      z,{+}
++:  call    scroll
+    ld      a,(scrollflags)
+    rlca
+    jr      nc,{+}              ; haven't scrolled the bg, so we don't need to update any pointers
 
     ld      hl,(restartPoint)   ; do something with a 'count till next restart point' ??
     inc     hl

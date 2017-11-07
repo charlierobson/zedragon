@@ -203,8 +203,11 @@ testevery8:
 
 
 scroll:
-    xor     a
-    ld      (scrolled),a
+    ld      hl,scrollflags
+    res     7,(hl)                  ; scrollflag.7 = 1 when scrolled
+
+    bit     0,(hl)                  ; scrollflag.0 = 1 when scrolling enabled
+    ret     z
 
     ld      hl,scrolltick           ; return if it's not time to scroll
     ld      c,23
@@ -219,19 +222,14 @@ scroll:
 
     ld      a,h
     cp      (600-32) / 256
-    jr      nz,{+}
+    ret     z
 
-    or      a                       ; clear Z flag
-    ret
-
-+:  ; do scroll
++:  ; do actual scroll
 
     inc     hl
     ld      (scrollpos),hl
-
-    ld      a,$ff
-    ld      (scrolled),a
-    xor     a
+    ld      hl,scrollflags
+    set     7,(hl)                  ; scrollflag.7 = 1 when scrolled
     ret
 
 
