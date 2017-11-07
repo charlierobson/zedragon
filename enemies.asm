@@ -12,8 +12,8 @@ NME_SHOOT    = $40
 _considertable:
     .word   considerstal, stalfall
     .word   considermine, minearise
-    .word   _considernull, 0
-    .word   _considernull, 0 ; considerdepth
+    .word   considernull, 0 ; never consider static mines
+    .word   considerdepth, depthcharge
     .word   considershooter, shootemup
 
 
@@ -34,7 +34,6 @@ _nope:
     inc     de
     djnz    _search
 
-_considernull:
     ret
 
 
@@ -104,8 +103,10 @@ _starterator:
     ; consideration functions - return with carry set to go with
     ; this object.
     ;
+considerdepth:          ; always starts
 considershooter:
-    scf                 ; start a shooter
+    scf
+considernull:           ; never starts
     ret
 
 considermine:
