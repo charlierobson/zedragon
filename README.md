@@ -6,10 +6,12 @@ ZX81 (with UDG) conversion of Russ Wetmore's classic atari game Sea Dragon
 * ~~stalactites~~
 * ~~shooters~~
 * depth charges
-* map cleanup
 * pixel movement torpedos
 * score
 * final boss
+
+### ONGOING
+* map cleanup
 
 ### BUGS
 * ship parts left behind when reversing
