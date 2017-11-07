@@ -132,11 +132,13 @@ void setMap(int x, int y, int c)
   map[scrollpos + x + (600 * y)] = (byte)c;
 
   for (x = 0; x < 600; ++x) {
+    enemyidx[x] = (byte)0xff;
     for (y = 0; y < 10; ++y) {
-      enemyidx[x] = (byte)0xff;
       int etype = enemyType(map[x + (600 * y)]);
       if (etype != -1) {
-        if(etype == 1 && y < 9 && map[x + (600 * (y+1))] == 0x32) etype = 2;
+        if(etype == 1 && y < 9 && (map[x + (600 * (y+1))] == 0x32 || map[x + (600 * (y-1))] != 0x00))
+          etype = 2;
+          
         int ev = (etype << 4) + y;
 
         enemydat[ec] = (byte)ev;
