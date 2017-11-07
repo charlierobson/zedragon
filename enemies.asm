@@ -383,6 +383,7 @@ _shoot_off_main:
 
     ld      (iy+OUSER+DLAY),50                 ; delay counter
 
+_soy2:
 -:  YIELD
 
     ld      a,(collision)                   ; die if sub died
@@ -415,9 +416,14 @@ nextframe:
 
 
 shootahoopa:
+    pop     hl
+    ld      (iy+OUSER+16),l
+    ld      (iy+OUSER+17),h
+
     ld      (iy+OUSER+DLAY),SHOOTPERIOD
 
---: ld      l,(iy+OUSER+3)      ; screen position
+_shmain:
+    ld      l,(iy+OUSER+3)      ; screen position
     ld      h,(iy+OUSER+4)
     ld      bc,601              ; offset to next shot posn on screen
 
@@ -427,11 +433,15 @@ shootahoopa:
     ld      e,(iy+OUSER+10)
     ld      d,(iy+OUSER+11)
 
--:  ld      a,(de)
+_shrender:
+    ld      a,(de)
     and     a
-    jr      z,{+}
+    jr      z,_skipadd
+
     add     a,(iy+OUSER+FFLOP)
-+:  ld      (hl),a
+
+_skipadd:
+    ld      (hl),a
     set     7,h
     res     6,h
     ld      (hl),a
@@ -440,16 +450,20 @@ shootahoopa:
     inc     de
     add     hl,bc
     dec     (iy+OUSER+CLEN)
-    jr      nz,{-}
+    jr      nz,_shrender
 
+_soy1:
     YIELD
     dec     (iy+OUSER+DLAY)
-    jr      nz,{--}
+    jr      nz,_shmain
 
     ld      a,(collision)           ; collision cache
     or      (iy+OUSER+COLL)
     ld      (iy+OUSER+COLL),a
 
+    ld      l,(iy+OUSER+16)
+    ld      h,(iy+OUSER+17)
+    push    hl
     ret
 
 
