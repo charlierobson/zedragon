@@ -308,8 +308,13 @@ _gobang:
 SHOOTPERIOD = 3
 SHOOTITERS = 10
 
-FFLOP = 8
-ITERS = 7
+OLEN = 5
+CLEN = 6
+DLAY = 7
+ITERS = 8
+FFLOP = 9
+;10/11
+COLL = 12
 
 shootemup:
     ld      l,(iy+OUSER)        ; x
@@ -321,15 +326,15 @@ shootemup:
     add     hl,de
     ld      (iy+OUSER+3),l
     ld      (iy+OUSER+4),h
-    ld      (iy+OUSER+5),0              ; shooter length
-    ld      (iy+OUSER+12),0             ; collision cache
+    ld      (iy+OUSER+OLEN),0              ; shooter length
+    ld      (iy+OUSER+COLL),0             ; collision cache
     ld      (iy+OUSER+FFLOP),0
 
     ; search the shooter space to find the required length
     ld      de,601
     jr      {+}
 
--:  inc     (iy+OUSER+5)        ; shooter length
+-:  inc     (iy+OUSER+OLEN)        ; shooter length
     add     hl,de
 
 +:  ld      a,(hl)
@@ -352,7 +357,7 @@ _shoot_on_main:
 
     call    nextframe
 
-    dec     (iy+OUSER+7)                    ; number of positions in offtabs
+    dec     (iy+OUSER+ITERS)                ; number of positions in offtabs
     jr      nz,_shoot_on_main
 
     ; shooting off
@@ -360,7 +365,7 @@ _shoot_on_main:
     ld      de,offtab
     ld      (iy+OUSER+10),e
     ld      (iy+OUSER+11),d
-    ld      (iy+OUSER+7),SHOOTITERS
+    ld      (iy+OUSER+ITERS),SHOOTITERS
 
 _shoot_off_main:
     call    shootahoopa
@@ -371,17 +376,17 @@ _shoot_off_main:
 
     call    nextframe
 
-    dec     (iy+OUSER+7)                    ; number of positions in offtabs
+    dec     (iy+OUSER+ITERS)                    ; number of positions in offtabs
     jr      nz,_shoot_off_main
 
     ; shoot sequence finished, wait a couple of seconds
 
-    ld      (iy+OUSER+6),50                 ; delay counter
+    ld      (iy+OUSER+DLAY),50                 ; delay counter
 
 -:  YIELD
 
     ld      a,(collision)                   ; die if sub died
-    or      (iy+OUSER+12)
+    or      (iy+OUSER+COLL)
     jr      nz,_die
 osc:
     ld      hl,(scrollpos)                  ; die when off screen
@@ -391,7 +396,7 @@ osc:
     sbc     hl,de
     jr      nc,_die
 
-    dec     (iy+OUSER+6)
+    dec     (iy+OUSER+DLAY)
     jr      nz,{-}
 
     jp      _pewpew
@@ -410,14 +415,14 @@ nextframe:
 
 
 shootahoopa:
-    ld      (iy+OUSER+6),SHOOTPERIOD
+    ld      (iy+OUSER+DLAY),SHOOTPERIOD
 
 --: ld      l,(iy+OUSER+3)      ; screen position
     ld      h,(iy+OUSER+4)
     ld      bc,601              ; offset to next shot posn on screen
 
-    ld      a,(iy+OUSER+5)      ; shot stream length
-    ld      (iy+OUSER+9),a
+    ld      a,(iy+OUSER+OLEN)      ; shot stream length
+    ld      (iy+OUSER+CLEN),a
 
     ld      e,(iy+OUSER+10)
     ld      d,(iy+OUSER+11)
@@ -434,16 +439,16 @@ shootahoopa:
     set     6,h
     inc     de
     add     hl,bc
-    dec     (iy+OUSER+9)
+    dec     (iy+OUSER+CLEN)
     jr      nz,{-}
 
     YIELD
-    dec     (iy+OUSER+6)
+    dec     (iy+OUSER+DLAY)
     jr      nz,{--}
 
     ld      a,(collision)           ; collision cache
-    or      (iy+OUSER+12)
-    ld      (iy+OUSER+12),a
+    or      (iy+OUSER+COLL)
+    ld      (iy+OUSER+COLL),a
 
     ret
 
