@@ -13,9 +13,8 @@ _considertable:
     .word   considerstal, stalfall
     .word   considermine, minearise
     .word   considernull, 0 ; never consider static mines
-    .word   considerdepth, depthcharge
+    .word   considerdepth, depthchargeGenerator
     .word   considershooter, shootemup
-
 
 
 enemyinitiator:
@@ -121,6 +120,19 @@ considerstal:
     call    rng
     pop     bc
     cp      1
+    ret
+
+
+    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ;
+    ; Return with carry set if x is off screen left
+    ;
+cIfOffscreenLeft:
+    ld      l,(iy+OUSER+0)
+    ld      h,(iy+OUSER+1)
+    ld      de,(scrollpos)
+    and     a
+    sbc     hl,de
     ret
 
 
@@ -387,22 +399,14 @@ _soy2:
 
     ld      a,(collision)                   ; die if sub died
     or      (iy+OUSER+COLL)
-    jr      nz,_die
-osc:
-    ld      hl,(scrollpos)                  ; die when off screen
-    ld      e,(iy+OUSER)                    ; x
-    ld      d,(iy+OUSER+1)
-    and     a
-    sbc     hl,de
-    jr      nc,_die
+    DIENZ
+    call    cIfOffscreenLeft
+    DIEC
 
     dec     (iy+OUSER+DLAY)
     jr      nz,{-}
 
     jp      _pewpew
-
-_die:
-    DIE
 
 
 nextframe:
@@ -485,64 +489,91 @@ offtab:
     ;
     .module DEPTH
 
+depthchargeGenerator:
+    YIELD
+    inc     (iy+OUSER+5)
+    ld      a,(iy+OUSER+5)
+    and     15
+    jr      nz,depthchargeGenerator
+
+    ld      bc,depthcharge
+    call    getobject
+    call    initobject
+    call    insertobject_afterthis
+
+    ld      a,(iy+OUSER+0)
+    ld      (hl),a
+    inc     hl
+    ld      a,(iy+OUSER+1)
+    ld      (hl),a
+    inc     hl
+    ld      a,(iy+OUSER+2)
+    ld      (hl),a
+
+    ld      a,(collision)
+    and     a
+    jr      z,depthchargeGenerator
+
+    DIE
+
+
 CH_DEPTHBASE = $98
 
-depthcharge:
-    ld      hl,D_BUFFER
-    ld      (iy+OUSER),l
-    ld      (iy+OUSER+1),h
+; TODO - make x,y to screenpos function to share amongst objects
+;        make function that creates & initialises object
 
-    xor     a
+depthcharge:
+    ld      l,(iy+OUSER+0)      ; x
+    ld      h,(iy+OUSER+1)
+    ld      a,(iy+OUSER+2)      ; y
+    call    mulby600
+    add     hl,de
+    ld      de,D_BUFFER+600
+    add     hl,de
+    ld      (iy+OUSER+3),l      ; screen pos
+    ld      (iy+OUSER+4),h
+    ld      (iy+OUSER+5),0
+
+    xor     a                   ; frame number
 
 _loop:
-    ld      (iy+OUSER+2),a
+    ld      l,(iy+OUSER+3)
+    ld      h,(iy+OUSER+4)
+ 
+    cp      5*8                 ; did we cross a border last time?
+    jr      nz,_noreset
 
+    ld      (hl),0              ; clear the remainder top half
+    ld      de,600              ; move down
+    add     hl,de
+    ld      (iy+OUSER+3),l
+    ld      (iy+OUSER+4),h
+
+    ld      a,8-1               ; reset anumation frame
+
+_noreset:
+    push    af
     sra     a
     sra     a
-    and     $fe
-    add     a,dctab & 255
-    ld      e,a
-    ld      d,dctab/256
-
-
-    ld      l,(iy+OUSER)
-    ld      h,(iy+OUSER+1)
-
-    ld      b,5
-
--:  push    bc
-    ld      bc,600
-
-    ld      a,(de)
+    sra     a
+    add     a,CH_DEPTHBASE
     ld      (hl),a
-    inc     de
-    add     hl,bc
+    pop     af
+    ld      (iy+OUSER+5),a
 
-    ld      a,(de)
-    ld      (hl),a
-    dec     de
-    add     hl,bc
+    cp      4*8
+    jr      nz,_notnext
 
-    pop     bc
-    djnz    {-}
+    ld      de,600
+    add     hl,de
+    ld      a,(hl)
+    or      a
+    DIENZ
 
+    ld      ()
+_notnext:
     YIELD
 
-    ld      a,(iy+OUSER+2)
+    ld      a,(iy+OUSER+5)
     inc     a
-    cp      9*8
-    jr      nz,_loop
-
-    xor     a
     jr      _loop
-
-dctab:
-    .byte   CH_DEPTHBASE+0,0
-    .byte   CH_DEPTHBASE+1,0
-    .byte   CH_DEPTHBASE+2,0
-    .byte   CH_DEPTHBASE+3,0
-    .byte   CH_DEPTHBASE+4,CH_DEPTHBASE+0
-    .byte   0,CH_DEPTHBASE+1
-    .byte   0,CH_DEPTHBASE+2
-    .byte   0,CH_DEPTHBASE+3
-    .byte   0,CH_DEPTHBASE+4

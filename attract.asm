@@ -18,19 +18,9 @@ attract:
     ld      (hl),0
     YIELD
 
-	call	getobject
-	ld		bc,depthcharge
-	call	initobject
-	call	insertobject_afterhead
-
 -:  ld      a,(FRAMES)
     and     127
     call    z,updatecredits
-
-;    ld      de,TOP_LINE
-;    ld      a,(kbin+7)
-;    ld      l,a
-;    call    binaryout
 
     YIELD
 

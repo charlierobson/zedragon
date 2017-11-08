@@ -1,7 +1,18 @@
 ; process control macros
 ;
 #define YIELD	call $+3 \ pop de \ jp yield
-#define	DIE		push iy \ pop hl \ call unlinkobject \ jp resumenext
+
+#define	DIE		jp dodie
+#define	DIEZ	jp z,dodie
+#define	DIENZ	jp nz,dodie
+#define	DIEC	jp c,dodie
+#define	DIENC	jp nc,dodie
+
+dodie:
+	push	iy
+	pop		hl
+	call	unlinkobject
+	jp		resumenext
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	;

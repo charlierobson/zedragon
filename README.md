@@ -18,7 +18,7 @@ ZX81 (with UDG) conversion of Russ Wetmore's classic atari game Sea Dragon
 * explosion parts left behind sometimes
 
 ### NICE TO HAVE
-* inter-screen wipes
+* inter-screen wipes - may also help with enemy resets like depth chargers
 * control customisation
 * high score saving
 * other udg boards
