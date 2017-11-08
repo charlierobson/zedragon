@@ -31,15 +31,14 @@ substart:
     add     hl,de
     ld      (oldsubaddress),de
 
-    ld      a,(gameframe)           ; $98 even frames, $b8 odd frames
-    dec     a
+    ld      a,(gameframe)           ; $b0 even frames, $b8 odd frames
     and     1
-    rrca
-    rrca
-    rrca
-    add     a,$98
+    ld      a,$b0
+    jr      nz,{+}                  ; we're a frame ahead, remember ;)
 
-    ld      (de),a
+    ld      a,$b8
+
++:  ld      (de),a
     inc     a
     inc     de
     ld      (hl),a
@@ -132,30 +131,24 @@ substart:
     ; to a new group of 3x2 characters - effectively a tiny bitmap
     ;
     ; on-screen (even frames)  (odd  frames)
-    ;            $98 $9a $9c    $a0 $a2 $a4
-    ;            $99 $9b $9d    $a1 $a3 $a5
+    ;            $b0 $b2 $b4    $b8 $ba $bc
+    ;            $b1 $b3 $b5    $b9 $bb $bd
     ;
     ; it's like this because the rendering of the sub char is easier using columns
 
     res     6,h                 ; point hl at mapcache in high memory
-    set     7,h
+    set     7,h                 ; hl is source pointer for character data
     push    hl
 
-    ld      a,(gameframe)       ; even frames $22c0, odd frames $23c0
-    and     1
-    or      $22
-    ld      d,a
-
-    ld      e,$c0               ; address of char $98/$b8
-    ld      (basecharptr),de
+    ld      de,charcache        ; b0/b8
     call    copychar
     ld      (iy+OUSER),a        ; collision index 0, store character code
 
-    ld      e,$d0               ; ... char 9a/ba
+    ld      de,charcache+16     ; ... char b2/ba
     call    copychar
     ld      (iy+OUSER+4),a      ; coll. idx. 2
 
-    ld      e,$e0               ; 9c/bc
+    ld      de,charcache+32     ; b4/bc
     call    copychar
     ld      (iy+OUSER+8),a      ; c.i. 4
 
@@ -163,17 +156,30 @@ substart:
     ld      bc,600
     add     hl,bc
 
-    ld      e,$c8
+    ld      de,charcache+8      ; b1/b9
     call    copychar
     ld      (iy+OUSER+2),a      ; c.i 1 
 
-    ld      e,$d8
+    ld      de,charcache+24     ; b3/bb
     call    copychar
     ld      (iy+OUSER+6),a      ; c.i 3
 
-    ld      e,$e8
+    ld      de,charcache+40     ; b5/bd
     call    copychar
     ld      (iy+OUSER+10),a     ; c.i 5
+
+    ld      de,$2380
+    ld      a,(gameframe)       ; even frames $2380, odd frames $23c0
+    and     1
+    jr      z,{+}
+    ld      e,$c0
++:  ld      (basecharptr),de
+
+    ld      hl,charcache        ; copy chars into charset
+    ld      bc,48
+    ldir
+
+    ;
 
     xor     a                   ; zero out collision bits
     ld      (iy+OUSER+1),a
@@ -345,6 +351,8 @@ collided:
 
     DIE
 
+charcache:
+    .fill   48
 
 testcollision:
     ld      a,c

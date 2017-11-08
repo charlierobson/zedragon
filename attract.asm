@@ -14,9 +14,14 @@ attract:
     ld      de,D_BUFFER
     call    LZ48_decrunch
 
-    ld      hl,scrollpos
+    ld      hl,scrollpos                ; ensure scroll is at 0 by waiting a cycle
     ld      (hl),0
     YIELD
+
+	call	getobject
+	ld		bc,depthcharge
+	call	initobject
+	call	insertobject_afterhead
 
 -:  ld      a,(FRAMES)
     and     127

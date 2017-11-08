@@ -485,5 +485,64 @@ offtab:
     ;
     .module DEPTH
 
+CH_DEPTHBASE = $98
+
 depthcharge:
-    DIE
+    ld      hl,D_BUFFER
+    ld      (iy+OUSER),l
+    ld      (iy+OUSER+1),h
+
+    xor     a
+
+_loop:
+    ld      (iy+OUSER+2),a
+
+    sra     a
+    sra     a
+    and     $fe
+    add     a,dctab & 255
+    ld      e,a
+    ld      d,dctab/256
+
+
+    ld      l,(iy+OUSER)
+    ld      h,(iy+OUSER+1)
+
+    ld      b,5
+
+-:  push    bc
+    ld      bc,600
+
+    ld      a,(de)
+    ld      (hl),a
+    inc     de
+    add     hl,bc
+
+    ld      a,(de)
+    ld      (hl),a
+    dec     de
+    add     hl,bc
+
+    pop     bc
+    djnz    {-}
+
+    YIELD
+
+    ld      a,(iy+OUSER+2)
+    inc     a
+    cp      9*8
+    jr      nz,_loop
+
+    xor     a
+    jr      _loop
+
+dctab:
+    .byte   CH_DEPTHBASE+0,0
+    .byte   CH_DEPTHBASE+1,0
+    .byte   CH_DEPTHBASE+2,0
+    .byte   CH_DEPTHBASE+3,0
+    .byte   CH_DEPTHBASE+4,CH_DEPTHBASE+0
+    .byte   0,CH_DEPTHBASE+1
+    .byte   0,CH_DEPTHBASE+2
+    .byte   0,CH_DEPTHBASE+3
+    .byte   0,CH_DEPTHBASE+4
