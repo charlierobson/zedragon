@@ -493,7 +493,7 @@ depthchargeGenerator:
     YIELD
     inc     (iy+OUSER+5)
     ld      a,(iy+OUSER+5)
-    and     15
+    and     31
     jr      nz,depthchargeGenerator
 
     ld      bc,depthcharge
@@ -530,45 +530,52 @@ depthcharge:
     add     hl,de
     ld      de,D_BUFFER+600
     add     hl,de
-    ld      (iy+OUSER+3),l      ; screen pos
-    ld      (iy+OUSER+4),h
+
     ld      (iy+OUSER+5),0
 
-    xor     a                   ; frame number
-
-_loop:
-    ld      l,(iy+OUSER+3)
-    ld      h,(iy+OUSER+4)
- 
-    cp      5*8                 ; did we cross a border last time?
-    jr      nz,_noreset
-
-    ld      (hl),0              ; clear the remainder top half
-    ld      de,600              ; move down
-    add     hl,de
-    ld      (iy+OUSER+3),l
+_loop0:
+    ld      (iy+OUSER+3),l      ; screen pos
     ld      (iy+OUSER+4),h
 
-    ld      a,8-1               ; reset anumation frame
+_loop1:
+    ld      l,(iy+OUSER+3)
+    ld      h,(iy+OUSER+4)
+    ld      (hl),$99
+    set     7,h
+    res     6,h
+    ld      (hl),$99
+    YIELD
+    inc     (iy+OUSER+5)
+    bit     3,(iy+OUSER+5)
+    jr      z,_loop1
 
-_noreset:
-    push    af
-    sra     a
-    sra     a
-    sra     a
-    add     a,CH_DEPTHBASE
-    ld      (hl),a
-    pop     af
-    ld      (iy+OUSER+5),a
+_loop2:
+    ld      l,(iy+OUSER+3)
+    ld      h,(iy+OUSER+4)
+    ld      (hl),$9b
+    set     7,h
+    res     6,h
+    ld      (hl),$9b
+    YIELD
+    inc     (iy+OUSER+5)
+    bit     3,(iy+OUSER+5)
+    jr      nz,_loop2
 
-    cp      4*8
-    jr      nz,_notnext
+    ld      l,(iy+OUSER+3)
+    ld      h,(iy+OUSER+4)
 
-    ld      de,600
-    add     hl,de
+    ld      (hl),0
+    set     7,h
+    res     6,h
+    ld      (hl),0
+
+    ld      bc,600
+    add     hl,bc
     ld      a,(hl)
+    res     7,h
+    set     6,h
     or      a
-    DIENZ
+    jr      z,_loop0
 
 _notnext:
     YIELD
