@@ -570,7 +570,6 @@ _noreset:
     or      a
     DIENZ
 
-    ld      ()
 _notnext:
     YIELD
 

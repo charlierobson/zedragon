@@ -331,7 +331,7 @@ SOUNDFN = $+1
 
 +:	xor		$ff
 
-	ld		hl,$23f0
+	ld		hl,$23f0		; character $BE
 	ld		(hl),a
 	inc		hl
 	ld		(hl),a

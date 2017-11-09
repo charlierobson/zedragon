@@ -1,9 +1,10 @@
-    CH_CHAIN = $32
-    CH_EXPLODEBASE = $39
-    CH_STALAC = $27
-    CH_MINE = $2F
-    CH_BULLET = $be
-    CH_SHOOTBASE = $33
+    CH_CHAIN = $96
+    CH_EXPLODEBASE = $a0
+    CH_STALACBASE = $88
+    CH_MINEBASE = $80
+    CH_MINE = $87
+    CH_BULLET = $bd
+    CH_SHOOTBASE = $90
 
     .asciimap ' ', '_', {*}-' '
 
@@ -176,6 +177,10 @@ flagframe:
 	.byte		0
 flaganimation:
 	.byte		$1e,$de, $1e,$dc, $1c,$dc, $1c,$de
+
+    .align  256
+subpix:
+    .incbin "prescrolledsubs.bin"
 
 ENEMYIDX:
     .incbin "enemyidx.bin"

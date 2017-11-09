@@ -77,10 +77,10 @@ updatebullets:
     inc     de
     ld      (bulletX),de
 
-    ld      de,$23f0            ; address of bullet buffer character, = char $be
+    ld      de,$23e8            ; address of bullet buffer character, = char $bd
     call    copychar
     ld      a,(bltyoff)
-    add     a,$f0
+    add     a,$e8
     ld      l,a
     ld      h,d
 

@@ -202,19 +202,19 @@ substart:
     and     7
     ld      c,a
     add     a,a
-    add     a,c             ; * 3, a is offset to set of 3 characters
+    add     a,c                 ; * 3, a is offset to set of 3 characters
 
     sla     a
     sla     a
-    sla     a               ; * 8, a is offset to 1st byte of sub char data 
+    sla     a                   ; * 8, a is offset to 1st byte of sub char data 
 
     ; get pointers to sub pixel data within the character set
 
-    ld      h,$22           ; form address in character set $22xx
+    ld      h,subpix / 256      ; form address in character set $22xx
     ld      l,a
 
-    ld      de,(basecharptr) ; pointer to 1st byte within column of 16 rows inside mini bitmap
-    ld      a,(suby)        ; that we will render to
+    ld      de,(basecharptr)    ; pointer to 1st byte within column of 16 rows inside mini bitmap
+    ld      a,(suby)            ; that we will render to
     and     7
     or      e
     ld      e,a
