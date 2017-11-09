@@ -77,10 +77,10 @@ updatebullets:
     inc     de
     ld      (bulletX),de
 
-    ld      de,$23e8            ; address of bullet buffer character, = char $bd
+    ld      de,$23f0            ; address of bullet buffer character, = char $bd
     call    copychar
     ld      a,(bltyoff)
-    add     a,$e8
+    add     a,$f0
     ld      l,a
     ld      h,d
 
@@ -93,9 +93,8 @@ updatebullets:
     ld      b,a
     jr      z,{+}
 
-    and     $f0
-    cp      $30
-    jr      nz,bullethit        ; jump if blocking pixels detected under blt
+    cp      $a0
+    jr      c,bullethit        ; jump if blocking pixels detected under blt
 
 +:  ld      a,b
     ld      (bltundrawchar),a
@@ -125,7 +124,8 @@ endmine:
 bullethit:
     ; a has the hit character, hl is the screen address
     ; clear enemy from screen and mirror map
-    cp      $20
+    and     $f0
+    cp      $80
     jr      nz,{+}
 
     ld      de,(bulletX)

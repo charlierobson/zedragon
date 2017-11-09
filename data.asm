@@ -1,10 +1,11 @@
-    CH_CHAIN = $96
-    CH_EXPLODEBASE = $a0
-    CH_STALACBASE = $88
-    CH_MINEBASE = $80
-    CH_MINE = $87
-    CH_BULLET = $bd
-    CH_SHOOTBASE = $90
+    CH_MINEBASE     = $80
+    CH_MINE         = $87
+    CH_STALACBASE   = $88
+    CH_SHOOTBASE    = $90
+    CH_CHAIN        = $96
+    CH_EXPLODEBASE  = $a0
+    CH_BULLET       = $be
+    CH_WATER        = $bf
 
     .asciimap ' ', '_', {*}-' '
 
