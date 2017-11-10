@@ -12,7 +12,7 @@ NME_SHOOT    = $40
 _considertable:
     .word   considerstal, stalfall
     .word   considermine, minearise
-    .word   considernull, 0 ; never consider static mines
+    .word   considernull, 0     ; never consider static mines
     .word   considerdepth, depthchargeGenerator
     .word   considershooter, shootemup
 
@@ -27,7 +27,19 @@ enemyinitiator:
 _search:
     ld      a,(de)              ; get enemy table index, or ff if no enemy at this x pos
     cp      $ff
-    jr      nz,_possibly
+    jr      z,_nope
+
+    push    bc
+    push    de
+
+    ld      h,ENEMYTBL / 256    ; make pointer into enemy data table
+    ld      l,a
+    ld      a,(hl)              ; get enemy type
+    bit     BIT_INACT,a
+    call    z,_possibly
+
+    pop     de
+    pop     bc
 
 _nope:
     inc     de
@@ -35,20 +47,14 @@ _nope:
 
     ret
 
-_possibly:
-    ld      h,ENEMYTBL / 256    ; make pointer into enemy data table
-    ld      l,a
 
-    ld      a,(hl)              ; get enemy type
-    bit     BIT_INACT,a
-    jr      nz,_nope
+_possibly:
+    and     $f0                 ; isolate type
+    rrca
+    rrca
 
     push    hl
 
-    and     $f0                 ; isolate type
-
-    rrca
-    rrca
     ld      hl,_considertable   ; index into consideration table
     or      l
     ld      l,a
@@ -62,10 +68,11 @@ _possibly:
     ldi
     pop     de
 
+    pop     hl
+
 _considerator:
     call    0
-    pop     hl
-    jr      nc,_nope
+    ret     nc
 
 _yep:
     set     BIT_INACT,(hl)              ; setting the inactive bit will change the enemy id
@@ -93,8 +100,7 @@ _starterator:
     pop     af                          ; retrieve Y
     ld      (hl),a
 
-    ret                                 ; remove this to check multiple enemies per frame
-
+    ret
 
 
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

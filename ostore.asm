@@ -110,7 +110,14 @@ _pokey
 	; preserves: all non-parameter registers
 	;
 getobject:
-	ld		hl,(NEXTFREE)
+	ld		a,(ocount)
+	cp		10
+	jr		c,{+}
+
+aaaaa:
+	nop
+
++:	ld		hl,(NEXTFREE)
 	ld		(_peeky+1),hl		; prepare read from list
 	dec		hl
 	dec		hl
