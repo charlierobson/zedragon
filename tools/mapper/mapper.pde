@@ -1,21 +1,29 @@
 import de.bezier.guido.*;
 
-/*
-CH_SHOOTER = $30
-CH_LASER = $31
-CH_DEPTH = $32
-CH_SHIP = $34
-*/
+int mode;
+byte[] map;
+byte[] enemyidx = new byte[600];
+byte[] enemydat = new byte[256];
+
+ArrayList<PImage> characterSet;
+
+int lastMouseX;
+int scrollpos;
+int fineScroll;
+int xtiles;
+int xc, yc, cx, cy;
+int selectedTile = 0;
+
 
 byte charToMap(byte c)
 {
-  if (c > 64) c += 64;
+  if (c > 63) c += 64;
   return c;
 }
 
 byte mapToChar(byte c)
 {
-  if (c > 128) c -= 64;
+  if (c > 127) c -= 64;
   return c;
 }
 
@@ -41,7 +49,7 @@ void selectCharacter(int charNum)
   mode = 0;
 }
 
-int mode;
+
 void setMode(int m)
 {
   if (m == mode) {
@@ -51,21 +59,6 @@ void setMode(int m)
 
   mode = m;
 }
-
-
-byte[] map;
-byte[] enemyidx = new byte[600];
-byte[] enemydat = new byte[256];
-
-ArrayList<PImage> characterSet;
-
-int lastMouseX;
-int scrollpos;
-int fineScroll;
-int xtiles;
-int xc, yc, cx, cy;
-int selectedTile = 0;
-
 
 
 void setup()
@@ -127,7 +120,7 @@ void draw()
     image(characterSet.get(getMap(xc, yc)), 720, 200, 16, 16);
   }
 
-  text("Selected: $" + hex(selectedTile, 2), 600, 178, 200, 17);
+  text("Selected: $" + hex(charToMap((byte)selectedTile), 2), 600, 178, 200, 17);
   image(characterSet.get(selectedTile), 720, 178, 16, 16);
 
   text("Mode: " + mode, 720, 350);
@@ -139,8 +132,9 @@ void draw()
 
 int enemyType(int c)
 {
-  if (c == 0x4f) return 0; // stal
-  if (c == 0x47) return 1; // mine
+  c &= 0xff;
+  if (c == 0x8f) return 0; // stal
+  if (c == 0x87) return 1; // mine
   if (c == 0x35) return 3; // depth
   if (c == 0x30) return 4; // shooter
 
@@ -159,7 +153,7 @@ void setMap(int x, int y, int c)
     for (y = 0; y < 10; ++y) {
       int etype = enemyType(map[x + (600 * y)]);
       if (etype != -1) {
-        if (etype == 1 && y < 9 && (map[x + (600 * (y+1))] == 0x32 || map[x + (600 * (y-1))] != 0x00))
+        if (etype == 1 && y < 9 && ((map[x + (600 * (y+1))] & 0xff) == 0x96 || map[x + (600 * (y-1))] != 0x00))
           etype = 2;
 
         int ev = (etype << 4) + y;

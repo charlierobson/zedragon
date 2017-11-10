@@ -8,7 +8,7 @@ NME_STATMINE = $20
 NME_DEPTH    = $30
 NME_SHOOT    = $40
 
-    .align  16
+    .align  32
 _considertable:
     .word   considerstal, stalfall
     .word   considermine, minearise
@@ -35,7 +35,6 @@ _nope:
 
     ret
 
-
 _possibly:
     ld      h,ENEMYTBL / 256    ; make pointer into enemy data table
     ld      l,a
@@ -47,6 +46,7 @@ _possibly:
     push    hl
 
     and     $f0                 ; isolate type
+
     rrca
     rrca
     ld      hl,_considertable   ; index into consideration table
@@ -241,7 +241,7 @@ minearise:
 
     and     %00001100
     rrca
-    add     a,$28+1             ; start of mine sequence in char set
+    add     a,CH_MINEBASE+1             ; start of mine sequence in char set
     ld      (hl),a
     ld      (de),a
     dec     a
@@ -286,7 +286,7 @@ _scc:
     and     a
     jr      z,{-}
 
-    cp      $20                 ; some solid thing?
+    cp      $30                 ; some solid thing?
     jr      nc,{-}
 
     ; all done - become an explosion
@@ -576,10 +576,3 @@ _loop2:
     set     6,h
     or      a
     jr      z,_loop0
-
-_notnext:
-    YIELD
-
-    ld      a,(iy+OUSER+5)
-    inc     a
-    jr      _loop

@@ -325,7 +325,7 @@ chkidx2 = $+5
 collided:
     ld      a,1
     ld      (collision),a
-    
+
     ; trigger some explosions
 
     ld      hl,explooff
@@ -358,7 +358,7 @@ testcollision:
     ld      a,c
     and     a
     ret     z
-    cp      $39
+    cp      $a0         ; no collision with chars $a0 or greater
     ret
 
 

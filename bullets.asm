@@ -93,7 +93,7 @@ updatebullets:
     ld      b,a
     jr      z,{+}
 
-    cp      $a0
+    cp      $90
     jr      c,bullethit        ; jump if blocking pixels detected under blt
 
 +:  ld      a,b
