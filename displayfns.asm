@@ -153,18 +153,18 @@ animatecharacters:
     add     a,l
     ld      l,a
     ld      a,(hl)
-	ld      (UDG+$f8),a
+    ld      (UDG+$1a8),a         ; ship rear end, $35
     inc     hl
     ld      a,(hl)
-	ld      (UDG+$f8+1),a
+    ld      (UDG+$1a8+1),a
 
-    ld      a,(UDG+$181)
+    ld      a,(UDG+$181)        ; shooter, $30
     xor     $66 ^ $7e
     ld      (UDG+$181),a
-    and     $3c
+    and     $3c                 ; laser, $31
     ld      (UDG+$18e),a
 
-    ld      a,(UDG+$189)
+    ld      a,(UDG+$189)        ; laser
     xor     $a7 ^ $e5
     ld      (UDG+$189),a
 
@@ -189,9 +189,8 @@ testevery8:
     ; every 8 frames
 
     ld      hl,shooterframe
-    ld      c,6
+    ld      c,5
     call    updatecounter
-
     ld      de,shooteranimation
     add     a,e
     ld      e,a
