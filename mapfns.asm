@@ -38,8 +38,8 @@ refreshmap:
     ; remove any status bits from the enemy table
     ;
 resetmines:
-    ld      b,NUMENEMY
-    ld      hl,ENEMYTBL
+    ld      b,numenemy
+    ld      hl,enemydat
 
 -:  res     BIT_INACT,(hl)
     inc     hl
@@ -58,7 +58,7 @@ findenemy:
     ld      (consideration),hl
 
     ld      de,(scrollpos)      ; find the first enemy on screen
-    ld      hl,ENEMYIDX
+    ld      hl,enemyidx
     add     hl,de
     ex      de,hl
     ld      b,32                ; and check up to 32 screen x positions from there
@@ -67,7 +67,7 @@ findenemy:
     cp      $ff
     jr      z,_skipthis
 
-    ld      h,ENEMYTBL / 256    ; make pointer into enemy data table
+    ld      h,enemydat / 256    ; make pointer into enemy data table
     ld      l,a
 
     ld      a,(hl)              ; get enemy type

@@ -81,8 +81,8 @@ fnmain:
 
 #include "attract.asm"
 #include "gamemain.asm"
+#include "testmain.asm"
 #include "fx.asm"
-
 #include "ostore.asm"
 #include "input.asm"
 #include "sub.asm"

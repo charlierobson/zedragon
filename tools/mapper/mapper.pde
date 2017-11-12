@@ -1,5 +1,8 @@
 import de.bezier.guido.*;
 
+
+String mapName = "map.bin";
+
 int mode;
 byte[] map;
 byte[] enemyidx = new byte[600];
@@ -63,7 +66,6 @@ void setMode(int m)
   mode = m;
 }
 
-
 void setup()
 {
   size(1024, 500);
@@ -86,7 +88,7 @@ void setup()
     characterSetE.add(p);
   }
 
-  map = loadBytes("map.bin");
+  map = loadBytes(mapName);
   updateEnemies();
 
   //
@@ -147,12 +149,13 @@ void draw()
       byte y = (byte)(ed & 0x0f);
       byte t = (byte)((ed>>4) & 0x0f);
 
-      println(ed, y, t);
 
       if(t == 0) image(characterSetE.get(0x4f), (i - scrollpos) * 16, y * 16, 16, 16);
       if(t == 1 || t == 2) image(characterSetE.get(0x47), (i - scrollpos) * 16, y * 16, 16, 16);
       if(t == 3) image(characterSetE.get(0x35), (i - scrollpos) * 16, y * 16, 16, 16);
       if(t == 4) image(characterSetE.get(0x30), (i - scrollpos) * 16, y * 16, 16, 16);
+      if(t == 5) image(characterSetE.get(0x31), (i - scrollpos) * 16, y * 16, 16, 16);
+      
     }
   }
 }
@@ -164,6 +167,7 @@ int enemyType(int c)
   if (c == 0x87) return 1; // mine
   if (c == 0x35) return 3; // depth
   if (c == 0x30) return 4; // shooter
+  if (c == 0x31) return 5; // laser
 
   return -1;
 }
@@ -175,7 +179,7 @@ void setMap(int x, int y, int c)
 
   updateEnemies();
 
-  saveBytes("data/map.bin", map);
+  saveBytes("data/"+mapName, map);
   saveBytes("data/enemyidx.bin", enemyidx);
   saveBytes("data/enemydat.bin", enemydat);
   saveBytes("data/charset.bin", getCharsetBytes());

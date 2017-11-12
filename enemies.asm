@@ -7,6 +7,7 @@ NME_MINE     = $10
 NME_STATMINE = $20
 NME_DEPTH    = $30
 NME_SHOOT    = $40
+NME_LASER    = $50
 
     .align  32
 _considertable:
@@ -15,11 +16,12 @@ _considertable:
     .word   considernull, 0     ; never consider static mines
     .word   considerdepth, depthchargeGenerator
     .word   considershooter, shootemup
+    .word   considerlaser, laseremup
 
 
 enemyinitiator:
     ld      de,(scrollpos)      ; find the first enemy on screen
-    ld      hl,ENEMYIDX
+    ld      hl,enemyidx
     add     hl,de
     ex      de,hl
     ld      b,32                ; and check up to 32 screen x positions from there
@@ -32,7 +34,7 @@ _search:
     push    bc
     push    de
 
-    ld      h,ENEMYTBL / 256    ; make pointer into enemy data table
+    ld      h,enemydat / 256    ; make pointer into enemy data table
     ld      l,a
     ld      a,(hl)              ; get enemy type
     bit     BIT_INACT,a
@@ -80,7 +82,7 @@ _yep:
     and     $0f                         ; isolate Y - also clears carry for SBC below
     push    af
 
-    ld      hl,ENEMYIDX                 ; calculate X
+    ld      hl,enemyidx                 ; calculate X
     ex      de,hl
     sbc     hl,de
     push    hl
@@ -110,6 +112,7 @@ _starterator:
     ;
 considerdepth:          ; always starts
 considershooter:
+considerlaser:
     scf
 considernull:           ; never starts
     ret
@@ -327,7 +330,7 @@ _gobang:
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
     .module SHOOTER 
-
+    ;
 SHOOTPERIOD = 3
 SHOOTITERS = 10
 
@@ -349,12 +352,15 @@ shootemup:
     add     hl,de
     ld      (iy+OUSER+3),l
     ld      (iy+OUSER+4),h
+
     ld      (iy+OUSER+OLEN),0              ; shooter length
     ld      (iy+OUSER+COLL),0             ; collision cache
     ld      (iy+OUSER+FFLOP),0
 
     ; search the shooter space to find the required length
     ld      de,601
+    set     7,h
+    res     6,h
     jr      {+}
 
 -:  inc     (iy+OUSER+OLEN)        ; shooter length
@@ -500,7 +506,7 @@ offtab:
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
     .module DEPTH
-
+    ;
 depthchargeGenerator:
     YIELD
     inc     (iy+OUSER+5)
@@ -536,10 +542,14 @@ depthchargeGenerator:
 depthcharge:
     ld      l,(iy+OUSER+0)      ; x
     ld      h,(iy+OUSER+1)
-    ld      a,(iy+OUSER+2)      ; y
+    inc     (iy+OUSER+2)
+    ld      a,(iy+OUSER+2)
+    sla     (iy+OUSER+2)
+    sla     (iy+OUSER+2)
+    sla     (iy+OUSER+2)
     call    mulby600
     add     hl,de
-    ld      de,D_BUFFER+600
+    ld      de,D_BUFFER
     add     hl,de
 
     ld      (iy+OUSER+5),0
@@ -550,15 +560,20 @@ _loop0:
 
 _loop1:
     ld      l,(iy+OUSER+3)
-    ld      h,(iy+OUSER+4)
+    ld      h,(iy+OUSER+4)    
     ld      (hl),CH_DEPTHBASE
     set     7,h
     res     6,h
     ld      (hl),CH_DEPTHBASE
     YIELD
+    call    _hittest
     inc     (iy+OUSER+5)
     bit     3,(iy+OUSER+5)
     jr      z,_loop1
+
+    ld      a,(iy+OUSER+2) 
+    add     a,4
+    ld      (iy+OUSER+2),a
 
 _loop2:
     ld      l,(iy+OUSER+3)
@@ -568,9 +583,14 @@ _loop2:
     res     6,h
     ld      (hl),CH_DEPTHBASE+1
     YIELD
+    call    _hittest
     inc     (iy+OUSER+5)
     bit     3,(iy+OUSER+5)
     jr      nz,_loop2
+
+    ld      a,(iy+OUSER+2)
+    add     a,4
+    ld      (iy+OUSER+2),a
 
     ld      l,(iy+OUSER+3)
     ld      h,(iy+OUSER+4)
@@ -586,6 +606,67 @@ _loop2:
     res     7,h
     set     6,h
     or      a
-    jr      z,_loop0
+    jp      z,_loop0
+
+    DIE
+
+_hittest:
+    ld      de,(bulletHitX)
+    ld      a,d
+    or      e
+    ret     z
+
+    ld      l,(iy+OUSER+0)
+    ld      h,(iy+OUSER+1)
+    sbc     hl,de
+    ret     nz
+
+    ld      a,(bulletY)
+    ld      b,a
+    ld      a,(iy+OUSER+2)
+    dec     a
+    cp      b
+    ret     nc
+
+    add     a,4+1
+    cp      b
+    ret     c
+
+    pop     hl
+
+    ; become explosion
+
+    ld      l,(iy+OUSER+3)
+    ld      (iy+OUSER+0),l
+    ld      h,(iy+OUSER+4)
+    ld      (iy+OUSER+1),h
+    ld      (hl),0
+    set     7,h
+    res     6,h
+    ld      (hl),0
+    ld      (iy+OUSER+2),16     ; short explosion
+    jp      becomeexplosion
+
+
+    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ;
+    .module LASER 
+
+laseremup:
+    ld      l,(iy+OUSER)        ; x
+    ld      h,(iy+OUSER+1)
+    ld      a,(iy+OUSER+2)      ; y
+    call    mulby600
+    add     hl,de
+
+    ld      de,D_BUFFER+600
+    add     hl,de
+
+    ld      bc,600
+-:  ld      (hl),CH_LASER
+    add     hl,bc
+    ld      a,(hl)
+    or      a
+    jr      z,{-}
 
     DIE

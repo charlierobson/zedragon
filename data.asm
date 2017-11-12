@@ -4,6 +4,7 @@
     CH_STALACBASE   = $88
     CH_SHOOTBASE    = $90
     CH_CHAIN        = $96
+    CH_LASER        = $97
     CH_EXPLODEBASE  = $a0
     CH_BULLET       = $be
     CH_WATER        = $bf
@@ -121,8 +122,12 @@ subcoloff:
     .byte   0
 bulletX:
     .word   0
+bulletY:
+    .byte   0
 bulletHitX:
     .word   0
+bulletHitY:
+    .byte   0
 
 ocount:
     .byte   0
@@ -184,16 +189,15 @@ flaganimation:
 subpix:
     .incbin "prescrolledsubs.bin"
 
-ENEMYIDX:
+enemyidx:
     .incbin "enemyidx.bin"
-
-    .align  256
 
 ; needs to start on a 256 byte page boundary and be contained wholly within it
 ;
-ENEMYTBL:
+    .align  256
+enemydat:
     .incbin "enemydat.bin"
-NUMENEMY = $-ENEMYTBL
+numenemy = $-enemydat
 
 ; this needs to be wholly within a 256 byte page too
 ;

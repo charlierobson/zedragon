@@ -17,4 +17,5 @@ void updateEnemies()
       }
     }
   }
+  println(ec);
 }

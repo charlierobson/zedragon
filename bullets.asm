@@ -38,6 +38,7 @@ startbullet:
     add     hl,de
 
 +:  add     a,4
+    ld      (bulletY),a
     and     7
     ld      (bltyoff),a
 
@@ -107,10 +108,10 @@ endmine:
     push    de
 
     ld      de,(bulletHitX)
-    ld      hl,ENEMYIDX
+    ld      hl,enemyidx
     add     hl,de
     ld      e,(hl)
-    ld      d,ENEMYTBL / 256
+    ld      d,enemydat / 256
     ex      de,hl
     set     BIT_INACT,(hl)
 
@@ -127,9 +128,6 @@ bullethit:
     and     $f0
     cp      $80
     jr      nz,{+}
-
-    ld      de,(bulletX)
-    ld      (bulletHitX),de
 
     push    hl
     push    hl
@@ -161,6 +159,11 @@ bullethit:
     inc     hl
     ld      (hl),d
 
-+:  xor     a                   ; deactivate bullet
++:  ld      de,(bulletX)
+    ld      (bulletHitX),de
+    ld      a,(bulletY)
+    ld      (bulletHitY),a
+
+    xor     a                   ; deactivate bullet
     ld      (bltlife),a
     ret
