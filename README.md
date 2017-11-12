@@ -16,6 +16,7 @@ ZX81 (with UDG) conversion of Russ Wetmore's classic atari game Sea Dragon
 ### BUGS
 * ship parts left behind when reversing
 * explosion parts left behind sometimes
+* crash when ship goes into line 9
 
 ### NICE TO HAVE
 * inter-screen wipes - may also help with enemy resets like depth chargers

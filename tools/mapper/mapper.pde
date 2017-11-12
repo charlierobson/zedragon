@@ -6,6 +6,7 @@ byte[] enemyidx = new byte[600];
 byte[] enemydat = new byte[256];
 
 ArrayList<PImage> characterSet;
+ArrayList<PImage> characterSetE;
 
 int lastMouseX;
 int scrollpos;
@@ -44,14 +45,16 @@ void selectCharacter(int charNum)
     PImage temp = characterSet.get(charNum);
     characterSet.set(charNum, characterSet.get(selectedTile));
     characterSet.set(selectedTile, temp);
+  } else if (mode == 3) {
+    characterSet.set(charNum, characterSet.get(selectedTile));
   }
   selectedTile = charNum;
   mode = 0;
 }
 
-
 void setMode(int m)
 {
+  // toggle/cancel
   if (m == mode) {
     mode = 0;
     return;
@@ -63,9 +66,6 @@ void setMode(int m)
 
 void setup()
 {
-  map = loadBytes("map.bin");
-  characterSet = new ArrayList<PImage>();
-
   size(1024, 500);
   background(128);
 
@@ -74,15 +74,25 @@ void setup()
   lastMouseX = mouseX;
 
   byte[] chardata = loadBytes("charset.bin");
-
   characterSet = new ArrayList<PImage>();
+  characterSetE = new ArrayList<PImage>();
+
   for (int i = 0; i < 0xc0; ++i) {
     PImage p = new PImage(8, 8);
-    putchar(p, chardata, i, 0, 0);
+    putchar(p, chardata, i, 0, 0, color(0,0,0));
     characterSet.add(p);
+    p = new PImage(8, 8);
+    putchar(p, chardata, i, 0, 0, color(240,0,0));
+    characterSetE.add(p);
   }
 
+  map = loadBytes("map.bin");
+  updateEnemies();
+
+  //
+
   Interactive.make( this );
+
   for (int y = 0; y < 8; ++y) {
     for (int x = 0; x < 16; ++x ) {
       new CharButton(x + (16 * y), 8 + x * 32, 168 + y * 32);
@@ -92,6 +102,7 @@ void setup()
   new MMButton("<<", -xtiles, 600, 300, 100, 25);
   new MMButton(">>", xtiles, 720, 300, 100, 25);
   new ModeButton("CharSwap", 1, 600, 350, 100, 25);
+  new ModeButton("CharCopy", 3, 600, 400, 100, 25);
 
   noFill();
 }
@@ -128,6 +139,22 @@ void draw()
   if (yc < 10) {
     text("x = " + (xc + scrollpos) + ", y = " + yc + "  ($"+hex(xc + scrollpos,2)+", $"+hex(yc,2)+")", 600, 232);
   }
+
+  for(int i = scrollpos; i < scrollpos + xtiles; ++i) {
+    int ei = enemyidx[i] & 0xff;
+    if (ei != 0xff) {
+      int ed = enemydat[ei] & 0xff;
+      byte y = (byte)(ed & 0x0f);
+      byte t = (byte)((ed>>4) & 0x0f);
+
+      println(ed, y, t);
+
+      if(t == 0) image(characterSetE.get(0x4f), (i - scrollpos) * 16, y * 16, 16, 16);
+      if(t == 1 || t == 2) image(characterSetE.get(0x47), (i - scrollpos) * 16, y * 16, 16, 16);
+      if(t == 3) image(characterSetE.get(0x35), (i - scrollpos) * 16, y * 16, 16, 16);
+      if(t == 4) image(characterSetE.get(0x30), (i - scrollpos) * 16, y * 16, 16, 16);
+    }
+  }
 }
 
 int enemyType(int c)
@@ -143,34 +170,15 @@ int enemyType(int c)
 
 void setMap(int x, int y, int c)
 {
-  int ec = 0;
-
   if (c > 63) c += 64;
   map[scrollpos + x + (600 * y)] = (byte)c;
 
-  for (x = 0; x < 600; ++x) {
-    enemyidx[x] = (byte)0xff;
-    for (y = 0; y < 10; ++y) {
-      int etype = enemyType(map[x + (600 * y)]);
-      if (etype != -1) {
-        if (etype == 1 && y < 9 && ((map[x + (600 * (y+1))] & 0xff) == 0x96 || map[x + (600 * (y-1))] != 0x00))
-          etype = 2;
-
-        int ev = (etype << 4) + y;
-
-        enemydat[ec] = (byte)ev;
-        enemyidx[x] = (byte)ec;
-        ++ec;
-      }
-    }
-  }
+  updateEnemies();
 
   saveBytes("data/map.bin", map);
   saveBytes("data/enemyidx.bin", enemyidx);
   saveBytes("data/enemydat.bin", enemydat);
   saveBytes("data/charset.bin", getCharsetBytes());
-
-  println(ec);
 }
 
 int getMap(int x, int y)

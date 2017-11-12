@@ -25,11 +25,10 @@ byte[] getCharsetBytes()
 }
 
 
-void putchar(PImage target, byte[] charset, int c, int x, int y)
+void putchar(PImage target, byte[] charset, int c, int x, int y, color fg)
 {
   target.loadPixels();
 
-  color fg = color(0);
   color bg = color(255);
 
   y *= target.width;

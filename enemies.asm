@@ -175,7 +175,7 @@ stalfall:
     res     6,d
 
     and     %00000110
-    add     a,$20+1             ; start of mine sequence in char set
+    add     a,CH_STALACBASE+1
     ld      (hl),a
     ld      (de),a
     dec     a
@@ -188,7 +188,7 @@ stalfall:
 
     YIELD
 
-    ld      l,(iy+OUSER+0)      ; restore screen pointer
+    ld      l,(iy+OUSER+0)      ; restore screen pointers
     ld      h,(iy+OUSER+1)
 
     inc     (iy+OUSER+2)        ; only move when frame = 0
@@ -196,17 +196,23 @@ stalfall:
     and     7
     jr      nz,{-}
 
-    ld      de,600
-    add     hl,de
+    ld      d,h
+    ld      e,l
+    set     7,d
+    res     6,d
+
+    ld      bc,600
+    add     hl,bc
 
     ld      a,(hl)              ; are we about to hit some thing?
     and     a
     jr      z,{-}
 
-    sbc     hl,de
-    ld      (hl),0              ; yep - undraw & stop
-    sbc     hl,de
-    ld      (hl),0
+    ; yep, done
+    xor     a
+    sbc     hl,bc
+    ld      (hl),a              ; yep - undraw & stop
+    ld      (de),a              ; yep - undraw & stop
 
     DIE
 
@@ -523,7 +529,6 @@ depthchargeGenerator:
     DIE
 
 
-CH_DEPTHBASE = $98
 
 ; TODO - make x,y to screenpos function to share amongst objects
 ;        make function that creates & initialises object
@@ -546,10 +551,10 @@ _loop0:
 _loop1:
     ld      l,(iy+OUSER+3)
     ld      h,(iy+OUSER+4)
-    ld      (hl),$99
+    ld      (hl),CH_DEPTHBASE
     set     7,h
     res     6,h
-    ld      (hl),$99
+    ld      (hl),CH_DEPTHBASE
     YIELD
     inc     (iy+OUSER+5)
     bit     3,(iy+OUSER+5)
@@ -558,10 +563,10 @@ _loop1:
 _loop2:
     ld      l,(iy+OUSER+3)
     ld      h,(iy+OUSER+4)
-    ld      (hl),$9b
+    ld      (hl),CH_DEPTHBASE+1
     set     7,h
     res     6,h
-    ld      (hl),$9b
+    ld      (hl),CH_DEPTHBASE+1
     YIELD
     inc     (iy+OUSER+5)
     bit     3,(iy+OUSER+5)
@@ -582,3 +587,5 @@ _loop2:
     set     6,h
     or      a
     jr      z,_loop0
+
+    DIE

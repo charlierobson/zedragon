@@ -305,7 +305,7 @@ chkidx2 = $+5
     ld      c,(iy+0)                ; character cell content
     ld      a,(iy+0)                ; pixel collision data
     and     a                       ; clears carry
-    call    nz,testcollision        ; test the collision
+ ;   call    nz,testcollision        ; test the collision
     jr      c,collided
 
     inc     d
