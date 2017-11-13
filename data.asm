@@ -6,8 +6,8 @@
     CH_CHAIN        = $96
     CH_LASER        = $97
     CH_EXPLODEBASE  = $a0
-    CH_BULLET       = $be
-    CH_WATER        = $bf
+    CH_BULLET       = $ae
+    CH_WATER        = $af
 
     .asciimap ' ', '_', {*}-' '
 
@@ -185,19 +185,7 @@ flagframe:
 flaganimation:
 	.byte		$1e,$de, $1e,$dc, $1c,$dc, $1c,$de
 
-    .align  256
-subpix:
-    .incbin "prescrolledsubs.bin"
-
-enemyidx:
-    .incbin "enemyidx.bin"
-
-; needs to start on a 256 byte page boundary and be contained wholly within it
-;
-    .align  256
-enemydat:
-    .incbin "enemydat.bin"
-numenemy = $-enemydat
+    .align 256
 
 ; this needs to be wholly within a 256 byte page too
 ;

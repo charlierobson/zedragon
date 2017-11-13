@@ -25,8 +25,22 @@ end = int(roundup(start + mapstat.st_size))
 print(hex(start) + " - " + hex(end) + " : pure map")
 
 start = end
-end = start + 63*32
-print(hex(start) + " - " + hex(end) + " : ostore")
+end = start + 64*32
+print(hex(start) + " - " + hex(end) + " : ostore (32 objects)")
+
+start = end
+end = start + 256
+print(hex(start) + " - " + hex(end) + " : enemydat")
+
+start = end
+end = start + 3*8*8
+print(hex(start) + " - " + hex(end) + " : prescrolledsubs")
+
+start = end
+end = start + 600
+print(hex(start) + " - " + hex(end) + " : enemyidx")
+
+
 
 start = end
 remaining = 0x4000 - start

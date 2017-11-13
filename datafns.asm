@@ -1,3 +1,23 @@
+initmovedata:
+    ld      hl,enemydatx
+    ld      de,enemydat
+    ld      bc,enemydatxsz
+    ldir
+
+    ld      hl,enemyidxx
+    ld      de,enemyidx
+    ld      bc,enemyidxxsz
+    ldir
+
+    ld      hl,pssubs
+    ld      de,subpix
+    ld      bc,pssubssz
+    ldir
+
+    ret
+
+
+
 mulby600:
     sla     a
     add     a,mul600tab & 255

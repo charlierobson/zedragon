@@ -15,11 +15,25 @@ OSTORE   = $2d00
 D_MIRROR = D_BUFFER+$4000
 FREELIST = $8000
 CHARSETS = $9C00
+enemyidx = $36c0
+enemydat = $3500
+subpix   = $3600
 
 maplz:       .incbin "map.binlz"
 maplzsz  =    $-maplz
+
 charsetlz:	 .incbin "charset.binlz"
 charsetlzsz = $ - charsetlz
+
+enemydatx:	 .incbin "enemydat.bin"
+enemydatxsz = $ - enemydatx
+
+enemyidxx:	 .incbin "enemyidx.bin"
+enemyidxxsz = $ - enemyidxx
+
+pssubs:      .incbin "prescrolledsubs.bin"
+pssubssz    = $ - enemyidxx
+
     ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)
 	RET
@@ -34,6 +48,7 @@ starthere:
     call    golow
 
     call    initmap
+    call    initmovedata
     call    initostore
     call    initcharsets
     call    setupdisplay

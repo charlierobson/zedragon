@@ -36,7 +36,7 @@ refreshmap:
     ; Remove all 'busy'/'used' status bits from the enemy table.
     ;
 resetenemies:
-    ld      b,numenemy
+    ld      b,0
     ld      hl,enemydat
 
 -:  res     BIT_INACT,(hl)

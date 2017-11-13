@@ -1,3 +1,96 @@
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+    .module BULLET
+;
+    .align  8
+_obdata:
+    .byte   %11111111
+    .byte   %01111111
+    .byte   %00111111
+    .byte   %00011111
+    .byte   %00001111
+    .byte   %00000111
+    .byte   %00000011
+    .byte   %00000001
+
+bulletCount:
+    .byte   0
+
+
+startOBullet:
+    ld      bc,obullet
+    call    getobject
+    call    initobject
+    call    insertobject_afterthis
+    ret
+
+
+obullet:
+    ld      a,18
+
+    ld      hl,bulletCount
+    inc     (hl)
+
+_loop:
+    ld      (iy+OUSER+10),a
+    and     7
+    ld      hl,_obdata
+    or      l
+    ld      l,a
+    ld      a,(hl)
+    ld      (iy+OUSER+11),a         ; cache mask
+
+    ld      a,0 ;(hl)                  ; get character out of mirror map
+    ld      de,$23b0
+    call    copychar
+    ld      a,0 ;(hl)                  ; get character out of mirror map
+    ld      de,$23b8
+    call    copychar
+
+    ld      a,(iy+OUSER+11)
+    xor     $ff
+    ld      b,a
+    ld      a,($23b0)
+    and     b
+    ld      ($23b0),a
+
+    ld      a,(iy+OUSER+11)
+    ld      b,a
+    ld      a,($23b8)
+    and     b
+    ld      ($23b8),a
+
+    ld      hl,(scrollpos)
+    ld      a,(iy+OUSER+10)         ; pixel x pos
+    and     $f8
+    rrca                            ; / 8
+    rrca
+    rrca
+    add     a,l
+    ld      l,a
+    jr      nc,{+}
+    inc     h
++:  ld      a,3                     ; y character
+    call    mulby600
+    add     hl,de
+    ld      de,D_BUFFER
+    add     hl,de
+    ld      (hl),$b6
+    inc     hl
+    ld      (hl),$b7
+
+    YIELD
+
+    ld      a,(iy+OUSER+10)
+    inc     a
+    jr      nc,_loop
+
+    ld      hl,bulletCount
+    dec     (hl)
+
+    DIE
+
+
 bltdrawaddr:
     .word   0
 bltundrawchar:
@@ -80,10 +173,10 @@ updatebullets:
     inc     de
     ld      (bulletX),de
 
-    ld      de,$23f0            ; address of bullet buffer character, = char $bd
+    ld      de,$2370            ; address of bullet buffer character, = char $ae
     call    copychar
     ld      a,(bltyoff)
-    add     a,$f0
+    add     a,$2370 & $ff
     ld      l,a
     ld      h,d
 

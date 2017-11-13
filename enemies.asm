@@ -112,11 +112,11 @@ _starterator:
     ret
 
 
-    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    ;
-    ; consideration functions - return with carry set to go with
-    ; this object.
-    ;
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+; consideration functions - return with carry set to go with
+; this object.
+;
 considerdepth:          ; always starts
 considershooter:
 considerlaser:
@@ -139,10 +139,10 @@ considerstal:
     ret
 
 
-    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    ;
-    ; Return with carry set if x is off screen left
-    ;
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+; Return with carry set if x is off screen left
+;
 cIfOffscreenLeft:
     ld      l,(iy+OUSER+0)
     ld      h,(iy+OUSER+1)

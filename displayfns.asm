@@ -177,8 +177,8 @@ animatecharacters:
     ld      e,a
     add     hl,de
     ld      a,(hl)
-    ld      (UDG+$3ff),a
-    ld      (CHARSETS+$3ff),a
+    ld      (UDG+$37f),a
+    ld      (CHARSETS+$37f),a
 
     xor     a
 
