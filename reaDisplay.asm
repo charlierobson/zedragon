@@ -331,22 +331,32 @@ SOUNDFN = $+1
 
 +:	xor		$ff
 
-	ld		hl,$22b8		; character $97
+	ld		hl,$22b8			; character $97
+	ld		de,CHARSETS+$2b8
+
 	ld		(hl),a
+	ld		(de),a
 	inc		hl
 	ld		(hl),a
+	ld		(de),a
 	inc		hl
 	ld		(hl),a
+	ld		(de),a
 	inc		hl
 	ld		(hl),a
+	ld		(de),a
 	inc		hl
 	ld		(hl),a
+	ld		(de),a
 	inc		hl
 	ld		(hl),a
+	ld		(de),a
 	inc		hl
 	ld		(hl),a
+	ld		(de),a
 	inc		hl
 	ld		(hl),a
+	ld		(de),a
 
 	POP		HL
 	POP		DE

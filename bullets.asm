@@ -42,8 +42,6 @@ startbullet:
     and     7
     ld      (bltyoff),a
 
-    ld      a,(hl)
-    ld      (bltundrawchar),a   ; save sub's char as 1st undraw
     ld      (bltdrawaddr),hl    ; where bullet got drawn
 
     ld      a,(subx)            ; work out blt maximum lifespan
@@ -66,7 +64,11 @@ updatebullets:
     ld      (bltlife),a
 
     ld      hl,(bltdrawaddr)    ; remove old blt
-    ld      a,(bltundrawchar)
+    ld      d,h
+    ld      e,l
+    set     7,d
+    res     6,d
+    ld      a,(de)
     ld      (hl),a
 
     inc     hl                  ; calculate new position

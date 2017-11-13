@@ -509,9 +509,12 @@ offtab:
     ;
 depthchargeGenerator:
     YIELD
-    inc     (iy+OUSER+5)
-    ld      a,(iy+OUSER+5)
-    and     31
+    push    iy
+    pop     hl
+    ld      bc,OUSER+6
+    add     hl,bc
+    ld      c,39
+    call    updatecounter
     jr      nz,depthchargeGenerator
 
     ld      bc,depthcharge
@@ -632,7 +635,7 @@ _hittest:
     cp      b
     ret     c
 
-    pop     hl
+    pop     hl                  ; sink return address
 
     ; become explosion
 
@@ -662,10 +665,19 @@ laseremup:
     ld      de,D_BUFFER+600
     add     hl,de
 
+    ld      e,l
+    ld      d,h
+    set     7,d
+    res     6,d
+
     ld      bc,600
--:  ld      (hl),CH_LASER
+-:  ld      a,CH_LASER
+    ld      (hl),a
+    ld      (de),a
     add     hl,bc
     ld      a,(hl)
+    ex      de,hl
+    add     hl,bc
     or      a
     jr      z,{-}
 
