@@ -4,13 +4,22 @@
 ;    ...[mines][core][bullets][gamemain/attract][sub][explosions]...
 
 testmain:
-	ld		a,r
-	ld		(rng+1),a
+    ld      l,0
 
-    ld      hl,D_BUFFER
-    ld      de,D_MIRROR
-    ld      bc,6000
-    ldir
+-:  ld      (iy+OUSER),l
+    ld      h,0
+    ld      (scrollpos),hl
+    YIELD
+    ld      l,(iy+OUSER)
+    inc     l
+    ld      a,33
+    cp      l
+    jr      nz,{-}
+
+    ;
+
+    ld      a,r
+    ld      (rng+1),a
 
     ld      hl,testenemyidx
     ld      de,enemyidx
@@ -23,18 +32,26 @@ testmain:
 
     call    resetair
 
-    ld      bc,32
-    ld      (scrollpos),bc
+_testreset:
+    ld      hl,titlescreen
+    ld      de,D_MIRROR
+    call    LZ48_decrunch
+
+    ld      hl,D_MIRROR
+    ld      de,D_BUFFER
+    ld      bc,6000
+    ldir
+
     ld      a,32
     ld      (subx),a
     ld      (suby),a
-
-    call    resetmines
 
 	call	getobject
 	ld		bc,subfunction
 	call	initobject
 	call	insertobject_afterthis
+
+    call    resetenemies
 
 _aliveloop:
     ld      hl,(gameframe)
@@ -56,12 +73,11 @@ _aliveloop:
 
     ld      a,(collision)
     and     a
-    jp      z,_aliveloop
+    jr      z,_aliveloop
 
     ; sub's dead
 
-    xor     a
-    ld      (iy+OUSER),a
+    ld      (iy+OUSER),$80
 
 -:  call    updatebullets
 
@@ -73,7 +89,7 @@ _aliveloop:
     inc     (iy+OUSER)
     jr      nz,{-}
 
-    jp      _aliveloop
+    jr      _testreset
 
 
 testenemydat:

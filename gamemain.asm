@@ -44,7 +44,7 @@ resetafterdeath:
     ld      a,(hl)
     ld      (suby),a
 
-    call    resetmines
+    call    resetenemies
 
 	call	getobject
 	ld		bc,subfunction

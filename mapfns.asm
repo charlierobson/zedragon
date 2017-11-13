@@ -2,10 +2,8 @@
 
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
-    ; The map at 8k is known as the 'pure' map. it is used to reset
-    ; the collison map which shadows the display in upper memory. 
-    ;
-    ; copy the compressed map data somewhere safe for later
+    ; Copy the compressed map data to lower memory, where it will
+    ; be used to reset the display and mirror maps each level.
     ;
 initmap:
     ld      hl,maplz
@@ -17,8 +15,8 @@ initmap:
 
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
-    ; copy the pure map up to the mirror above 16k. copy the mirror
-    ; into the display file.
+    ; Deompress the map into the mirror display file above 16k,
+    ; and then memcpy that into the display file.
     ;
 refreshmap:
     ld      hl,PUREMAP
@@ -35,9 +33,9 @@ refreshmap:
 
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
-    ; remove any status bits from the enemy table
+    ; Remove all 'busy'/'used' status bits from the enemy table.
     ;
-resetmines:
+resetenemies:
     ld      b,numenemy
     ld      hl,enemydat
 
@@ -50,9 +48,10 @@ resetmines:
 
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
-    ; using a supplied method we will consider each of the enemies
-    ; currently on screen. if the consideration function returns
-    ; with C set, that enemy is considered as selected.
+    ; Consider each of the enemies currently on screen. HL contains
+    ; a pointer to a function which is used to consider each enemy.
+    ; If the consideration function returns with C set, then that
+    ; enemy is ready to run.
     ;
 findenemy:
     ld      (consideration),hl

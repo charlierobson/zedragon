@@ -189,7 +189,7 @@ testevery8:
     ; every 8 frames
 
     ld      hl,shooterframe
-    ld      c,5
+    ld      c,5                     ; 6 frames, 0..5 inclusive
     call    updatecounter
     ld      de,shooteranimation
     add     a,e
