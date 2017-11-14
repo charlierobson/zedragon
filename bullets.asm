@@ -2,8 +2,9 @@
 ;
     .module BULLET
 ;
+
     .align  8
-_obdata:
+obdata:
     .byte   %11111111
     .byte   %01111111
     .byte   %00111111
@@ -25,67 +26,125 @@ startOBullet:
     ret
 
 
+O_X = OUSER
+O_Y = OUSER+2
+O_UNDRAW = OUSER+3
+O_PIXX = OUSER+5
+O_PIXY = OUSER+6
+O_COY = OUSER+7
+O_MASK = OUSER+8
+
 obullet:
-    ld      a,18
+    ld      a,(suby)
+    add     a,4
+    ld      (iy+O_PIXY),a
+
+    and     7
+    or      $b0
+    ld      (iy+O_COY),a
+
+    ld      a,(subx)
+    add     a,16
 
     ld      hl,bulletCount
     inc     (hl)
 
 _loop:
-    ld      (iy+OUSER+10),a
+    ld      (iy+O_PIXX),a       ; calculate pixel mask using pixel x offset
+    push    af                  ; stash x pixel pos
     and     7
-    ld      hl,_obdata
+    ld      hl,obdata
     or      l
     ld      l,a
     ld      a,(hl)
-    ld      (iy+OUSER+11),a         ; cache mask
+    ld      (iy+O_MASK),a       ; cache mask
 
-    ld      a,0 ;(hl)                  ; get character out of mirror map
-    ld      de,$23b0
-    call    copychar
-    ld      a,0 ;(hl)                  ; get character out of mirror map
-    ld      de,$23b8
-    call    copychar
-
-    ld      a,(iy+OUSER+11)
-    xor     $ff
-    ld      b,a
-    ld      a,($23b0)
-    and     b
-    ld      ($23b0),a
-
-    ld      a,(iy+OUSER+11)
-    ld      b,a
-    ld      a,($23b8)
-    and     b
-    ld      ($23b8),a
-
+    ; target display position
+    pop     af                  ; recover x pixel pos
     ld      hl,(scrollpos)
-    ld      a,(iy+OUSER+10)         ; pixel x pos
     and     $f8
-    rrca                            ; / 8
+    rrca                        ; / 8
     rrca
     rrca
     add     a,l
     ld      l,a
     jr      nc,{+}
     inc     h
-+:  ld      a,3                     ; y character
++:  ld      a,(iy+O_PIXY)       ; calculate y character
+    and     $f8
+    rrca
+    rrca
+    rrca
     call    mulby600
-    add     hl,de
+    add     hl,de               ; char to screen pos
     ld      de,D_BUFFER
     add     hl,de
+    push    hl                  ; stash draw address
+    set     7,h                 ; get character out of mirror map
+    res     6,h
+    ld      a,(hl)
+    push    hl
+    ld      de,$23b0
+    call    copychar
+    pop     hl
+    inc     hl
+    ld      de,$23b8
+    call    copychar
+
+    ld      d,$23               ; 1st bullet character address is $23b0, PIXY is b0..b7
+    ld      e,(iy+O_COY)
+    ld      a,(iy+O_MASK)
+    push    af                  ; save pixel mask
+    xor     $ff
+    ld      b,a
+    ld      a,(de)
+    and     b
+    ld      (de),a
+
+    pop     bc                  ; recover pixel mask
+    ld      a,e                 ; next character address
+    or      8
+    ld      e,a
+    ld      a,(de)
+    and     b
+    ld      (de),a
+
+    ld      l,(iy+O_UNDRAW)     ; undraw trailing character of bullet
+    ld      h,(iy+O_UNDRAW+1)
+    push    hl
+    set     7,h
+    res     6,h
+    ld      a,(hl)
+    pop     hl
+    ld      (hl),a
+
+    pop     hl                  ; recover latest address
     ld      (hl),$b6
+    ld      (iy+O_UNDRAW),l     ; stash current address as last undraw
+    ld      (iy+O_UNDRAW+1),h
     inc     hl
     ld      (hl),$b7
 
     YIELD
 
-    ld      a,(iy+OUSER+10)
-    inc     a
-    jr      nc,_loop
+    ld      a,(iy+O_PIXX)       ; new position is off screen right
+    add     a,0
+    jp      nc,_loop
 
-    ld      hl,bulletCount
+    ld      l,(iy+O_UNDRAW)     ; undraw both bullet chars
+    ld      h,(iy+O_UNDRAW+1)
+    push    hl
+    set     7,h
+    res     6,h
+    ld      a,(hl)
+    inc     hl
+    ld      b,(hl)
+    pop     hl
+    ld      (hl),a
+    inc     hl
+    ld      (hl),b
+
+    ld      hl,bulletCount      ; die
     dec     (hl)
 
     DIE

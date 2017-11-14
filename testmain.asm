@@ -65,17 +65,16 @@ _aliveloop:
 
     call    enemyinitiator
 
-    ld      de,0
-    ld      (bulletHitX),de
-    call    updatebullets
-
-    call    startbullet
+;    ld      de,0
+;    ld      (bulletHitX),de
+;    call    updatebullets
+;    call    startbullet
 
     ld      a,(bulletCount)
     and     a
     call    z,startOBullet
 
-    call    showcols
+    ;call    showcols
 
     ld      a,(collision)
     and     a
