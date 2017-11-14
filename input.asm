@@ -4,7 +4,7 @@ kbin:
 
 readinput:
     call    $1ffe               ; get the joystick bits
-    or      %00000111
+    or      %00000111           ; we need some 1 bits for 'no joy' test
     ld      (LAST_J),a
 
     ld      de,kbin             ; read the keyboard, building a table at (de)
@@ -33,7 +33,7 @@ readinput:
 
 updateinputstate:
     ld      a,(hl)          ; input info table
-    ld      (uibittest),a   ; get opcode for j/s bit test
+    ld      (uibittest),a   ; get mask for j/s bit test
 
     inc     hl
     ld      a,(hl)          ; half-row index
@@ -42,16 +42,16 @@ updateinputstate:
     or      e
     ld      e,a             ; add offset to table
     ld      a,(de)          ; get key input bits
-    and     (hl)            ; result will be 0 if required key is down
+    and     (hl)            ; result will be a = 0 if required key is down
     inc     hl
-    jr      z,{+}           ; skip joystick read if pressed - h is 0
+    jr      z,{+}           ; skip joystick read if pressed
 
     ld      a,(LAST_J)
 
 +:  sla     (hl)            ; (key & 3) = 0 - not pressed, 1 - just pressed, 2 - just released and >3 - held
 
 uibittest = $+1
-    bit     0,a             ; if a key was already detected a will be 0 so this test succeeds
+    and     0               ; if a key was already detected a will be 0 so this test succeeds
     jr      nz,{+}          ; otherwise joystick bit is tested - skip if bit = 1 (not pressed)
 
     set     0,(hl)          ; signify impulse

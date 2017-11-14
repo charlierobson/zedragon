@@ -41,18 +41,8 @@ sfx:
 LAST_J:
 	.byte	0
 
-; btb = bit test byte = 2nd byte of bit N,a instruction
-btb0 = %01000111
-btb1 = %01001111
-btb2 = %01010111
-btb3 = %01011111
-btb4 = %01100111
-btb5 = %01101111
-btb6 = %01110111
-btb7 = %01111111
-
 ; -----  4  3  2  1  0
-;                       
+;
 ; $FE -  V, C, X, Z, SH   0
 ; $FD -  G, F, D, S, A    1
 ; $FB -  T, R, E, W, Q    2
@@ -62,19 +52,19 @@ btb7 = %01111111
 ; $BF -  H, J, K, L, NL   6
 ; $7F -  B, N, M, ., SP   7
 ;
-; joystick bit test opcode fragment,
+; joystick bit, or $ff/%11111111 for no joy
 ; key row offset 0-7,
-; key mask,
-; input impulse
+; key mask, or $ff/%11111111 for no key
+; trigger impulse
 
 inputstates:
-    .byte	btb7,2,%00000001,0        ; up      (Q)
-    .byte	btb6,1,%00000001,0        ; down    (A)
-    .byte	btb5,7,%00001000,0        ; left    (N)
-    .byte	btb4,7,%00000100,0        ; right   (M)
-    .byte	btb3,7,%00000001,0        ; fire    (SP)
-    .byte	btb0,3,%00000001,0        ; advance (1)
-    .byte	btb0,0,$00000101,0        ; quit    (SH-X)
+    .byte	%10000000,2,%00000001,0        ; up      (Q)
+    .byte	%01000000,1,%00000001,0        ; down    (A)
+    .byte	%00100000,7,%00001000,0        ; left    (N)
+    .byte	%00010000,7,%00000100,0        ; right   (M)
+    .byte	%00001000,7,%00000001,0        ; fire    (SP)
+    .byte	%11111111,3,%00000001,0        ; advance (1)
+    .byte	%11111111,0,$00000101,0        ; quit    (SH-X)
 
 ; calculate actual input impulse addresses
 up      = inputstates + 3
