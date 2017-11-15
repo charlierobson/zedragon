@@ -31,17 +31,12 @@ O_Y = OUSER+2
 O_UNDRAW = OUSER+3
 O_PIXX = OUSER+5
 O_PIXY = OUSER+6
-O_COY = OUSER+7
-O_MASK = OUSER+8
+O_MASK = OUSER+7
 
 obullet:
     ld      a,(suby)
     add     a,4
     ld      (iy+O_PIXY),a
-
-    and     7
-    or      $b0
-    ld      (iy+O_COY),a
 
     ld      a,(subx)
     add     a,16
@@ -83,16 +78,29 @@ _loop:
     set     7,h                 ; get character out of mirror map
     res     6,h
     ld      a,(hl)
+
+_scalc:
+    ld      a,(gameframe)       ; $23b0/b8 even frames, $23f0/f8 odd
+    and     1
+    rrca
+    rrca
+    or      $b0
+    ld      e,a
+    ld      d,$23
+    push    de
     push    hl
-    ld      de,$23b0
+
     call    copychar
     pop     hl
     inc     hl
-    ld      de,$23b8
     call    copychar
 
-    ld      d,$23               ; 1st bullet character address is $23b0, PIXY is b0..b7
-    ld      e,(iy+O_COY)
+    ld      a,(iy+O_PIXY)
+    and     7
+    pop     de
+    or      e
+    ld      e,a
+
     ld      a,(iy+O_MASK)
     push    af                  ; save pixel mask
     xor     $ff
@@ -118,17 +126,25 @@ _loop:
     pop     hl
     ld      (hl),a
 
+    ld      a,(gameframe)       ; $b6/b7 on even frames, $be/bf
+    and     1
+    rlca
+    rlca
+    rlca
+    add     a,$b6
+
     pop     hl                  ; recover latest address
-    ld      (hl),$b6
+    ld      (hl),a
     ld      (iy+O_UNDRAW),l     ; stash current address as last undraw
     ld      (iy+O_UNDRAW+1),h
     inc     hl
-    ld      (hl),$b7
+    inc     a
+    ld      (hl),a
 
     YIELD
 
     ld      a,(iy+O_PIXX)       ; new position is off screen right
-    add     a,0
+    add     a,1
     jp      nc,_loop
 
     ld      l,(iy+O_UNDRAW)     ; undraw both bullet chars
