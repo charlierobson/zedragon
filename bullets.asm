@@ -10,11 +10,11 @@ O_UNDRAW = OUSER+3
 
 obullet:
     ld      a,(iy+O_PIXY)
-    add     a,6
+    add     a,4
     ld      (iy+O_PIXY),a
 
     ld      a,(iy+O_PIXX)
-    add     a,16
+    add     a,12
 
     ld      hl,bulletCount
     inc     (hl)
@@ -108,12 +108,15 @@ _cf0:
     ld      a,$be
 _cf1:
     pop     hl                  ; recover latest address
+    ld      (bullet1sp),hl
+    ld      (bullet1ch),a
     ld      (hl),a
     ld      (iy+O_UNDRAW),l     ; stash current address as last undraw
     ld      (iy+O_UNDRAW+1),h
     inc     hl
     inc     a
     ld      (hl),a
+    ld      (bullet2sp),hl
 
     YIELD
 

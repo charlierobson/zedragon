@@ -1,6 +1,7 @@
 O_SUBX = OUSER+0          ; don't change
 O_SUBY = OUSER+1          ; don't change
-O_COLLTAB = OUSER+2
+O_PBULLET = OUSER+2
+O_COLLTAB = OUSER+4
 
 subfunction:
     ld      hl,$0000
@@ -119,7 +120,8 @@ _checkfire:
     call    getobject
     call    initobject
     call    insertobject_afterthis
-
+    ld      (iy+O_PBULLET),l
+    ld      (iy+O_PBULLET+1),h
     ld      a,(iy+O_SUBX)
     ld      (hl),a
     inc     hl
@@ -171,31 +173,31 @@ _subrender:
     push    hl
 
     ld      de,charcache        ; b0/b8
-    call    copychar
-    ld      (iy+O_COLLTAB),a        ; collision index 0, store character code
+    call    copycharx
+    ld      (iy+O_COLLTAB),a    ; collision index 0, store character code
 
     ld      de,charcache+16     ; ... char b2/ba
-    call    copychar
-    ld      (iy+O_COLLTAB+4),a      ; coll. idx. 2
+    call    copycharx
+    ld      (iy+O_COLLTAB+4),a  ; coll. idx. 2
 
     ld      de,charcache+32     ; b4/bc
-    call    copychar
-    ld      (iy+O_COLLTAB+8),a      ; c.i. 4
+    call    copycharx
+    ld      (iy+O_COLLTAB+8),a  ; c.i. 4
 
     pop     hl
     ld      bc,600
     add     hl,bc
 
     ld      de,charcache+8      ; b1/b9
-    call    copychar
+    call    copycharx
     ld      (iy+O_COLLTAB+2),a      ; c.i 1 
 
     ld      de,charcache+24     ; b3/bb
-    call    copychar
+    call    copycharx
     ld      (iy+O_COLLTAB+6),a      ; c.i 3
 
     ld      de,charcache+40     ; b5/bd
-    call    copychar
+    call    copycharx
     ld      (iy+O_COLLTAB+10),a     ; c.i 5
 
     ld      de,$2380
