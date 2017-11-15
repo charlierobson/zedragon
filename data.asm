@@ -115,6 +115,20 @@ bulletHitX:
 bulletHitY:
     .byte   0
 
+    .align  8
+obdata:
+    .byte   %11111111
+    .byte   %01111111
+    .byte   %00111111
+    .byte   %00011111
+    .byte   %00001111
+    .byte   %00000111
+    .byte   %00000011
+    .byte   %00000001
+
+bulletCount:
+    .byte   0
+
 ocount:
     .byte   0
 

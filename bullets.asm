@@ -3,26 +3,6 @@
     .module BULLET
 ;
 
-    .align  8
-obdata:
-    .byte   %11111111
-    .byte   %01111111
-    .byte   %00111111
-    .byte   %00011111
-    .byte   %00001111
-    .byte   %00000111
-    .byte   %00000011
-    .byte   %00000001
-
-bulletCount:
-    .byte   0
-
-
-startOBullet:
-c
-    ret
-
-
 O_PIXX = OUSER+0
 O_PIXY = OUSER+1
 O_MASK = OUSER+2
