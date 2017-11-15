@@ -31,6 +31,7 @@ gamemain:
 resetafterdeath:
     call    refreshmap
     call    resetair
+    call    resetenemies
 
     ld      hl,(restartPoint)
     ld      c,(hl)
@@ -38,18 +39,17 @@ resetafterdeath:
     ld      b,(hl)
     inc     hl
     ld      (scrollpos),bc
-    ld      a,(hl)
-    ld      (subx),a
-    inc     hl
-    ld      a,(hl)
-    ld      (suby),a
-
-    call    resetenemies
+    push    hl
 
 	call	getobject
 	ld		bc,subfunction
 	call	initobject
 	call	insertobject_afterthis
+
+    pop     de                      ; points to restart X,Y (pixel positions)
+    ex      de,hl                   ; de now points to sub's user data area
+    ldi
+    ldi
 
 aliveloop:
     ld      a,(advance)
@@ -116,15 +116,10 @@ aliveloop:
 
     ld      de,0
     ld      (bulletHitX),de
-    call    updatebullets
 
     ld      a,(FRAMES)              ; play ping sfx every so often
     and     127
     call    z,AFXPLAY
-
-    ld      a,(fire)
-    cp      1
-    call    z,startbullet
 
     ld      a,(collision)
     and     a

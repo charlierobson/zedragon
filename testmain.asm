@@ -42,14 +42,14 @@ _testreset:
     ld      bc,6000
     ldir
 
-    ld      a,32
-    ld      (subx),a
-    ld      (suby),a
-
 	call	getobject
 	ld		bc,subfunction
 	call	initobject
 	call	insertobject_afterthis
+
+    ld      (hl),32                     ; X
+    inc     hl
+    ld      (hl),32                     ; Y
 
     call    resetenemies
 
@@ -64,15 +64,6 @@ _aliveloop:
     YIELD
 
     call    enemyinitiator
-
-;    ld      de,0
-;    ld      (bulletHitX),de
-;    call    updatebullets
-;    call    startbullet
-
-    ld      a,(bulletCount)
-    and     a
-    call    z,startOBullet
 
     ;call    showcols
 

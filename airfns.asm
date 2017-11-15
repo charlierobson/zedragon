@@ -15,7 +15,7 @@ resetair:
 updateair:
     ld      hl,airupdatecounter
 
-    ld      a,(suby)
+    ld      a,6 ;(airflag)         ; sub's usage of air
     cp      6
     jr      nz,decreaseair
 

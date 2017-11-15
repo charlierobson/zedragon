@@ -1,3 +1,7 @@
+O_SUBX = OUSER+0          ; don't change
+O_SUBY = OUSER+1          ; don't change
+O_COLLTAB = OUSER+2
+
 subfunction:
     ld      hl,$0000
     ld      (subaddress),hl         ; we'll sink the first sub drawing into the ROM
@@ -58,7 +62,10 @@ substart:
     ; move sub
     ;
 
-    ld      hl,suby
+    push    iy
+    pop     hl
+    ld      de,O_SUBY
+    add     hl,de
 
     ld      a,(up)          ; min y = 6
     and     1
@@ -78,7 +85,10 @@ substart:
     jr      nc,{+}
     inc     (hl)
 
-+:  ld      hl,subx
++:  push    iy
+    pop     hl
+    ld      de,O_SUBX
+    add     hl,de
 
     ld      a,(left)        ; min x = 0
     and     1
@@ -90,26 +100,47 @@ substart:
 
 +:  ld      a,(right)       ; max x = 160
     and     1
-    jr      z,{+}
+    jr      z,_checkfire
     ld      a,(hl)
     cp      $a0
-    jr      nc,{+}
+    jr      nc,_checkfire
     inc     (hl)
+
+    ;
+    ; check fire
+    ;
+
+_checkfire:
+    ld      a,(fire)
+    cp      1
+    jr      nz,_subrender
+
+    ld      bc,obullet
+    call    getobject
+    call    initobject
+    call    insertobject_afterthis
+
+    ld      a,(iy+O_SUBX)
+    ld      (hl),a
+    inc     hl
+    ld      a,(iy+O_SUBY)
+    ld      (hl),a
 
     ;
     ; render sub
     ;
 
-+:  ; calculate address of sub in the map, relative to the current scroll position
+_subrender:
+    ; calculate address of sub in the map, relative to the current scroll position
 
-    ld      a,(subx)            ; pixel -> char conversion
+    ld      a,(iy+O_SUBX)       ; pixel -> char conversion
     srl     a
     srl     a
     srl     a
     ld      l,a
     ld      h,0
 
-    ld      a,(suby)            ; div by 8 to get character line then mul by 600
+    ld      a,(iy+O_SUBY)       ; div by 8 to get character line then mul by 600
     srl     a
     srl     a
     srl     a
@@ -141,15 +172,15 @@ substart:
 
     ld      de,charcache        ; b0/b8
     call    copychar
-    ld      (iy+OUSER),a        ; collision index 0, store character code
+    ld      (iy+O_COLLTAB),a        ; collision index 0, store character code
 
     ld      de,charcache+16     ; ... char b2/ba
     call    copychar
-    ld      (iy+OUSER+4),a      ; coll. idx. 2
+    ld      (iy+O_COLLTAB+4),a      ; coll. idx. 2
 
     ld      de,charcache+32     ; b4/bc
     call    copychar
-    ld      (iy+OUSER+8),a      ; c.i. 4
+    ld      (iy+O_COLLTAB+8),a      ; c.i. 4
 
     pop     hl
     ld      bc,600
@@ -157,15 +188,15 @@ substart:
 
     ld      de,charcache+8      ; b1/b9
     call    copychar
-    ld      (iy+OUSER+2),a      ; c.i 1 
+    ld      (iy+O_COLLTAB+2),a      ; c.i 1 
 
     ld      de,charcache+24     ; b3/bb
     call    copychar
-    ld      (iy+OUSER+6),a      ; c.i 3
+    ld      (iy+O_COLLTAB+6),a      ; c.i 3
 
     ld      de,charcache+40     ; b5/bd
     call    copychar
-    ld      (iy+OUSER+10),a     ; c.i 5
+    ld      (iy+O_COLLTAB+10),a     ; c.i 5
 
     ld      de,$2380
     ld      a,(gameframe)       ; even frames $2380, odd frames $23c0
@@ -181,12 +212,12 @@ substart:
     ;
 
     xor     a                   ; zero out collision bits
-    ld      (iy+OUSER+1),a
-    ld      (iy+OUSER+3),a
-    ld      (iy+OUSER+5),a
-    ld      (iy+OUSER+7),a
-    ld      (iy+OUSER+9),a
-    ld      (iy+OUSER+11),a
+    ld      (iy+O_COLLTAB+1),a
+    ld      (iy+O_COLLTAB+3),a
+    ld      (iy+O_COLLTAB+5),a
+    ld      (iy+O_COLLTAB+7),a
+    ld      (iy+O_COLLTAB+9),a
+    ld      (iy+O_COLLTAB+11),a
     ld      (collision),a
 
     ld      a,OUSER+1
@@ -197,7 +228,7 @@ substart:
     ;
     ; choose which set of 3 pre-scrolled sub tiles to use.
 
-    ld      a,(subx)        ; pixel offset 0..7
+    ld      a,(iy+O_SUBX)       ; pixel offset 0..7
     and     7
     ld      c,a
     add     a,a
@@ -213,7 +244,7 @@ substart:
     ld      l,a
 
     ld      de,(basecharptr)    ; pointer to 1st byte within column of 16 rows inside mini bitmap
-    ld      a,(suby)            ; that we will render to
+    ld      a,(IY+O_SUBY)       ; that we will render to
     and     7
     or      e
     ld      e,a
@@ -226,7 +257,7 @@ substart:
 
     ld      b,8             ; 8 lines
 
-    ld      a,(suby)        ; keep track of the row number that we're rendering into,
+    ld      a,(iy+O_SUBY)   ; keep track of the row number that we're rendering into,
     and     7               ; so that we can track collision data on a per character cell basis
     ld      (subrowoff),a
 
@@ -290,8 +321,8 @@ colidx2 = $+6
 
     YIELD
 
-    ld      d,OUSER
-    ld      e,OUSER+1
+    ld      d,O_COLLTAB
+    ld      e,O_COLLTAB+1
     ld      b,6
 
 -:  ld      a,d
@@ -399,41 +430,41 @@ showcols:
     ld      bc,32
     xor     a
     call    fillmem
-    ld      a,(iy+OUSER+0)
+    ld      a,(iy+O_COLLTAB+0)
     ld      de,TOP_LINE
     call    hexout
-    ld      a,(iy+OUSER+1)
+    ld      a,(iy+O_COLLTAB+1)
     ld      de,TOP_LINE+2
     call    hexout
-    ld      a,(iy+OUSER+2)
+    ld      a,(iy+O_COLLTAB+2)
     ld      de,TOP_LINE+5
     call    hexout
-    ld      a,(iy+OUSER+3)
+    ld      a,(iy+O_COLLTAB+3)
     ld      de,TOP_LINE+7
     call    hexout
-    ld      a,(iy+OUSER+4)
+    ld      a,(iy+O_COLLTAB+4)
     ld      de,TOP_LINE+10
     call    hexout
-    ld      a,(iy+OUSER+5)
+    ld      a,(iy+O_COLLTAB+5)
     ld      de,TOP_LINE+12
     call    hexout
 
-    ld      a,(iy+OUSER+6)
+    ld      a,(iy+O_COLLTAB+6)
     ld      de,TOP_LINE+15
     call    hexout
-    ld      a,(iy+OUSER+7)
+    ld      a,(iy+O_COLLTAB+7)
     ld      de,TOP_LINE+17
     call    hexout
-    ld      a,(iy+OUSER+8)
+    ld      a,(iy+O_COLLTAB+8)
     ld      de,TOP_LINE+20
     call    hexout
-    ld      a,(iy+OUSER+9)
+    ld      a,(iy+O_COLLTAB+9)
     ld      de,TOP_LINE+22
     call    hexout
-    ld      a,(iy+OUSER+10)
+    ld      a,(iy+O_COLLTAB+10)
     ld      de,TOP_LINE+25
     call    hexout
-    ld      a,(iy+OUSER+11)
+    ld      a,(iy+O_COLLTAB+11)
     ld      de,TOP_LINE+27
     call    hexout
 

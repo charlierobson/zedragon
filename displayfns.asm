@@ -232,22 +232,6 @@ scroll:
     ret
 
 
-showsubcoords:
-    ld      a,(subx)
-    ld      de,TOP_LINE+7
-    call    hexout
-    xor     a
-    ld      (de),a
-    ld      a,(suby)
-    call    hexout
-    xor     a
-    ld      (de),a
-    ld      a,(subx)
-    and     7
-    call    hexout
-    ret
-
-
 displayocount:
     ld      a,(ocount)
     ld      de,TOP_LINE

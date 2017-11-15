@@ -19,26 +19,21 @@ bulletCount:
 
 
 startOBullet:
-    ld      bc,obullet
-    call    getobject
-    call    initobject
-    call    insertobject_afterthis
+c
     ret
 
 
-O_X = OUSER
-O_Y = OUSER+2
+O_PIXX = OUSER+0
+O_PIXY = OUSER+1
+O_MASK = OUSER+2
 O_UNDRAW = OUSER+3
-O_PIXX = OUSER+5
-O_PIXY = OUSER+6
-O_MASK = OUSER+7
 
 obullet:
-    ld      a,(suby)
-    add     a,4
+    ld      a,(iy+O_PIXY)
+    add     a,6
     ld      (iy+O_PIXY),a
 
-    ld      a,(subx)
+    ld      a,(iy+O_PIXX)
     add     a,16
 
     ld      hl,bulletCount
@@ -182,7 +177,7 @@ startbullet:
     ld      a,4-1
     call    AFXPLAY
 
-    ld      a,(subx)
+    ld      a,(000000)
     add     a,8
     srl     a
     srl     a
@@ -196,7 +191,7 @@ startbullet:
     ld      hl,(subaddress)     ; we always draw bullet in front of sub
     inc     hl
 
-    ld      a,(suby)
+    ld      a,(000000)
     
     bit     2,a
     jr      z,{+}
@@ -211,7 +206,7 @@ startbullet:
 
     ld      (bltdrawaddr),hl    ; where bullet got drawn
 
-    ld      a,(subx)            ; work out blt maximum lifespan
+    ld      a,(00000)            ; work out blt maximum lifespan
     add     a,16
     neg
     srl     a

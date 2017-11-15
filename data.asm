@@ -85,10 +85,6 @@ scrollflags:
 gameframe:
     .word   0
 
-subx:
-    .byte   0
-suby:
-    .byte   0
 subaddress:
     .word   0
 oldsubaddress:
