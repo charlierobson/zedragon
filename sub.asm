@@ -54,7 +54,6 @@ substart:
     inc     a
     ld      (hl),a
 
-
     ;
     ; move sub
     ;

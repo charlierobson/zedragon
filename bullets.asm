@@ -82,10 +82,10 @@ _loop:
 _scalc:
     ld      a,(gameframe)       ; $23b0/b8 even frames, $23f0/f8 odd
     and     1
-    rrca
-    rrca
-    or      $b0
-    ld      e,a
+    ld      e,$b0
+    jr      z,_cf0
+    ld      e,$f0
+_cf0:
     ld      d,$23
     push    de
     push    hl
@@ -128,11 +128,10 @@ _scalc:
 
     ld      a,(gameframe)       ; $b6/b7 on even frames, $be/bf
     and     1
-    rlca
-    rlca
-    rlca
-    add     a,$b6
-
+    ld      a,$b6
+    jr      z,_cf1
+    ld      a,$be
+_cf1:
     pop     hl                  ; recover latest address
     ld      (hl),a
     ld      (iy+O_UNDRAW),l     ; stash current address as last undraw
