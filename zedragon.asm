@@ -89,6 +89,17 @@ fnmain:
     ld      (BUFF_OFFSET),hl
     call    waitvsync
 
+    ld      hl,bchar
+    ld      de,$23b0
+    ldi \ ldi
+    ldi \ ldi
+    ldi \ ldi
+    ldi \ ldi
+    ldi \ ldi
+    ldi \ ldi
+    ldi \ ldi
+    ldi \ ldi
+
     YIELD
 
     jr      fnmain

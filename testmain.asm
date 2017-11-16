@@ -75,9 +75,7 @@ _aliveloop:
 
     ld      (iy+OUSER),$80
 
--:  call    updatebullets
-
-    call    displayocount
+-:  call    displayocount
     xor     a
     ld      (ocount),a
     YIELD

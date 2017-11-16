@@ -293,24 +293,25 @@ bullet2sp:
 bullet1ch:
     .byte   0
 
+    .module COPYCHAR
+
 copycharx:
     ld      a,(bullet1sp)
     sub     l
-    jr      nz,tryp2
+    jr      nz,_tryp2
     ld      a,(bullet1sp+1)
     or      $80
     and     %10111111
     sub     h
-    jr      nz,tryp2
+    jr      nz,_tryp2
 
-    ld      a,UDG&255
-    ld      (csp),a
-    ld      a,UDG/256
-    ld      (csp+1),a
-    ld      a,(bullet1ch)
-    jr      copycharnl
+    push    af
+    inc     hl
+    push    hl
+    ld      hl,bchar
+    jp      _cpnquit
 
-tryp2:
+_tryp2:
     ld      a,(bullet2sp)
     sub     l
     jr      nz,copychar
@@ -320,47 +321,38 @@ tryp2:
     sub     h
     jr      nz,copychar
 
-    ld      a,UDG&255
-    ld      (csp),a
-    ld      a,UDG/256
-    ld      (csp+1),a
-    ld      a,(bullet1ch)
-    inc     a
-    jr      copycharnl
-
-csp:
-    .word   CHARSETS
+    push    af
+    inc     hl
+    push    hl
+    ld      hl,bchar+8
+    jp      _cpnquit
 
 copychar:
-    ld      a,CHARSETS&255
-    ld      (csp),a
-    ld      a,CHARSETS/256
-    ld      (csp+1),a
     ld      a,(hl)
-copycharnl:
     push    af
     inc     hl
     push    hl
 
     ld      hl,eightuffuffs    
     and     a
-    jr      z,{+}
+    jr      z,_cpnquit
 
-    ld      hl,(csp)
+    ld      hl,CHARSETS
     ld      b,0             ; prep to receive carry
     sla     a               ; if this char is +64 (codes $80..$c0) then C is set
     rr      b               ; 0, or $80 if this was a +64 char
     or      b               ; add bit 7 back into the function as bit 6 after a shift
     ld      b,0
     ld      c,a
-    rl      b
+    rl      b               ; bc * 8
     sla     c
     rl      b
     sla     c
     rl      b
     add     hl,bc
 
-:+  ldi \ ldi               ; copy pixel data to new character pointed at by DE
+_cpnquit:
+    ldi \ ldi               ; copy pixel data to new character pointed at by DE
     ldi \ ldi
     ldi \ ldi
     ldi \ ldi

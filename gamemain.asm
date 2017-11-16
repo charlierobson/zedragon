@@ -136,9 +136,7 @@ deadsub:
     ld      (lives),a
     call    showlives
 
--:  call    updatebullets
-
-    call    displayocount
+-:  call    displayocount
     xor     a
     ld      (ocount),a
     YIELD
