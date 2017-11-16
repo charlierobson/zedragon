@@ -68,44 +68,47 @@ _loop:
     res     6,h
 
     ld      de,bchar            ; copy characters into bullet render buffer
-    push    de
+    push    de                  ; stash pointer
     call    copychar
     ld      (iy+O_LCHAR),a      ; left character
     call    copychar
     ld      (iy+O_RCHAR),a      ; right character
 
+    ; source character data is inverted, as we only write into UDGs $80-$c0
+
     ld      a,(iy+O_PIXY)       ; vertical offset into bullet character
     and     7
-    pop     de
+    pop     de                  ; recover character data pointer
     or      e
     ld      e,a
-_nick:
-    ld      a,(iy+O_MASK)
-    push    af                  ; stash pixel mask
-    ld      c,a
-    xor     $ff
-    ld      b,a
-    ld      a,(de)              ; character bits
+
+    ld      a,(iy+O_MASK)       ; '00011111' for example, when bullet is at (x & 7) == 3
+    ld      c,a                 ; stash mask
+    xor     $ff                 ; why not store the mask inverted? you'll see .. ;)
+    ld      b,a                 ; '11100000'
+
+    ld      a,(de)              ; character bits - clear bits are black on-screen
     ld      l,a
     and     b
     ld      (de),a
-    ld      a,l                 ; left collision bits
-    and     c
-    ld      (iy+O_LCOLB),a
 
-    pop     bc                  ; recover pixel mask
+    ld      a,l                 ; calculate left collision bits
+    xor     $ff
+    and     c
+    ld      (iy+O_LCOLB),a      ; leave collided bits here for a minute
+
     ld      a,e                 ; next character address
     or      8
     ld      e,a
-    ld      a,b
-    ld      c,a
+
     ld      a,(de)
     ld      l,a
-    and     b
+    and     c                   ; '11100000' - the inverted mask is the remainder of the 8 pixel bullet
     ld      (de),a
-    ld      a,l
+
+    ld      a,l                 ; calculate right collision bits
     xor     $ff
-    and     c
+    and     b
     ld      (iy+O_RCOLB),a
 
     ; all rendered.
