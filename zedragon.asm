@@ -4,6 +4,9 @@
 #include "include/sysvars.asm"
 #include "include/zxline0.asm"
 
+.define ADD_DE_A add a,e \ ld e,a \ adc a,d \ sub e \ ld d,a
+.define ADD_HL_A add a,l \ ld l,a \ adc a,h \ sub l \ ld h,a
+
     .exportmode NO$GMB          ; xxxx:yyyy NAME
     .export
 

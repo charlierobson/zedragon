@@ -155,7 +155,7 @@ _loop:
     jr      z,_bulletdie
 
     ld      a,(iy+_SPEED)
-    cp      28
+    cp      8 ;28
     jr      z,{+}
 
     inc     a
@@ -186,7 +186,6 @@ _bulletdie:
     dec     (hl)
 
     DIE
-.define ADD_DE_A add a,e \ ld e,a \ adc a,d \ sub e \ ld d,a
 
 
 _collisioncheck:
@@ -196,6 +195,22 @@ _collisioncheck:
     or      a
     ret     z
 
+    cp      $30
+    jr      nc,_testenemy
+
+    ld      l,(iy+_UNDRAW)     ; remove enemy and bullet from mirror
+    ld      h,(iy+_UNDRAW+1)
+    inc     hl
+    push    hl
+    call    startexplosion      ; start an explosion
+    pop     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    inc     (iy+_COLNF)
+    ret
+
+_testenemy:
     ld      a,(iy+_PIXX)        ; convert pixel x of torpedo tip to map character x
     add     a,7
     and     $f8
@@ -219,12 +234,26 @@ _collisioncheck:
     cp      e
     ret     nz
 
+    set     7,(hl)              ; kill enemy
+
+    ld      l,(iy+_UNDRAW)     ; remove enemy and bullet from mirror
+    ld      h,(iy+_UNDRAW+1)
+    set     7,h
+    res     6,h
+    ld      (hl),0
+    inc     hl
+    ld      (hl),0
+
     inc     (iy+_COLNF)
     ret
 
 
 
-
+startexplosion:
+	call	getobject
+	ld		bc,explosion
+	call	initobject
+	jp      insertobject_afterthis
 
 
 
@@ -253,68 +282,3 @@ _dispcolls:
     ld      a,(iy+_RCOLB)
     ld      de,TOP_LINE+13
     jp      hexout
-
-
-
-
-endmine:
-    push    hl
-    push    de
-
-    ld      de,(bulletHitX)
-    ld      hl,enemyidx
-    add     hl,de
-    ld      e,(hl)
-    ld      d,enemydat / 256
-    ex      de,hl
-    set     BIT_INACT,(hl)
-
-    pop     de
-    pop     hl
-    and     a
-    ccf
-    ret
-
-
-bullethit:
-    ; a has the hit character, hl is the screen address
-    ; clear enemy from screen and mirror map
-    and     $f0
-    cp      $80
-    jr      nz,{+}
-
-    push    hl
-    push    hl
-
-    ld      (hl),0
-    res     6,h                 ; point hl at mapcache in high memory
-    set     7,h
-    ld      (hl),0
-
-    ; nullify mine
-    ld      hl,endmine          ; mark enemy as dead
-    call    findenemy
-
-	call	getobject
-	ld		bc,explosion
-	call	initobject
-	call	insertobject_afterthis
-    pop     de
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-
-	call	getobject
-	ld		bc,chaindrop
-	call	initobject
-	call	insertobject_afterthis
-    pop     de
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-
-+:  ld      de,(bulletX)
-    ld      (bulletHitX),de
-    ld      a,(bulletY)
-    ld      (bulletHitY),a
-    ret
