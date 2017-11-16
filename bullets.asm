@@ -3,28 +3,36 @@
     .module BULLET
 ;
 
-O_PIXX = OUSER+0
-O_PIXY = OUSER+1
-O_MASK = OUSER+2
-O_SPEED = OUSER+3
-O_LCOLB = OUSER+4
-O_RCOLB = OUSER+5
-O_LCHAR = OUSER+6
-O_RCHAR = OUSER+7
-O_UNDRAW = OUSER+8
+_PIXX = OUSER+0
+_PIXY = OUSER+1
+_MASK = OUSER+2
+_SPEED = OUSER+3
+_LCOLB = OUSER+4
+_RCOLB = OUSER+5
+_LCHAR = OUSER+6
+_RCHAR = OUSER+7
+_BCHAR = OUSER+8
+_COLNF = OUSER+9
+_UNDRAW = OUSER+10
 
     .align  16
 bchar:
     .fill   16
 
+allocbrender:
+    ld      de,bchar
+    ld      a,$b6
+    ret
+
+
 obullet:
-    ld      (iy+O_SPEED),0
+    ld      (iy+_SPEED),0
 
-    ld      a,(iy+O_PIXY)
+    ld      a,(iy+_PIXY)
     add     a,4
-    ld      (iy+O_PIXY),a
+    ld      (iy+_PIXY),a
 
-    ld      a,(iy+O_PIXX)
+    ld      a,(iy+_PIXX)
     add     a,12
 
     ld      hl,bulletCount
@@ -33,14 +41,14 @@ obullet:
 _loop:
     ; calculate pixel mask
 
-    ld      (iy+O_PIXX),a       ; pixel x offset
+    ld      (iy+_PIXX),a       ; pixel x offset
     push    af
     and     7
     ld      hl,obdata
     or      l
     ld      l,a
     ld      a,(hl)
-    ld      (iy+O_MASK),a       ; cache mask
+    ld      (iy+_MASK),a       ; cache mask
 
     ; calculate display position
 
@@ -54,7 +62,7 @@ _loop:
     ld      l,a
     jr      nc,{+}
     inc     h
-+:  ld      a,(iy+O_PIXY)       ; calculate y character
++:  ld      a,(iy+_PIXY)       ; calculate y character
     and     $f8
     rrca
     rrca
@@ -67,22 +75,23 @@ _loop:
     set     7,h                 ; point at background character in mirror map
     res     6,h
 
-    ld      de,bchar            ; copy characters into bullet render buffer
-    push    de                  ; stash pointer
+    call    allocbrender        ; get pointer to bullet udg slot in de
+    push    de                  ; stash for rendering
+    ld      (iy+_BCHAR),a       ; store returned character number
     call    copychar
-    ld      (iy+O_LCHAR),a      ; left character
+    ld      (iy+_LCHAR),a      ; left character
     call    copychar
-    ld      (iy+O_RCHAR),a      ; right character
+    ld      (iy+_RCHAR),a      ; right character
 
     ; source character data is inverted, as we only write into UDGs $80-$c0
 
-    ld      a,(iy+O_PIXY)       ; vertical offset into bullet character
+    ld      a,(iy+_PIXY)       ; vertical offset into bullet character
     and     7
     pop     de                  ; recover character data pointer
     or      e
     ld      e,a
 
-    ld      a,(iy+O_MASK)       ; '00011111' for example, when bullet is at (x & 7) == 3
+    ld      a,(iy+_MASK)       ; '00011111' for example, when bullet is at (x & 7) == 3
     ld      c,a                 ; stash mask
     xor     $ff                 ; why not store the mask inverted? you'll see .. ;)
     ld      b,a                 ; '11100000'
@@ -95,7 +104,7 @@ _loop:
     ld      a,l                 ; calculate left collision bits
     xor     $ff
     and     c
-    ld      (iy+O_LCOLB),a      ; leave collided bits here for a minute
+    ld      (iy+_LCOLB),a      ; leave collided bits here for a minute
 
     ld      a,e                 ; next character address
     or      8
@@ -109,12 +118,12 @@ _loop:
     ld      a,l                 ; calculate right collision bits
     xor     $ff
     and     b
-    ld      (iy+O_RCOLB),a
+    ld      (iy+_RCOLB),a
 
     ; all rendered.
 
-    ld      l,(iy+O_UNDRAW)     ; undraw trailing character of bullet
-    ld      h,(iy+O_UNDRAW+1)
+    ld      l,(iy+_UNDRAW)     ; undraw trailing character of bullet
+    ld      h,(iy+_UNDRAW+1)
     push    hl
     set     7,h
     res     6,h
@@ -124,49 +133,44 @@ _loop:
 
     pop     hl                  ; recover latest address
     ld      (bullet1sp),hl
-    ld      (hl),$b6
-    ld      (iy+O_UNDRAW),l     ; stash current address as last undraw
-    ld      (iy+O_UNDRAW+1),h
+    ld      a,(iy+_BCHAR)
+    ld      (hl),a
+    ld      (iy+_UNDRAW),l     ; stash current address as last undraw
+    ld      (iy+_UNDRAW+1),h
     inc     hl
-    ld      (hl),$b7
+    inc     a
+    ld      (hl),a
     ld      (bullet2sp),hl
 
     YIELD
 
     ; when we arrive back here the previously rendered bullet will be on screen
 
-    ld      a,(iy+O_LCHAR)
-    ld      de,TOP_LINE+4
-    call    hexout
-    ld      a,(iy+O_LCOLB)
-    ld      de,TOP_LINE+7
-    call    hexout
-    ld      a,(iy+O_RCHAR)
-    ld      de,TOP_LINE+10
-    call    hexout
-    ld      a,(iy+O_RCOLB)
-    ld      de,TOP_LINE+13
-    call    hexout
+    ld      c,(iy+_RCHAR)
+    ld      a,(iy+_RCOLB)
+    or      a
+    call    nz,_collisioncheck
 
-;    ld      a,(iy+O_SPEED)
-;    cp      28
-;    jr      z,{+}
-;
-;    inc     a
-;    ld      (iy+O_SPEED),a
-;
-;+:  srl     a
-;    srl     a
-;    add     a,(iy+O_PIXX)       ; until new position is off screen right
-    ld      a,(advance)
-    cp      1
-    ld      a,(iy+O_PIXX)
-    jp      nz,_loop
+    dec     (iy+_COLNF)
+    jr      z,_bulletdie
+
+    ld      a,(iy+_SPEED)
+    cp      28
+    jr      z,{+}
+
     inc     a
+    ld      (iy+_SPEED),a
+
++:  srl     a
+    srl     a
+    add     a,(iy+_PIXX)       ; until new position is off screen right
     jp      nc,_loop
 
-    ld      l,(iy+O_UNDRAW)     ; undraw both bullet chars
-    ld      h,(iy+O_UNDRAW+1)
+    ; off screen or collided, stop
+
+_bulletdie:
+    ld      l,(iy+_UNDRAW)     ; undraw both bullet chars
+    ld      h,(iy+_UNDRAW+1)
     push    hl
     set     7,h
     res     6,h
@@ -182,6 +186,73 @@ _loop:
     dec     (hl)
 
     DIE
+.define ADD_DE_A add a,e \ ld e,a \ adc a,d \ sub e \ ld d,a
+
+
+_collisioncheck:
+    ld      (iy+_COLNF),0
+
+    ld      a,c
+    or      a
+    ret     z
+
+    ld      a,(iy+_PIXX)        ; convert pixel x of torpedo tip to map character x
+    add     a,7
+    and     $f8
+    rrca
+    rrca
+    rrca
+    ld      de,(scrollpos)
+    ADD_DE_A
+    call    getenemy
+    and     a
+    ret     m
+
+    and     $0f                 ; enemy Y
+    ld      e,a
+
+    ld      a,(iy+_PIXY)        ; convert pixel y of torpedo to map row
+    and     $f8
+    rrca
+    rrca
+    rrca
+    cp      e
+    ret     nz
+
+    inc     (iy+_COLNF)
+    ret
+
+
+
+
+
+
+
+getenemy:
+    ld      hl,enemyidx
+    add     hl,de
+    ld      a,(hl)
+    cp      $ff
+    ret     z
+    ld      h,enemydat/256
+    ld      l,a
+    ld      a,(hl)
+    ret
+
+
+_dispcolls:
+    ld      a,(iy+_LCHAR)
+    ld      de,TOP_LINE+4
+    call    hexout
+    ld      a,(iy+_LCOLB)
+    ld      de,TOP_LINE+7
+    call    hexout
+    ld      a,(iy+_RCHAR)
+    ld      de,TOP_LINE+10
+    call    hexout
+    ld      a,(iy+_RCOLB)
+    ld      de,TOP_LINE+13
+    jp      hexout
 
 
 
