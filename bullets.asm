@@ -247,6 +247,7 @@ _testenemy:
     res     6,h
     ld      (hl),0
 
+
 _blow:
     call    getobject
     ld      bc,explosion
@@ -258,7 +259,6 @@ _blow:
     ld      (hl),d
     inc     (iy+_COLNF)
     ret
-
 
 
 _getenemy:
