@@ -145,6 +145,10 @@ _loop:
     YIELD
 
     ; when we arrive back here the previously rendered bullet will be on screen
+    ;call    _dispcolls
+    ;call    _checkadvance
+    ;ld      a,(iy+_PIXX)
+    ;jp      nz,_loop
 
     ld      c,(iy+_RCHAR)
     ld      a,(iy+_RCOLB)
@@ -188,6 +192,12 @@ _bulletdie:
     DIE
 
 
+_checkadvance:
+    ld      a,(advance)
+    cp      1
+    ret
+
+
 _collisioncheck:
     ld      (iy+_COLNF),0
 
@@ -200,15 +210,8 @@ _collisioncheck:
 
     ld      l,(iy+_UNDRAW)     ; remove enemy and bullet from mirror
     ld      h,(iy+_UNDRAW+1)
-    inc     hl
     push    hl
-    call    startexplosion      ; start an explosion
-    pop     de
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-    inc     (iy+_COLNF)
-    ret
+    jr      _blow
 
 _testenemy:
     ld      a,(iy+_PIXX)        ; convert pixel x of torpedo tip to map character x
@@ -236,28 +239,29 @@ _testenemy:
 
     set     7,(hl)              ; kill enemy
 
-    ld      l,(iy+_UNDRAW)     ; remove enemy and bullet from mirror
+    ld      l,(iy+_UNDRAW)     ; remove enemy from mirror
     ld      h,(iy+_UNDRAW+1)
+    inc     hl
+    push    hl
     set     7,h
     res     6,h
     ld      (hl),0
-    inc     hl
-    ld      (hl),0
 
+_blow:
+    call    getobject
+    ld      bc,explosion
+    call    initobject
+    call    insertobject_afterthis
+    pop     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
     inc     (iy+_COLNF)
     ret
 
 
 
-startexplosion:
-	call	getobject
-	ld		bc,explosion
-	call	initobject
-	jp      insertobject_afterthis
-
-
-
-getenemy:
+_getenemy:
     ld      hl,enemyidx
     add     hl,de
     ld      a,(hl)
