@@ -222,7 +222,7 @@ _testenemy:
     rrca
     ld      de,(scrollpos)
     ADD_DE_A
-    call    getenemy
+    call    _getenemy
     and     a
     ret     m
 
