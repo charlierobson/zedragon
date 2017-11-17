@@ -155,7 +155,7 @@ _loop:
     jr      z,_bulletdie
 
     ld      a,(iy+_SPEED)
-    cp      8 ;28
+    cp      28
     jr      z,{+}
 
     inc     a
@@ -198,7 +198,7 @@ _collisioncheck:
     cp      $30
     jr      nc,_testenemy
 
-    ld      l,(iy+_UNDRAW)     ; remove enemy and bullet from mirror
+    ld      l,(iy+_UNDRAW)
     ld      h,(iy+_UNDRAW+1)
     inc     hl
     push    hl
@@ -238,11 +238,19 @@ _testenemy:
 
     ld      l,(iy+_UNDRAW)     ; remove enemy and bullet from mirror
     ld      h,(iy+_UNDRAW+1)
+    push    hl
     set     7,h
     res     6,h
     ld      (hl),0
     inc     hl
     ld      (hl),0
+
+    call    startexplosion      ; start an explosion
+    pop     de
+    inc     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
 
     inc     (iy+_COLNF)
     ret
