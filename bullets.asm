@@ -35,6 +35,10 @@ obullet:
     ld      a,(iy+_PIXX)
     add     a,12
 
+    ld      hl,D_BUFFER-2
+    ld      (iy+_UNDRAW),l
+    ld      (iy+_UNDRAW+1),h
+
     ld      hl,bulletCount
     inc     (hl)
 
@@ -128,10 +132,14 @@ _loop:
     set     7,h
     res     6,h
     ld      a,(hl)
+    inc     hl
+    ld      b,(hl)
     pop     hl
     ld      (hl),a
+    inc     hl
+    ld      (hl),b
 
-    pop     hl                  ; recover latest address
+    pop     hl                  ; recover draw address
     ld      (bullet1sp),hl
     ld      a,(iy+_BCHAR)
     ld      (hl),a
@@ -195,22 +203,23 @@ _collisioncheck:
     or      a
     ret     z
 
-    cp      $30
-    jr      nc,_testenemy
-
-    ld      l,(iy+_UNDRAW)
-    ld      h,(iy+_UNDRAW+1)
-    inc     hl
-    push    hl
-    call    startexplosion      ; start an explosion
-    pop     de
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
     inc     (iy+_COLNF)
-    ret
 
-_testenemy:
+    cp      $30
+    ret      c
+
+    ; we've hit scenery
+
+;    ld      l,(iy+_UNDRAW)
+;    ld      h,(iy+_UNDRAW+1)
+;    inc     hl
+;    push    hl
+;    call    startexplosion      ; start an explosion
+;    pop     de
+;    ld      (hl),e
+;    inc     hl
+;    ld      (hl),d
+
     ld      a,(iy+_PIXX)        ; convert pixel x of torpedo tip to map character x
     add     a,7
     and     $f8
@@ -219,6 +228,8 @@ _testenemy:
     rrca
     ld      de,(scrollpos)
     ADD_DE_A
+    ld      (bulletHitX),de
+
     call    getenemy
     and     a
     ret     m
@@ -252,7 +263,6 @@ _testenemy:
     inc     hl
     ld      (hl),d
 
-    inc     (iy+_COLNF)
     ret
 
 

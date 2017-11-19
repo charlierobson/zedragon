@@ -106,7 +106,7 @@ aliveloop:
     ld      a,12
     call    AFXPLAY
 
-+:  call    displayocount
++:  ;;call    displayocount
     xor     a
     ld      (ocount),a
     YIELD

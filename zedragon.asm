@@ -35,7 +35,7 @@ enemyidxx:	 .incbin "enemyidx.bin"
 enemyidxxsz = $ - enemyidxx
 
 pssubs:      .incbin "prescrolledsubs.bin"
-pssubssz    = $ - enemyidxx
+pssubssz    = $ - pssubs
 
     ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)
