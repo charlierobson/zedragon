@@ -27,7 +27,7 @@ testmain:
     ldir
     ld      hl,testenemydat
     ld      de,enemydat
-    ld      bc,10
+    ld      bc,16
     ldir
 
     call    resetair

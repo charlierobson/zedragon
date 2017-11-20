@@ -116,6 +116,10 @@ _checkfire:
     cp      1
     jr      nz,_subrender
 
+    ld      a,(bulletCount)
+    or      a
+    jr      nz,_subrender
+
     ld      bc,obullet
     call    getobject
     call    initobject
