@@ -206,19 +206,9 @@ _collisioncheck:
     inc     (iy+_COLNF)
 
     cp      $30
-    ret      c
+    ret      c                  ; we've hit scenery
 
-    ; we've hit scenery
-
-;    ld      l,(iy+_UNDRAW)
-;    ld      h,(iy+_UNDRAW+1)
-;    inc     hl
-;    push    hl
-;    call    startexplosion      ; start an explosion
-;    pop     de
-;    ld      (hl),e
-;    inc     hl
-;    ld      (hl),d
+    ; enemy, probably
 
     ld      a,(iy+_PIXX)        ; convert pixel x of torpedo tip to map character x
     add     a,7
@@ -228,7 +218,7 @@ _collisioncheck:
     rrca
     ld      de,(scrollpos)
     ADD_DE_A
-    ld      (bulletHitX),de
+    ld      (bulletHitX),de     ; let any object enemies know there's been a collision
 
     call    getenemy
     and     a
@@ -247,7 +237,7 @@ _collisioncheck:
 
     set     7,(hl)              ; kill enemy
 
-    ld      l,(iy+_UNDRAW)     ; remove enemy and bullet from mirror
+    ld      l,(iy+_UNDRAW)     ; remove enemy from mirror and screen
     ld      h,(iy+_UNDRAW+1)
     push    hl
     set     7,h
@@ -259,6 +249,16 @@ _collisioncheck:
     call    startexplosion      ; start an explosion
     pop     de
     inc     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+
+    push    de
+    call	getobject
+	ld		bc,chaindrop
+	call	initobject
+	call    insertobject_afterthis
+    pop     de
     ld      (hl),e
     inc     hl
     ld      (hl),d
