@@ -126,7 +126,7 @@ _loop:
 
     ; all rendered.
 
-    ld      l,(iy+_UNDRAW)     ; undraw trailing character of bullet
+    ld      l,(iy+_UNDRAW)     ; undraw bullet
     ld      h,(iy+_UNDRAW+1)
     push    hl
     set     7,h
@@ -237,27 +237,32 @@ _collisioncheck:
 
     set     7,(hl)              ; kill enemy
 
-    ld      l,(iy+_UNDRAW)     ; remove enemy from mirror and screen
+    ld      l,(iy+_UNDRAW)      ; remove enemy from mirror
     ld      h,(iy+_UNDRAW+1)
-    push    hl
+    inc     hl                  ; always explode at the tip
+    push    hl                  ; stash for explosion
     set     7,h
     res     6,h
-    ld      (hl),0
-    inc     hl
-    ld      (hl),0
-
+    ld      a,(hl)              ; note what we're overwriting
+    ld      (hl),0              ; zero enemy site in mirror
+    push    af
     call    startexplosion      ; start an explosion
+    pop     af
     pop     de
-    inc     de
     ld      (hl),e
     inc     hl
     ld      (hl),d
 
+    cp      CH_MINE             ; did we just pop a mine?
+    ret     nz
+
+    ; mine popped, so potentially drop the chain
+
     push    de
-    call	getobject
-	ld		bc,chaindrop
-	call	initobject
-	call    insertobject_afterthis
+    call    getobject
+    ld      bc,chaindrop
+    call    initobject
+    call    insertobject_afterthis
     pop     de
     ld      (hl),e
     inc     hl
@@ -268,10 +273,10 @@ _collisioncheck:
 
 
 startexplosion:
-	call	getobject
-	ld		bc,explosion
-	call	initobject
-	jp      insertobject_afterthis
+    call    getobject
+    ld      bc,explosion
+    call    initobject
+    jp      insertobject_afterthis
 
 
 
