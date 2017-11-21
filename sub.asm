@@ -1,14 +1,15 @@
+    .module SUB
+
 O_SUBX = OUSER+0          ; don't change
 O_SUBY = OUSER+1          ; don't change
-O_PBULLET = OUSER+2
-O_COLLTAB = OUSER+4
+O_COLLTAB = OUSER+2
 
 subfunction:
     ld      hl,$0000
     ld      (subaddress),hl         ; we'll sink the first sub drawing into the ROM
     ld      (oldsubaddress),hl
 
-substart:
+_substart:
     ; undraw the old sub
 
     ld      hl,(oldsubaddress)      ; point hl into clean map
@@ -36,14 +37,8 @@ substart:
     add     hl,de
     ld      (oldsubaddress),de
 
-    ld      a,(gameframe)           ; $b0 even frames, $b8 odd frames
-    and     1
-    ld      a,$b0
-    jr      nz,{+}                  ; we're a frame ahead, remember ;)
-
-    ld      a,$b8
-
-+:  ld      (de),a
+    ld      a,$b0           ; b0 b2 b4
+    ld      (de),a          ; b1 b3 b5
     inc     a
     inc     de
     ld      (hl),a
@@ -124,8 +119,6 @@ _checkfire:
     call    getobject
     call    initobject
     call    insertobject_afterthis
-    ld      (iy+O_PBULLET),l
-    ld      (iy+O_PBULLET+1),h
     ld      a,(iy+O_SUBX)
     ld      (hl),a
     inc     hl
@@ -164,27 +157,27 @@ _subrender:
     ; find the character codes that appear under the sub in its new position
     ; use the map cache as the code source because the display is dirty at this point
     ; copy the pixel data corresponding to the characters under the sub
-    ; to a new group of 3x2 characters - effectively a tiny bitmap
+    ; to a cache of 6x8 bytes - effectively a tiny bitmap
     ;
-    ; on-screen (even frames)  (odd  frames)
-    ;            $b0 $b2 $b4    $b8 $ba $bc
-    ;            $b1 $b3 $b5    $b9 $bb $bd
+    ; on-screen:  $b0 $b2 $b4
+    ;             $b1 $b3 $b5
     ;
-    ; it's like this because the rendering of the sub char is easier using columns
+    ; it's arranged like this because the rendering of the sub char is
+    ; easier using columns, even if it makes other things harder.
 
     res     6,h                 ; point hl at mapcache in high memory
     set     7,h                 ; hl is source pointer for character data
     push    hl
 
-    ld      de,charcache        ; b0/b8
+    ld      de,charcache        ; b0
     call    copycharx
     ld      (iy+O_COLLTAB),a    ; collision index 0, store character code
 
-    ld      de,charcache+16     ; ... char b2/ba
+    ld      de,charcache+16     ; ... char b2
     call    copycharx
     ld      (iy+O_COLLTAB+4),a  ; coll. idx. 2
 
-    ld      de,charcache+32     ; b4/bc
+    ld      de,charcache+32     ; b4
     call    copycharx
     ld      (iy+O_COLLTAB+8),a  ; c.i. 4
 
@@ -192,30 +185,20 @@ _subrender:
     ld      bc,600
     add     hl,bc
 
-    ld      de,charcache+8      ; b1/b9
+    ld      de,charcache+8      ; b1
     call    copycharx
     ld      (iy+O_COLLTAB+2),a      ; c.i 1 
 
-    ld      de,charcache+24     ; b3/bb
+    ld      de,charcache+24     ; b3
     call    copycharx
     ld      (iy+O_COLLTAB+6),a      ; c.i 3
 
-    ld      de,charcache+40     ; b5/bd
+    ld      de,charcache+40     ; b5
     call    copycharx
     ld      (iy+O_COLLTAB+10),a     ; c.i 5
 
-    ld      de,$2380
-    ld      a,(gameframe)       ; even frames $2380, odd frames $23c0
-    and     1
-    jr      z,{+}
-    ld      e,$c0
-+:  ld      (basecharptr),de
-
-    ld      hl,charcache        ; copy chars into charset
-    ld      bc,48
-    ldir
-
-    ;
+    ; ok, we'll simplify here for a minute but we need to actually do the
+    ; screen chars update after vsync otherwise we'll be flickering
 
     xor     a                   ; zero out collision bits
     ld      (iy+O_COLLTAB+1),a
@@ -226,7 +209,7 @@ _subrender:
     ld      (iy+O_COLLTAB+11),a
     ld      (collision),a
 
-    ld      a,OUSER+1
+    ld      a,O_COLLTAB
     ld      (subcoloff),a
 
     ; now we've effectively built our tiny bitmap and cleared out the collision bits,
@@ -249,7 +232,7 @@ _subrender:
     ld      h,subpix / 256      ; form address in character set $22xx
     ld      l,a
 
-    ld      de,(basecharptr)    ; pointer to 1st byte within column of 16 rows inside mini bitmap
+    ld      de,charcache        ; pointer to 1st byte within column of 16 rows inside mini bitmap
     ld      a,(IY+O_SUBY)       ; that we will render to
     and     7
     or      e
@@ -342,7 +325,7 @@ chkidx2 = $+5
     ld      a,(iy+0)                ; pixel collision data
     and     a                       ; clears carry
     call    nz,testcollision        ; test the collision
-    jr      c,collided
+    jr      c,_subdead
 
     inc     d
     inc     d
@@ -354,11 +337,11 @@ chkidx2 = $+5
 
     ld      a,(airlevel)
     and     a
-    jp      nz,substart
+    jp      nz,_substart
 
     ; sub is dead, explo-o-o-o-ode
 
-collided:
+_subdead:
     ld      a,1
     ld      (collision),a
 
@@ -387,6 +370,7 @@ collided:
 
     DIE
 
+    .align 16
 charcache:
     .fill   48
 

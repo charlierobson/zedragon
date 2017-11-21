@@ -92,20 +92,23 @@ fnmain:
     ld      (BUFF_OFFSET),hl
     call    waitvsync
 
+    ; copy sub into charset
+    ld      hl,charcache
+    ld      de,$2380
+    ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi       ; 2380-238f
+    ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi 
+    ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi       ; 2390-239f
+    ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi 
+    ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi       ; 23a0-23af
+    ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi 
+
     ld      hl,bchar
-    ld      de,$23b0
-    ldi \ ldi
-    ldi \ ldi
-    ldi \ ldi
-    ldi \ ldi
-    ldi \ ldi
-    ldi \ ldi
-    ldi \ ldi
-    ldi \ ldi
+    ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi       ; 23b0-23bf
+    ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi \ ldi 
 
     YIELD
 
-    jr      fnmain
+    jp      fnmain
 
 
 #include "attract.asm"

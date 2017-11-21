@@ -89,10 +89,6 @@ subaddress:
     .word   0
 oldsubaddress:
     .word   0
-bgchardata:
-	.byte	0,0,0,0,0,0
-basecharptr:
-    .word   0
 
 lives:
     .byte   0

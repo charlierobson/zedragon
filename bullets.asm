@@ -177,6 +177,10 @@ _loop:
     ; off screen or collided, stop
 
 _bulletdie:
+    ld      hl,0
+    ld      (bullet1sp),hl
+    ld      (bullet2sp),hl
+
     ld      l,(iy+_UNDRAW)     ; undraw both bullet chars
     ld      h,(iy+_UNDRAW+1)
     push    hl

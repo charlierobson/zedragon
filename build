@@ -1,4 +1,3 @@
-ls tools/mapper/data/* .
 cp tools/mapper/data/* .
 
 tools/lz48 -i map.bin -o map.binlz
