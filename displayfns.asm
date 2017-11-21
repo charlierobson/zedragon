@@ -300,8 +300,8 @@ copycharx:
     sub     l
     jr      nz,_tryp2
     ld      a,(bullet1sp+1)
-    or      $80
-    and     %10111111
+    set     7,a
+    res     6,a
     sub     h
     jr      nz,_tryp2
 
@@ -316,8 +316,8 @@ _tryp2:
     sub     l
     jr      nz,copychar
     ld      a,(bullet2sp+1)
-    or      $80
-    and     %10111111
+    set     7,a
+    res     6,a
     sub     h
     jr      nz,copychar
 
