@@ -1,8 +1,8 @@
     .module SUB
 
-O_SUBX = OUSER+0          ; don't change
-O_SUBY = OUSER+1          ; don't change
-O_COLLTAB = OUSER+2
+_SUBX = OUSER+0          ; don't change
+_SUBY = OUSER+1          ; don't change
+_COLLTAB = OUSER+2
 
 subfunction:
     ld      hl,$0000
@@ -60,7 +60,7 @@ _substart:
 
     push    iy
     pop     hl
-    ld      de,O_SUBY
+    ld      de,_SUBY
     add     hl,de
 
     ld      a,(up)          ; min y = 6
@@ -83,7 +83,7 @@ _substart:
 
 +:  push    iy
     pop     hl
-    ld      de,O_SUBX
+    ld      de,_SUBX
     add     hl,de
 
     ld      a,(left)        ; min x = 0
@@ -119,10 +119,10 @@ _checkfire:
     call    getobject
     call    initobject
     call    insertobject_afterthis
-    ld      a,(iy+O_SUBX)
+    ld      a,(iy+_SUBX)
     ld      (hl),a
     inc     hl
-    ld      a,(iy+O_SUBY)
+    ld      a,(iy+_SUBY)
     ld      (hl),a
 
     ;
@@ -132,14 +132,14 @@ _checkfire:
 _subrender:
     ; calculate address of sub in the map, relative to the current scroll position
 
-    ld      a,(iy+O_SUBX)       ; pixel -> char conversion
+    ld      a,(iy+_SUBX)       ; pixel -> char conversion
     srl     a
     srl     a
     srl     a
     ld      l,a
     ld      h,0
 
-    ld      a,(iy+O_SUBY)       ; div by 8 to get character line then mul by 600
+    ld      a,(iy+_SUBY)       ; div by 8 to get character line then mul by 600
     srl     a
     srl     a
     srl     a
@@ -171,15 +171,15 @@ _subrender:
 
     ld      de,charcache        ; b0
     call    copycharx
-    ld      (iy+O_COLLTAB),a    ; collision index 0, store character code
+    ld      (iy+_COLLTAB),a     ; collision index 0, store character code
 
     ld      de,charcache+16     ; ... char b2
     call    copycharx
-    ld      (iy+O_COLLTAB+4),a  ; coll. idx. 2
+    ld      (iy+_COLLTAB+4),a   ; coll. idx. 2
 
     ld      de,charcache+32     ; b4
     call    copycharx
-    ld      (iy+O_COLLTAB+8),a  ; c.i. 4
+    ld      (iy+_COLLTAB+8),a   ; c.i. 4
 
     pop     hl
     ld      bc,600
@@ -187,29 +187,29 @@ _subrender:
 
     ld      de,charcache+8      ; b1
     call    copycharx
-    ld      (iy+O_COLLTAB+2),a      ; c.i 1 
+    ld      (iy+_COLLTAB+2),a   ; c.i 1 
 
     ld      de,charcache+24     ; b3
     call    copycharx
-    ld      (iy+O_COLLTAB+6),a      ; c.i 3
+    ld      (iy+_COLLTAB+6),a   ; c.i 3
 
     ld      de,charcache+40     ; b5
     call    copycharx
-    ld      (iy+O_COLLTAB+10),a     ; c.i 5
+    ld      (iy+_COLLTAB+10),a  ; c.i 5
 
     ; ok, we'll simplify here for a minute but we need to actually do the
     ; screen chars update after vsync otherwise we'll be flickering
 
     xor     a                   ; zero out collision bits
-    ld      (iy+O_COLLTAB+1),a
-    ld      (iy+O_COLLTAB+3),a
-    ld      (iy+O_COLLTAB+5),a
-    ld      (iy+O_COLLTAB+7),a
-    ld      (iy+O_COLLTAB+9),a
-    ld      (iy+O_COLLTAB+11),a
+    ld      (iy+_COLLTAB+1),a
+    ld      (iy+_COLLTAB+3),a
+    ld      (iy+_COLLTAB+5),a
+    ld      (iy+_COLLTAB+7),a
+    ld      (iy+_COLLTAB+9),a
+    ld      (iy+_COLLTAB+11),a
     ld      (collision),a
 
-    ld      a,O_COLLTAB
+    ld      a,_COLLTAB
     ld      (subcoloff),a
 
     ; now we've effectively built our tiny bitmap and cleared out the collision bits,
@@ -217,7 +217,7 @@ _subrender:
     ;
     ; choose which set of 3 pre-scrolled sub tiles to use.
 
-    ld      a,(iy+O_SUBX)       ; pixel offset 0..7
+    ld      a,(iy+_SUBX)        ; pixel offset 0..7
     and     7
     ld      c,a
     add     a,a
@@ -233,12 +233,12 @@ _subrender:
     ld      l,a
 
     ld      de,charcache        ; pointer to 1st byte within column of 16 rows inside mini bitmap
-    ld      a,(IY+O_SUBY)       ; that we will render to
+    ld      a,(iy+_SUBY)        ; that we will render to
     and     7
     or      e
     ld      e,a
 
-    ld      b,3             ; 3 characters
+    ld      b,3                 ; 3 characters
 
 --: push    bc
 
@@ -246,7 +246,7 @@ _subrender:
 
     ld      b,8             ; 8 lines
 
-    ld      a,(iy+O_SUBY)   ; keep track of the row number that we're rendering into,
+    ld      a,(iy+_SUBY)   ; keep track of the row number that we're rendering into,
     and     7               ; so that we can track collision data on a per character cell basis
     ld      (subrowoff),a
 
@@ -310,8 +310,8 @@ colidx2 = $+6
 
     YIELD
 
-    ld      d,O_COLLTAB
-    ld      e,O_COLLTAB+1
+    ld      d,_COLLTAB
+    ld      e,_COLLTAB+1
     ld      b,6
 
 -:  ld      a,d
@@ -324,7 +324,7 @@ chkidx2 = $+5
     ld      c,(iy+0)                ; character cell content
     ld      a,(iy+0)                ; pixel collision data
     and     a                       ; clears carry
-    call    nz,testcollision        ; test the collision
+    call    nz,_testcollision        ; test the collision
     jr      c,_subdead
 
     inc     d
@@ -358,12 +358,12 @@ _subdead:
     ld      h,a
     ld      (exploptr),hl
 
-    call    subsubexplo
-    call    subsubexplo
-    call    subsubexplo
-    call    subsubexplo
-    call    subsubexplo
-    call    subsubexplo
+    call    _subsubexplo
+    call    _subsubexplo
+    call    _subsubexplo
+    call    _subsubexplo
+    call    _subsubexplo
+    call    _subsubexplo
 
     ld      a,12-1
     call    AFXPLAY
@@ -374,7 +374,7 @@ _subdead:
 charcache:
     .fill   48
 
-testcollision:
+_testcollision:
     ld      a,c
     and     a
     ret     z
@@ -382,7 +382,7 @@ testcollision:
     ret
 
 
-subsubexplo:
+_subsubexplo:
     ld      hl,(exploptr)
     ld      e,(hl)
     inc     hl
@@ -420,41 +420,41 @@ showcols:
     ld      bc,32
     xor     a
     call    fillmem
-    ld      a,(iy+O_COLLTAB+0)
+    ld      a,(iy+_COLLTAB+0)
     ld      de,TOP_LINE
     call    hexout
-    ld      a,(iy+O_COLLTAB+1)
+    ld      a,(iy+_COLLTAB+1)
     ld      de,TOP_LINE+2
     call    hexout
-    ld      a,(iy+O_COLLTAB+2)
+    ld      a,(iy+_COLLTAB+2)
     ld      de,TOP_LINE+5
     call    hexout
-    ld      a,(iy+O_COLLTAB+3)
+    ld      a,(iy+_COLLTAB+3)
     ld      de,TOP_LINE+7
     call    hexout
-    ld      a,(iy+O_COLLTAB+4)
+    ld      a,(iy+_COLLTAB+4)
     ld      de,TOP_LINE+10
     call    hexout
-    ld      a,(iy+O_COLLTAB+5)
+    ld      a,(iy+_COLLTAB+5)
     ld      de,TOP_LINE+12
     call    hexout
 
-    ld      a,(iy+O_COLLTAB+6)
+    ld      a,(iy+_COLLTAB+6)
     ld      de,TOP_LINE+15
     call    hexout
-    ld      a,(iy+O_COLLTAB+7)
+    ld      a,(iy+_COLLTAB+7)
     ld      de,TOP_LINE+17
     call    hexout
-    ld      a,(iy+O_COLLTAB+8)
+    ld      a,(iy+_COLLTAB+8)
     ld      de,TOP_LINE+20
     call    hexout
-    ld      a,(iy+O_COLLTAB+9)
+    ld      a,(iy+_COLLTAB+9)
     ld      de,TOP_LINE+22
     call    hexout
-    ld      a,(iy+O_COLLTAB+10)
+    ld      a,(iy+_COLLTAB+10)
     ld      de,TOP_LINE+25
     call    hexout
-    ld      a,(iy+O_COLLTAB+11)
+    ld      a,(iy+_COLLTAB+11)
     ld      de,TOP_LINE+27
     call    hexout
 
