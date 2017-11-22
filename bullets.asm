@@ -207,10 +207,13 @@ _collisioncheck:
     or      a
     ret     z
 
+    cp      $90
+    ret     nc                  ; no hit, carry on
+
     inc     (iy+_COLNF)
 
     cp      $30
-    ret      c                  ; we've hit scenery
+    ret      c                  ; we've hit scenery, just stop
 
     ; enemy, probably
 

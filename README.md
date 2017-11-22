@@ -1,17 +1,27 @@
 # zedragon
-ZX81 (with UDG) conversion of Russ Wetmore's classic atari game Sea Dragon
+ZX81 conversion of Russ Wetmore's classic atari game Sea Dragon
+
+## Additional Hardware Requirements
+
+RAM at 8-40K : Chroma / ZXPand / ZXpand+
+UDG : UDG-For-ZXpand / CHR$128 mod
+
+Joystick : Kempston / Chroma / ZXpand+ / ZXpand-AY
+Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
+
 
 ### TODO
 * ~~lasers~~
 * ~~stalactites~~
 * ~~shooters~~
 * ~~depth charges~~
-* pixel movement torpedos
+* ~~pixel movement torpedos~~
 * score
 * final boss
 
 ### IN PROGRESS
-* pixel movement torpedos
+* sub collisions
+* collision tuning
 
 ### ONGOING
 * map cleanup
@@ -20,6 +30,7 @@ ZX81 (with UDG) conversion of Russ Wetmore's classic atari game Sea Dragon
 * ship parts left behind when reversing
 * explosion parts left behind sometimes
 * crash when ship goes into line 9
+* ~~chain sometimes doesn't fall~~
 * ~~laser graphically interferes with bullet~~
 * sub collisions broken
 

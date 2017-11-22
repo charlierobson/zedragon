@@ -1,3 +1,5 @@
+    .module FX
+
 SFX_EXPLODE = 8-1
 
 explosion:
@@ -40,26 +42,31 @@ becomeexplosion:
 
 
 chaindrop:
+    ld      (iy+OUSER+3),7
+
+_chainloop:
     YIELD
-    YIELD
-    YIELD
-    YIELD
+    dec     (iy+OUSER+3)
+    jr      nz,_chainloop
+
+    ld      (iy+OUSER+3),7
 
     ld      e,(iy+OUSER)
     ld      d,(iy+OUSER+1)
     ld      hl,600
     add     hl,de
-
+    set     7,h
+    res     6,h
     ld      a,(hl)
     cp      CH_CHAIN
     jr      z,{+}
 
     DIE
 
-+:  ld      (iy+OUSER),l
++:  ld      (hl),0
+    res     7,h
+    set     6,h
+    ld      (hl),0
+    ld      (iy+OUSER),l
     ld      (iy+OUSER+1),h
-    ld      (hl),0
-    set     7,h
-    res     6,h
-    ld      (hl),0
-    jr      chaindrop
+    jr      _chainloop
