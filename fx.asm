@@ -39,17 +39,15 @@ becomeexplosion:
     DIE
 
 
-
+    .module CHAIN
 
 chaindrop:
     ld      (iy+OUSER+3),7
 
-_chainloop:
+_chainwait:
     YIELD
     dec     (iy+OUSER+3)
-    jr      nz,_chainloop
-
-    ld      (iy+OUSER+3),7
+    jr      nz,_chainwait
 
     ld      e,(iy+OUSER)
     ld      d,(iy+OUSER+1)
@@ -69,4 +67,4 @@ _chainloop:
     ld      (hl),0
     ld      (iy+OUSER),l
     ld      (iy+OUSER+1),h
-    jr      _chainloop
+    jr      chaindrop
