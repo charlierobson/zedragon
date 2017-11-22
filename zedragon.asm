@@ -12,15 +12,18 @@
 
 D_BUFFER = $
 
-UDG      = $2000
-PUREMAP  = $2600
-OSTORE   = $2d00
-D_MIRROR = D_BUFFER+$4000
-FREELIST = $8000
-CHARSETS = $9C00
-enemyidx = $36c0
-enemydat = $3500
-subpix   = $3600
+UDG         = $2000
+PUREMAP     = $2600
+OSTORE      = $2d00
+enemydat    = $3500
+subpix      = $3600
+enemyidx    = $36c0
+
+FREELIST    = $8000
+D_MIRROR    = $808a
+CHARSETS    = $97fa
+DRAWLIST_0  = $9c00
+DRAWLIST_1  = $9e00
 
 maplz:       .incbin "map.binlz"
 maplzsz  =    $-maplz
