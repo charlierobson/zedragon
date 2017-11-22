@@ -305,6 +305,7 @@ copycharx:
     sub     h
     jr      nz,_tryp2
 
+; should this be from mirror or 0?
     push    af
     inc     hl
     push    hl
@@ -321,6 +322,7 @@ _tryp2:
     sub     h
     jr      nz,copychar
 
+; should this be from mirror or 0?
     push    af
     inc     hl
     push    hl
