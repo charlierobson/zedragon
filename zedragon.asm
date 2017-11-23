@@ -95,6 +95,8 @@ fnmain:
     ld      (BUFF_OFFSET),hl
     call    waitvsync
 
+    call    updatescreen
+
     ; copy sub into charset
     ld      hl,charcache
     ld      de,$2380

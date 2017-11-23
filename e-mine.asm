@@ -23,7 +23,8 @@ minearise:
 
     xor     a
 
--:  ld      (iy+OUSER),l        ; screen pointer
+_loop:
+    ld      (iy+OUSER),l        ; screen pointer
     ld      (iy+OUSER+1),h
     ld      (iy+OUSER+2),a      ; counter
     ld      d,h
@@ -31,18 +32,21 @@ minearise:
     set     7,d
     res     6,d
 
+    ; always draw before the yield
+    ; check collisions after
+
     and     %00001100
     rrca
-    add     a,CH_MINEBASE+1             ; start of mine sequence in char set
-    ld      (hl),a
+    add     a,CH_MINEBASE+1
     ld      (de),a
+    call    char2dlist
     dec     a
     ld      bc,600
     add     hl,bc
+    call    char2dlist
     ex      de,hl
     add     hl,bc
     ld      (hl),a
-    ld      (de),a
 
     YIELD
 
@@ -65,7 +69,7 @@ _scc:
     inc     (iy+OUSER+2)        ; only move mine up when frame = 0
     ld      a,(iy+OUSER+2)
     and     15
-    jr      nz,{-}
+    jr      nz,_loop
 
     dec     (iy+OUSER+3)        ; explode when mine hits the top
     jr      z,_gobang
@@ -76,29 +80,23 @@ _scc:
 
     ld      a,(hl)              ; are we about to hit some thing?
     and     a
-    jr      z,{-}
+    jr      z,_loop
 
     cp      $30                 ; some solid thing?
-    jr      nc,{-}
+    jr      nc,_loop
 
     ; all done - become an explosion
 
 _gobang:
-    ld      l,(iy+OUSER)        ; remove characters from the screen
+    ld      l,(iy+OUSER)        ; remove characters from the mirror
     ld      h,(iy+OUSER+1)
-    ld      d,h
-    ld      e,l
-    set     7,d
-    res     6,d
+    set     7,h
+    res     6,h
     xor     a
     ld      (hl),a
-    ld      (de),a
     ld      bc,600
     add     hl,bc
-    ex      de,hl
-    add     hl,bc
     ld      (hl),a
-    ld      (de),a
 
     ld      (iy+OUSER+2),a      ; swap to explosion coroutine
     jp      becomeexplosion

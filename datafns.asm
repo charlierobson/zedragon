@@ -26,6 +26,7 @@ mulby600:
     ret
 
 
+
 updatecounter:
     inc     c           ; the reset value is bumped
     ld      a,(hl)
@@ -35,6 +36,7 @@ updatecounter:
 +:  dec     a           ; the dec is always performed which is why reset value was bumped
     ld      (hl),a
     ret                 ; we return with Z set when the counter has reached zero
+
 
 
 rng:
