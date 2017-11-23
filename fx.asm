@@ -1,6 +1,16 @@
     .module FX
 
-SFX_EXPLODE = 8-1
+_SCRPOS = OUSER
+_SCRADDL = OUSER
+_SCRADDH = OUSER+1
+_COUNTER = OUSER+2
+
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+; explosion
+;
+
+SFX_EXPLODE = 7
 
 explosion:
     ld      a,(FRAMES)
@@ -10,9 +20,10 @@ explosion:
 
     xor     a
 
--:  ld      (iy+OUSER+2),a
-    ld      l,(iy+OUSER)
-    ld      h,(iy+OUSER+1)
+_exploop:
+    ld      (iy+_COUNTER),a
+    ld      l,(iy+_SCRADDL)
+    ld      h,(iy+_SCRADDH)
 
     sra     a
     sra     a
@@ -21,50 +32,56 @@ explosion:
 
     YIELD
 
-becomeexplosion:
-    ld      a,(iy+OUSER+2)
+becomeexplosion:                ; entry point for objects wishing to become explosions
+    ld      a,(iy+_COUNTER)
     inc     a
     cp      28
-    jr      nz,{-}
+    jr      nz,_exploop
 
-    ld      l,(iy+OUSER)        ; clear explosion from the screen
-    ld      h,(iy+OUSER+1)
+    ld      l,(iy+_SCRADDL)     ; clear explosion from the screen
+    ld      h,(iy+_SCRADDH)
     push    hl
+
     set     7,h                 ; look into the mirror map to get replacement char
     res     6,h
     ld      a,(hl)
+
     pop     hl
-    ld      (hl),a
+    ld      (hl),a              ; remove from display
 
     DIE
 
 
-    .module CHAIN
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+; chain dropper
+;
 
 chaindrop:
-    ld      (iy+OUSER+3),7
+    set     7,(iy+_SCRADDH)
+    res     6,(iy+_SCRADDH)
 
-_chainwait:
+_loop:
+    ld      (iy+_COUNTER),7
+
+_wait:
     YIELD
-    dec     (iy+OUSER+3)
-    jr      nz,_chainwait
+    dec     (iy+_COUNTER)
+    jr      nz,_wait
 
-    ld      e,(iy+OUSER)
-    ld      d,(iy+OUSER+1)
-    ld      hl,600
+    ld      l,(iy+_SCRADDL)
+    ld      h,(iy+_SCRADDH)
+    ld      de,600
     add     hl,de
-    set     7,h
-    res     6,h
-    ld      a,(hl)
+    ld      a,(hl)              ; chain in the mirror?
     cp      CH_CHAIN
-    jr      z,{+}
+    DIENZ
 
-    DIE
-
-+:  ld      (hl),0
-    res     7,h
-    set     6,h
-    ld      (hl),0
+    ld      (hl),0              ; remove from mirror
     ld      (iy+OUSER),l
     ld      (iy+OUSER+1),h
-    jr      chaindrop
+
+    res     7,h
+    set     6,h
+    ld      (hl),0              ; remove from display
+    jr      _loop

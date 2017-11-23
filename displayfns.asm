@@ -375,8 +375,7 @@ elp:
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	;
-	; register a character to be drawn at the start of the next
-    ; frame.
+	; get a pointer to the next free slot in the drawlist in de
 	;
 getdlp:
     ld      de,(dlp)
@@ -390,6 +389,11 @@ getdlp:
     ret
 
 
+	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	;
+	; put a character draw request in the drawlist. address is in
+    ; hl, character in a
+	;
 char2dlist:
     push    de
     push    hl
@@ -429,8 +433,10 @@ updatescreen:
     dec     l
     jr      z,_draw             ; skip undraw if list empty
 
-    ld      b,l                 ; low byte contains count * 3
+    ld      b,l                 ; low byte contains count * 3, offset of first free item
     ld      l,0                 ; reset pointer to start of list
+
+    ; undraw old
 
 _eraloop:
     ld      e,(hl)              ; character address
@@ -445,7 +451,7 @@ _eraloop:
     pop     de                  ; recover display pointer
     ld      (de),a
 
-    ld      a,l
+    ld      a,l                 ; b = loop counter / offset of last draw item
     cp      b
     jr      nz,_eraloop
 
@@ -457,7 +463,7 @@ _draw:
     dec     l
     jr      z,_swap
 
-    ld      b,l                 ; low byte contains count
+    ld      b,l                 ; low byte contains count * 3, offset of first free item
     ld      l,0                 ; reset pointer to start of list
 
 _drwloop:

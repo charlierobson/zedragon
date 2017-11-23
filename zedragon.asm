@@ -116,12 +116,12 @@ fnmain:
     jp      fnmain
 
 
+#include "ostore.asm"
+#include "input.asm"
 #include "attract.asm"
 #include "gamemain.asm"
 #include "testmain.asm"
 #include "fx.asm"
-#include "ostore.asm"
-#include "input.asm"
 #include "sub.asm"
 #include "bullets.asm"
 #include "enemies.asm"
