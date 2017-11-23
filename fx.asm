@@ -28,7 +28,7 @@ _exploop:
     sra     a
     sra     a
     add     a,CH_EXPLODEBASE
-    ld      (hl),a
+    call    char2dlist
 
     YIELD
 
@@ -37,17 +37,6 @@ becomeexplosion:                ; entry point for objects wishing to become expl
     inc     a
     cp      28
     jr      nz,_exploop
-
-    ld      l,(iy+_SCRADDL)     ; clear explosion from the screen
-    ld      h,(iy+_SCRADDH)
-    push    hl
-
-    set     7,h                 ; look into the mirror map to get replacement char
-    res     6,h
-    ld      a,(hl)
-
-    pop     hl
-    ld      (hl),a              ; remove from display
 
     DIE
 
@@ -58,7 +47,7 @@ becomeexplosion:                ; entry point for objects wishing to become expl
 ;
 
 chaindrop:
-    set     7,(iy+_SCRADDH)
+    set     7,(iy+_SCRADDH)     ; work in mirror domain
     res     6,(iy+_SCRADDH)
 
 _loop:
@@ -77,11 +66,13 @@ _wait:
     cp      CH_CHAIN
     DIENZ
 
-    ld      (hl),0              ; remove from mirror
+    xor     a                   ; also used in char2dlist
+
+    ld      (hl),a              ; remove from mirror
     ld      (iy+OUSER),l
     ld      (iy+OUSER+1),h
 
     res     7,h
     set     6,h
-    ld      (hl),0              ; remove from display
+    call    char2dlist
     jr      _loop

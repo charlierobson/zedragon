@@ -27,15 +27,15 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * map cleanup
 
 ### BUGS
-* ship parts left behind when reversing
-* explosion parts left behind sometimes
+* ~~ship parts left behind when reversing~~
+* ~~explosion parts left behind sometimes~~
 * crash when ship goes into line 9
 * ~~chain sometimes doesn't fall~~
 * ~~laser graphically interferes with bullet~~
 * sub collisions broken
 
 ### NICE TO HAVE
-* inter-screen wipes - may also help with enemy resets like depth chargers
+* inter-screen wipes
 * control customisation
 * high score saving
 * other udg boards
