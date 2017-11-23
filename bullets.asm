@@ -150,6 +150,9 @@ _loop:
     ld      (hl),a
     ld      (bullet2sp),hl
 
+    ld      hl,0
+    ld      (bulletHitX),hl ; WRONG PLACE
+
     YIELD
 
     ; when we arrive back here the previously rendered bullet will be on screen
@@ -226,6 +229,8 @@ _collisioncheck:
     ld      de,(scrollpos)
     ADD_DE_A
     ld      (bulletHitX),de     ; let any object enemies know there's been a collision
+    ld      a,(iy+_PIXY)
+    ld      (bulletHitY),a
 
     call    getenemy
     and     a

@@ -131,7 +131,7 @@ _hittest:
     sbc     hl,de
     ret     nz
 
-    ld      a,(bulletY)         ; check if bullet is either side of the charge
+    ld      a,(bulletHitY)         ; check if bullet is either side of the charge
     ld      b,a
 
     ld      a,(iy+OUSER+2)

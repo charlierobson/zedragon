@@ -104,8 +104,6 @@ subcoloff:
     .byte   0
 bulletX:
     .word   0
-bulletY:
-    .byte   0
 bulletHitX:
     .word   0
 bulletHitY:
