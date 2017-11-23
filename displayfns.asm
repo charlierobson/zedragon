@@ -427,9 +427,9 @@ updatescreen:
     ld      hl,(elp)            ; erase list pointer
     inc     l
     dec     l
-    jr      z,_draw
+    jr      z,_draw             ; skip undraw if list empty
 
-    ld      b,l                 ; low byte contains count
+    ld      b,l                 ; low byte contains count * 3
     ld      l,0                 ; reset pointer to start of list
 
 _eraloop:
@@ -444,7 +444,10 @@ _eraloop:
     ld      a,(de)              ; get undraw char
     pop     de                  ; recover display pointer
     ld      (de),a
-    djnz    _eraloop
+
+    ld      a,l
+    cp      b
+    jr      nz,_eraloop
 
     ; draw new
 
@@ -465,7 +468,10 @@ _drwloop:
     ld      a,(hl)
     inc     hl
     ld      (de),a
-    djnz    _drwloop
+
+    ld      a,l                 ; b = loop counter / offset of last draw item
+    cp      b
+    jr      nz,_drwloop
 
 _swap:
     ld      de,(elp)            ; swap draw and erase list pointers

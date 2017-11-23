@@ -3,30 +3,35 @@
     .module MINE
 ;
 
+_SCRPOS = OUSER
+_COUNTER = OUSER+2
+_YPOS = OUSER+3
+_XPOS = OUSER+4
+
 minearise:
     ld      a,5
     call    AFXPLAY
 
-    ld      l,(iy+OUSER)        ; hl = x
-    ld      h,(iy+OUSER+1)
-    ld      a,(iy+OUSER+2)      ; = y
+    ld      l,(iy+_SCRPOS+0)        ; hl = x
+    ld      h,(iy+_SCRPOS+1)
+    ld      a,(iy+_COUNTER)         ; = y
     dec     a
 
-    ld      (iy+OUSER+3),a      ; keep X & (adjusted) Y around for various comparisons
-    ld      (iy+OUSER+4),l
-    ld      (iy+OUSER+5),h
+    ld      (iy+_YPOS),a          ; keep X & (adjusted) Y around for various comparisons
+    ld      (iy+_XPOS+0),l
+    ld      (iy+_XPOS+1),h
 
     call    mulby600
-    add     hl,de               ; hl = x + 600 * (y-1)
+    add     hl,de                   ; hl = x + 600 * (y-1)
     ld      de,D_BUFFER
     add     hl,de
 
     xor     a
 
 _loop:
-    ld      (iy+OUSER),l        ; screen pointer
-    ld      (iy+OUSER+1),h
-    ld      (iy+OUSER+2),a      ; counter
+    ld      (iy+_SCRPOS+0),l        ; screen pointer
+    ld      (iy+_SCRPOS+1),h
+    ld      (iy+_COUNTER),a      ; counter
     ld      d,h
     ld      e,l
     set     7,d
@@ -56,22 +61,22 @@ _loop:
     or      h
     jr      z,_scc              ; skip column check if no x position reported
 
-    ld      e,(iy+OUSER+4)      ; column check
-    ld      d,(iy+OUSER+5)
+    ld      e,(iy+_XPOS+0)      ; column check
+    ld      d,(iy+_XPOS+1)
     and     a
     sbc     hl,de
     jr      z,_gobang
 
 _scc:
-    ld      l,(iy+OUSER+0)      ; restore screen pointer
-    ld      h,(iy+OUSER+1)
+    ld      l,(iy+_SCRPOS+0)      ; restore screen pointer
+    ld      h,(iy+_SCRPOS+1)
 
-    inc     (iy+OUSER+2)        ; only move mine up when frame = 0
-    ld      a,(iy+OUSER+2)
+    inc     (iy+_COUNTER)        ; only move mine up when frame = 0
+    ld      a,(iy+_COUNTER)
     and     15
     jr      nz,_loop
 
-    dec     (iy+OUSER+3)        ; explode when mine hits the top
+    dec     (iy+_YPOS)        ; explode when mine hits the top
     jr      z,_gobang
 
     ld      de,600              ; move mine up
@@ -88,8 +93,8 @@ _scc:
     ; all done - become an explosion
 
 _gobang:
-    ld      l,(iy+OUSER)        ; remove characters from the mirror
-    ld      h,(iy+OUSER+1)
+    ld      l,(iy+_SCRPOS+0)        ; remove characters from the mirror
+    ld      h,(iy+_SCRPOS+1)
     set     7,h
     res     6,h
     xor     a
@@ -98,6 +103,6 @@ _gobang:
     add     hl,bc
     ld      (hl),a
 
-    ld      (iy+OUSER+2),a      ; swap to explosion coroutine
+    ld      (iy+_COUNTER),a      ; swap to explosion coroutine
     jp      becomeexplosion
 
