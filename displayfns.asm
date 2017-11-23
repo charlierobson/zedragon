@@ -385,7 +385,6 @@ getdlp:
     inc     e
     ld      (dlp),de
     pop     de
--:    jr      c,{-}    ; lock up if we overrun the list
     ret
 
 
@@ -408,7 +407,6 @@ char2dlist:
     ld      (dlp),hl
     pop     hl
     pop     de
--:    jr      c,{-}    ; lock up if we overrun the list
     ret
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

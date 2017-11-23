@@ -31,7 +31,7 @@ attract:
     call    silencesound
 
 	call	getobject
-	ld		bc,gamemain ;testmain ;
+	ld		bc,testmain ; gamemain ;
 	call	initobject
 	call	insertobject_afterhead
 

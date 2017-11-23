@@ -55,7 +55,6 @@ _loop:
     add     hl,bc
     ld      (hl),a
 
-_nodrawneeded:
     YIELD
 
     ; is the bullet reporting a collision, and is it in our column?

@@ -65,10 +65,11 @@ _loop0:  ; reset
 _loop1:
     ld      l,(iy+OUSER+3)
     ld      h,(iy+OUSER+4)    
-    ld      (hl),CH_DEPTHBASE
+    ld      a,CH_DEPTHBASE+1
+    call    char2dlist
     set     7,h
     res     6,h
-    ld      (hl),CH_DEPTHBASE
+    ld      (hl),a
     YIELD
 
     call    _hittest            ; doesn't return if we're hit
@@ -84,10 +85,11 @@ _loop1:
 _loop2:
     ld      l,(iy+OUSER+3)
     ld      h,(iy+OUSER+4)
-    ld      (hl),CH_DEPTHBASE+1
+    ld      a,CH_DEPTHBASE+1
+    call    char2dlist
     set     7,h
     res     6,h
-    ld      (hl),CH_DEPTHBASE+1
+    ld      (hl),a
     YIELD
 
     call    _hittest
