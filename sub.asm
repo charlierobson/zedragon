@@ -2,62 +2,15 @@
 
 _SUBX = OUSER+0          ; don't change
 _SUBY = OUSER+1          ; don't change
-_COLLTAB = OUSER+2
+_SCRADL = OUSER+2
+_SCRADH = OUSER+3
+_COLO = OUSER+4
+_ROWO = OUSER+5
+_COLLTAB = OUSER+6
 
 subfunction:
-    ld      hl,$0000
-    ld      (subaddress),hl         ; we'll sink the first sub drawing into the ROM
-    ld      (oldsubaddress),hl
 
 _substart:
-    ; undraw the old sub
-
-    ld      hl,(oldsubaddress)      ; point hl into clean map
-    ld      e,l
-    ld      d,h
-    res     6,h
-    set     7,h
-    ldi
-    ldi
-    ldi
-    ld      de,600-3
-    add     hl,de
-    ld      e,l
-    ld      d,h
-    res     7,d
-    set     6,d
-    ldi
-    ldi
-    ldi
-
-    ; now draw the mini bitmap containing the sub to the screen
-
-    ld      hl,600
-    ld      de,(subaddress)
-    add     hl,de
-    ld      (oldsubaddress),de
-
-    ld      a,$b0           ; b0 b2 b4
-    ld      (de),a          ; b1 b3 b5
-    inc     a
-    inc     de
-    ld      (hl),a
-    inc     a
-    inc     hl
-    ld      (de),a
-    inc     a
-    inc     de
-    ld      (hl),a
-    inc     a
-    inc     hl
-    ld      (de),a
-    inc     a
-    ld      (hl),a
-
-    ;
-    ; move sub
-    ;
-
     push    iy
     pop     hl
     ld      de,_SUBY
@@ -118,7 +71,7 @@ _checkfire:
     ld      bc,obullet
     call    getobject
     call    initobject
-    call    insertobject_afterthis
+    call    insertobject_beforethis
     ld      a,(iy+_SUBX)
     ld      (hl),a
     inc     hl
@@ -152,7 +105,8 @@ _subrender:
     ld      de,D_BUFFER
     add     hl,de
 
-    ld      (subaddress),hl     ; sub's address in the display memory
+    ld      (iy+_SCRADL),l     ; sub's address in the display memory
+    ld      (iy+_SCRADH),h
 
     ; find the character codes that appear under the sub in its new position
     ; use the map cache as the code source because the display is dirty at this point
@@ -210,7 +164,7 @@ _subrender:
     ld      (collision),a
 
     ld      a,_COLLTAB
-    ld      (subcoloff),a
+    ld      (iy+_COLO),a
 
     ; now we've effectively built our tiny bitmap and cleared out the collision bits,
     ; we can render the sub into it and collect any collision pixels
@@ -240,7 +194,8 @@ _subrender:
 
     ld      b,3                 ; 3 characters
 
---: push    bc
+_rendersub:
+    push    bc
 
     ; copy 8 sub pixels into bg bitmap
 
@@ -248,13 +203,14 @@ _subrender:
 
     ld      a,(iy+_SUBY)   ; keep track of the row number that we're rendering into,
     and     7               ; so that we can track collision data on a per character cell basis
-    ld      (subrowoff),a
+    ld      (iy+_ROWO),a
 
-    ld      a,(subcoloff)   ; init collision indices
+    ld      a,(iy+_COLO)   ; init collision indices
     ld      (colidx1),a
     ld      (colidx2),a
 
--:  ld      c,(hl)          ; get sub pixels
+_column:
+    ld      c,(hl)          ; get sub pixels
     ld      a,(de)          ; get bg pixels
     push    af
     and     c               ; merge sub into background
@@ -267,9 +223,9 @@ _subrender:
 
     ; we need to know what collision pixels map to which background char
 
-    ld      a,(subrowoff)   ; when rendering hits row 8 bump collision data index
+    ld      a,(iy+_ROWO)   ; when rendering hits row 8 bump collision data index
     inc     a
-    ld      (subrowoff),a
+    ld      (iy+_ROWO),a
     cp      8
     jr      nz,{+}
 
@@ -287,7 +243,7 @@ colidx2 = $+6
 
     inc     hl
     inc     de
-    djnz    {-}
+    djnz    _column
 
     ; step across the dest bitmap to the next column
     ; we know the address won't overflow the bottom 8 bits
@@ -296,17 +252,72 @@ colidx2 = $+6
     add     a,e
     ld      e,a
 
-    ld      a,(subcoloff)  ; iy+ouser progression: +1, (+3), +5, (+7), +9, (+11)
+    ld      a,(iy+_COLO)  ; iy+ouser progression: +1, (+3), +5, (+7), +9, (+11)
     inc     a
     inc     a
     inc     a
     inc     a
-    ld      (subcoloff),a
+    ld      (iy+_COLO),a
 
     pop     bc
-    djnz    {--}
+    djnz    _rendersub
 
-    ; all rendered
+    ; all rendered. now draw the mini bitmap containing the sub to the screen
+    ; b0 b2 b4
+    ; b1 b3 b5
+
+    ld      e,(iy+_SCRADL)
+    ld      d,(iy+_SCRADH)
+    ld      hl,(dlp)
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    inc     hl
+    ld      (hl),$b0
+    inc     hl
+    inc     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    inc     hl
+    ld      (hl),$b2
+    inc     hl
+    inc     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    inc     hl
+    ld      (hl),$b4
+    inc     hl
+
+    push    hl
+    ld      hl,600-2
+    add     hl,de
+    ex      de,hl
+    pop     hl
+
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    inc     hl
+    ld      (hl),$b1
+    inc     hl
+    inc     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    inc     hl
+    ld      (hl),$b3
+    inc     hl
+    inc     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    inc     hl
+    ld      (hl),$b5
+    inc     hl
+
+    ld      (dlp),hl
 
     YIELD
 
@@ -314,7 +325,8 @@ colidx2 = $+6
     ld      e,_COLLTAB+1
     ld      b,6
 
--:  ld      a,d
+_checkcoll:
+    ld      a,d
     ld      (chkidx1),a
     ld      a,e
     ld      (chkidx2),a
@@ -331,7 +343,7 @@ chkidx2 = $+5
     inc     d
     inc     e
     inc     e
-    djnz    {-}
+    djnz    _checkcoll
 
     ;call    showcols
 
@@ -389,7 +401,8 @@ _subsubexplo:
     ld      d,(hl)
     inc     hl
     ld      (exploptr),hl
-    ld      hl,(subaddress)
+    ld      l,(iy+_SCRADL)
+    ld      h,(iy+_SCRADH)
     add     hl,de
     push    hl
 

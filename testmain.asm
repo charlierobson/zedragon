@@ -45,7 +45,7 @@ _testreset:
 	call	getobject
 	ld		bc,subfunction
 	call	initobject
-	call	insertobject_afterthis
+	call	insertobject_beforehead
 
     ld      (hl),32                     ; X
     inc     hl

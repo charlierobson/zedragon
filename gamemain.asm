@@ -44,7 +44,7 @@ resetafterdeath:
 	call	getobject
 	ld		bc,subfunction
 	call	initobject
-	call	insertobject_afterthis
+	call	insertobject_beforehead
 
     pop     de                      ; points to restart X,Y (pixel positions)
     ex      de,hl                   ; de now points to sub's user data area

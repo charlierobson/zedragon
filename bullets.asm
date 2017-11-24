@@ -252,7 +252,7 @@ _collisioncheck:
     call    getobject
     ld      bc,chaindrop
     call    initobject
-    call    insertobject_afterthis
+    call    insertobject_afterhead
     pop     de
     ld      (hl),e
     inc     hl
@@ -266,7 +266,7 @@ startexplosion:
     call    getobject
     ld      bc,explosion
     call    initobject
-    jp      insertobject_afterthis
+    jp      insertobject_afterhead
 
 
 

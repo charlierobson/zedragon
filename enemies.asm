@@ -99,7 +99,7 @@ _starterator:
 
     call    getobject
     call    initobject
-    call    insertobject_beforehead     ; exits with hl-> data area
+    call    insertobject_afterthis      ; exits with hl-> data area
 
     pop     de                          ; retrieve X
     ld      (hl),e

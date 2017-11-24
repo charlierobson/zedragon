@@ -85,25 +85,12 @@ scrollflags:
 gameframe:
     .word   0
 
-subaddress:
-    .word   0
-oldsubaddress:
-    .word   0
-
 lives:
     .byte   0
 
-minebase:
-    .word   0
-
 collision:
     .byte   0
-subrowoff:
-    .byte   0
-subcoloff:
-    .byte   0
-bulletX:
-    .word   0
+
 bulletHitX:
     .word   0
 bulletHitY:

@@ -373,19 +373,6 @@ dlp:
 elp:
     .word   DRAWLIST_1
 
-	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	;
-	; get a pointer to the next free slot in the drawlist in de
-	;
-getdlp:
-    ld      de,(dlp)
-    push    de
-    inc     e
-    inc     e
-    inc     e
-    ld      (dlp),de
-    pop     de
-    ret
 
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
