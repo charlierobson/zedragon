@@ -17,7 +17,7 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~depth charges~~
 * ~~pixel movement torpedos~~
 * ~~score~~
-* hiscore
+* ~~hiscore~~
 * final boss
 
 ### IN PROGRESS
