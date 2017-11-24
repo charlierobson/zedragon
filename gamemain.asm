@@ -3,6 +3,7 @@
 _LIVES = OUSER
 _RSPL = OUSER+1
 _RSPH = OUSER+2
+_COUNTER = OUSER+3
 
 ; for debugging
 dofspecial:
@@ -32,7 +33,7 @@ gamemain:
     ld      a,(laserframe)
     ld      (laserframe+1),a
 
-resetafterdeath:
+_resetafterdeath:
     call    refreshmap
     call    resetair
     call    resetenemies
@@ -56,66 +57,43 @@ resetafterdeath:
     ldi
     ldi
 
-aliveloop:
-    ld      a,(advance)
-    cp      1
-    jr      nz,{+}
-    ld      l,(iy+_RSPL)
-    ld      h,(iy+_RSPH)
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    ld      (iy+_RSPL),l
-    ld      (iy+_RSPH),h
-+:
+_gameloop:
+    call    _advancecheck
 
     ld      hl,(gameframe)
     inc     hl
     ld      (gameframe),hl
 
-    ld      hl,laserframe
-    ld      a,(hl)
-    and     $80
-    inc     hl
-    cp      (hl)
-    jr      z,{+}
-
-    ld      (hl),a
-    and     a
-    jr      nz,{+}
-
-    ld      a,15
-    call    AFXPLAY
-
-+:  call    scroll
+    call    scroll
     ld      a,(scrollflags)
     rlca
-    jr      nc,{+}              ; haven't scrolled the bg, so we don't need to update any pointers
+    jr      nc,_notscrolled     ; haven't scrolled the bg, so we don't need to update any pointers
 
-    ld      l,(iy+_RSPL)
-    ld      h,(iy+_RSPH)       ; do something with a 'count till next restart point' ??
-    inc     hl
+    ; check if we've hit a restart point
+
+    ld      l,(iy+_RSPL)        ; this is definitely a bit starbucks
+    ld      h,(iy+_RSPH)
+    inc     hl                  ; look past the current restart info
     inc     hl
     inc     hl
     inc     hl
     push    hl
-    ld      e,(hl)
+    ld      e,(hl)              ; next restart x into de
     inc     hl
     ld      d,(hl)
     ld      hl,(scrollpos)
     and     a
     sbc     hl,de
     pop     hl
-    jr      nz,{+}
+    jr      nz,_notscrolled     ; we haven't reached the restart yet
 
-    ld      (iy+_RSPL),l
+    ld      (iy+_RSPL),l        ; store the new restart info pointer
     ld      (iy+_RSPH),h
 
-    ld      a,12
+    ld      a,12                ; let player know
     call    AFXPLAY
 
-+:  ;;call    displayocount
+_notscrolled:
     xor     a
     ld      (ocount),a
     YIELD
@@ -123,43 +101,39 @@ aliveloop:
     call    updateair
     call    enemyinitiator
 
-    ld      de,0
-    ld      (bulletHitX),de
-
-    ld      a,(FRAMES)              ; play ping sfx every so often
+    ld      a,(FRAMES)          ; play ping sfx (id = 0) every so often
     and     127
     call    z,AFXPLAY
 
-    ld      a,(collision)
+    ld      a,(collision)       ; loop until the sub has collided with something
     and     a
-    jp      z,aliveloop
-
+    jp      z,_gameloop
 
     ; sub's dead
-deadsub:
-    xor     a
-    ld      (iy+OUSER),a
 
     ld      a,(iy+_LIVES)
     dec     a
     ld      (iy+_LIVES),a
     call    _showlives
 
--:  call    displayocount
+    ld      (iy+_COUNTER),100        ; counts up until roll-over: 150ish = ~3 sec
+
+_interlifedelay:
     xor     a
     ld      (ocount),a
     YIELD
 
-    inc     (iy+OUSER)
-    jr      nz,{-}
+    inc     (iy+_COUNTER)
+    jr      nz,_interlifedelay
 
+_nomoreo:
     ld      a,(ocount)              ; wait until all objects apart from MAIN and GAMEMAIN are dead
     cp      2
-    jr      nz,{-}
+    jr      nz,_nomoreo
 
-    ld      a,(iy+_LIVES)
+    ld      a,(iy+_LIVES)           ; if no more subs are available then it's game over
     and     a
-    jp      nz,resetafterdeath
+    jp      nz,_resetafterdeath
 
     call    silencesound
 
@@ -175,4 +149,21 @@ _showlives:
     ld      a,(iy+_LIVES)
     add     a,16
     ld      (TOP_LINE+31),a
+    ret
+
+
+
+_advancecheck:
+    ld      a,(advance)
+    dec     a
+    ret     nz
+
+    ld      l,(iy+_RSPL)
+    ld      h,(iy+_RSPH)
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    ld      (iy+_RSPL),l
+    ld      (iy+_RSPH),h
     ret

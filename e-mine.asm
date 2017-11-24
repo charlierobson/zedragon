@@ -110,5 +110,5 @@ _gobang:
     add     hl,bc
     ld      (hl),0
 
-    ld      (iy+_COUNTER),a      ; swap to explosion coroutine
+    ld      (iy+_COUNTER),0      ; swap to explosion coroutine
     jp      becomeexplosion
