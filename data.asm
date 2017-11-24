@@ -85,9 +85,6 @@ scrollflags:
 gameframe:
     .word   0
 
-lives:
-    .byte   0
-
 collision:
     .byte   0
 
@@ -118,9 +115,6 @@ airupdatecounter:
 airlevel:
     .byte   0
 
-
-restartPoint:
-    .word   0
 
     ; Restart scroll and sub positions
 dofs:
@@ -172,3 +166,4 @@ flaganimation:
 ;
 mul600tab:
     .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
+; MOVE THIS TO $8000

@@ -1,29 +1,32 @@
+    .module GAMEMAIN
 
-;               HEAD
-;    ...[mines][core][bullets][gamemain/attract][sub][explosions]...
+_LIVES = OUSER
+_RSP = OUSER+1
 
+; for debugging
 dofspecial:
     .word   $70
-	.byte	$78,$28
+    .byte   $78,$28
+
 
 gamemain:
     call    cls
     call    resetscore
     call    enablegamesound
 
-	ld		a,r
-	ld		(rng+1),a
+    ld      a,r
+    ld      (rng+1),a
 
     ld      hl,scrollflags          ; enable scrolling
     set     0,(hl)
 
-    ld      hl,dofs
-    ;ld      hl,dofspecial
-    ld      (restartPoint),hl
+    ld      hl,dofs ;; dofspecial
+    ld      (iy+_RSP),l
+    ld      (iy+_RSP+1),h
 
     ld      a,4
-    ld      (lives),a
-    call    showlives
+    ld      (iy+_LIVES),a
+    call    _showlives
 
     ld      a,(laserframe)
     ld      (laserframe+1),a
@@ -33,7 +36,8 @@ resetafterdeath:
     call    resetair
     call    resetenemies
 
-    ld      hl,(restartPoint)
+    ld      l,(iy+_RSP)
+    ld      h,(iy+_RSP+1)
     ld      c,(hl)
     inc     hl
     ld      b,(hl)
@@ -55,12 +59,14 @@ aliveloop:
     ld      a,(advance)
     cp      1
     jr      nz,{+}
-    ld      hl,(restartPoint)
+    ld      l,(iy+_RSP)
+    ld      h,(iy+_RSP+1)
     inc     hl
     inc     hl
     inc     hl
     inc     hl
-    ld      (restartPoint),hl
+    ld      (iy+_RSP),l
+    ld      (iy+_RSP+1),h
 +:
 
     ld      hl,(gameframe)
@@ -86,7 +92,8 @@ aliveloop:
     rlca
     jr      nc,{+}              ; haven't scrolled the bg, so we don't need to update any pointers
 
-    ld      hl,(restartPoint)   ; do something with a 'count till next restart point' ??
+    ld      l,(iy+_RSP)
+    ld      h,(iy+_RSP+1)       ; do something with a 'count till next restart point' ??
     inc     hl
     inc     hl
     inc     hl
@@ -101,7 +108,8 @@ aliveloop:
     pop     hl
     jr      nz,{+}
 
-    ld      (restartPoint),hl
+    ld      (iy+_RSP),l
+    ld      (iy+_RSP+1),h
 
     ld      a,12
     call    AFXPLAY
@@ -131,10 +139,10 @@ deadsub:
     xor     a
     ld      (iy+OUSER),a
 
-    ld      a,(lives)
+    ld      a,(iy+_LIVES)
     dec     a
-    ld      (lives),a
-    call    showlives
+    ld      (iy+_LIVES),a
+    call    _showlives
 
 -:  call    displayocount
     xor     a
@@ -148,7 +156,7 @@ deadsub:
     cp      2
     jr      nz,{-}
 
-    ld      a,(lives)
+    ld      a,(iy+_LIVES)
     and     a
     jp      nz,resetafterdeath
 
@@ -160,3 +168,10 @@ deadsub:
 	call	insertobject_afterhead
 
 	DIE
+
+
+_showlives:
+    ld      a,(iy+_LIVES)
+    add     a,16
+    ld      (TOP_LINE+31),a
+    ret
