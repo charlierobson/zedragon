@@ -155,6 +155,9 @@ _loop:
 
     YIELD
 
+    ld      hl,0
+    ld      (bulletHitX),hl
+
     ; when we arrive back here the previously rendered bullet will be on screen
 
     ld      c,(iy+_RCHAR)
@@ -199,6 +202,11 @@ _bulletdie:
 
     ld      hl,bulletCount      ; die
     dec     (hl)
+
+    YIELD
+
+    ld      hl,0
+    ld      (bulletHitX),hl
 
     DIE
 

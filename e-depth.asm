@@ -11,14 +11,16 @@ depthchargeGenerator:
 _loop:
     YIELD
 
-    ld      a,(collision)
-    and     a
+    ld      a,(collision)                   ; die if sub died
+    or      a
     DIENZ
+    call    cIfOffscreenLeft
+    DIEC
 
     dec     (iy+OUSER+6)
     jr      nz,_loop
 
-    ld      (iy+OUSER+6),39
+    ld      (iy+OUSER+6),$22
 
     ld      bc,depthcharge
     call    getobject
@@ -65,7 +67,7 @@ _loop0:  ; reset
 _loop1:
     ld      l,(iy+OUSER+3)
     ld      h,(iy+OUSER+4)    
-    ld      a,CH_DEPTHBASE+1
+    ld      a,CH_DEPTHBASE+0
     call    char2dlist
     set     7,h
     res     6,h
