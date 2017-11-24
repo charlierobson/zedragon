@@ -109,18 +109,18 @@ nextframe:
 
 
 _shootahoopa:
-    pop     hl
-    ld      (iy+OUSER+16),l
+    pop     hl                      ; because we're a subroutine and we will YIELD,
+    ld      (iy+OUSER+16),l         ; remove the return address and stash it locally
     ld      (iy+OUSER+17),h
 
     ld      (iy+OUSER+DLAY),SHOOTPERIOD
 
 _shmain:
-    ld      l,(iy+OUSER+3)      ; screen position
+    ld      l,(iy+OUSER+3)          ; screen position
     ld      h,(iy+OUSER+4)
-    ld      bc,601              ; offset to next shot posn on screen
+    ld      bc,601                  ; offset to next shot posn on screen
 
-    ld      a,(iy+OUSER+OLEN)      ; shot stream length
+    ld      a,(iy+OUSER+OLEN)       ; shot stream length
     ld      (iy+OUSER+CLEN),a
 
     ld      e,(iy+OUSER+10)
@@ -134,10 +134,10 @@ _shrender:
     add     a,(iy+OUSER+FFLOP)
 
 _skipadd:
-    ld      (hl),a
+    call    char2dlist
     set     7,h
     res     6,h
-    ld      (hl),a
+    ld      (hl),a                  ; mirror, for sub killing
     res     7,h
     set     6,h
     inc     de
@@ -154,9 +154,9 @@ _soy1:
     or      (iy+OUSER+COLL)
     ld      (iy+OUSER+COLL),a
 
-    ld      l,(iy+OUSER+16)
+    ld      l,(iy+OUSER+16)         ; recover return address,
     ld      h,(iy+OUSER+17)
-    push    hl
+    push    hl                      ; and return!
     ret
 
 
