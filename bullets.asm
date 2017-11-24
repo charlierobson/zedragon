@@ -182,7 +182,7 @@ _bulletdie:
 
 
 _collisioncheck:
-    ld      (iy+_COLNF),0
+    ld      (iy+_COLNF),0 
 
     ld      a,c
     or      a
@@ -226,6 +226,9 @@ _collisioncheck:
     ret     nz
 
     set     7,(hl)              ; kill enemy
+
+    ld      bc,1
+    call    addscore
 
     ld      l,(iy+_SCRPOSL)
     ld      h,(iy+_SCRPOSH)

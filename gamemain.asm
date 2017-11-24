@@ -14,6 +14,8 @@ dofspecial:
 gamemain:
     call    cls
     call    resetscore
+    call    displayscore
+    call    displayhi
     call    enablegamesound
 
     ld      a,r
@@ -96,6 +98,10 @@ _notscrolled:
     xor     a
     ld      (ocount),a
     YIELD
+
+    call    displayscore
+    call    checkhi
+    call    c,displayhi
 
     call    updateair
     call    enemyinitiator

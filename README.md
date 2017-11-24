@@ -16,7 +16,8 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~shooters~~
 * ~~depth charges~~
 * ~~pixel movement torpedos~~
-* score
+* ~~score~~
+* hiscore
 * final boss
 
 ### IN PROGRESS
@@ -33,6 +34,7 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~chain sometimes doesn't fall~~
 * ~~laser graphically interferes with bullet~~
 * sub collisions broken
+* enemies can fall below line 10
 
 ### NICE TO HAVE
 * inter-screen wipes
