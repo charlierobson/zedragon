@@ -1,7 +1,8 @@
     .module GAMEMAIN
 
 _LIVES = OUSER
-_RSP = OUSER+1
+_RSPL = OUSER+1
+_RSPH = OUSER+2
 
 ; for debugging
 dofspecial:
@@ -21,8 +22,8 @@ gamemain:
     set     0,(hl)
 
     ld      hl,dofs ;; dofspecial
-    ld      (iy+_RSP),l
-    ld      (iy+_RSP+1),h
+    ld      (iy+_RSPL),l
+    ld      (iy+_RSPH),h
 
     ld      a,4
     ld      (iy+_LIVES),a
@@ -36,8 +37,8 @@ resetafterdeath:
     call    resetair
     call    resetenemies
 
-    ld      l,(iy+_RSP)
-    ld      h,(iy+_RSP+1)
+    ld      l,(iy+_RSPL)
+    ld      h,(iy+_RSPH)
     ld      c,(hl)
     inc     hl
     ld      b,(hl)
@@ -59,14 +60,14 @@ aliveloop:
     ld      a,(advance)
     cp      1
     jr      nz,{+}
-    ld      l,(iy+_RSP)
-    ld      h,(iy+_RSP+1)
+    ld      l,(iy+_RSPL)
+    ld      h,(iy+_RSPH)
     inc     hl
     inc     hl
     inc     hl
     inc     hl
-    ld      (iy+_RSP),l
-    ld      (iy+_RSP+1),h
+    ld      (iy+_RSPL),l
+    ld      (iy+_RSPH),h
 +:
 
     ld      hl,(gameframe)
@@ -92,8 +93,8 @@ aliveloop:
     rlca
     jr      nc,{+}              ; haven't scrolled the bg, so we don't need to update any pointers
 
-    ld      l,(iy+_RSP)
-    ld      h,(iy+_RSP+1)       ; do something with a 'count till next restart point' ??
+    ld      l,(iy+_RSPL)
+    ld      h,(iy+_RSPH)       ; do something with a 'count till next restart point' ??
     inc     hl
     inc     hl
     inc     hl
@@ -108,8 +109,8 @@ aliveloop:
     pop     hl
     jr      nz,{+}
 
-    ld      (iy+_RSP),l
-    ld      (iy+_RSP+1),h
+    ld      (iy+_RSPL),l
+    ld      (iy+_RSPH),h
 
     ld      a,12
     call    AFXPLAY
