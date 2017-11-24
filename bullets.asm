@@ -13,7 +13,8 @@ _LCHAR = OUSER+6
 _RCHAR = OUSER+7
 _BCHAR = OUSER+8
 _COLNF = OUSER+9
-_UNDRAW = OUSER+10
+_SCRPOSL = OUSER+10
+_SCRPOSH = OUSER+11
 
     .align  16
 bchar:
@@ -34,10 +35,6 @@ obullet:
 
     ld      a,(iy+_PIXX)
     add     a,12
-
-    ld      hl,D_BUFFER-2
-    ld      (iy+_UNDRAW),l
-    ld      (iy+_UNDRAW+1),h
 
     ld      hl,bulletCount
     inc     (hl)
@@ -75,7 +72,9 @@ _loop:
     add     hl,de               ; char to screen pos
     ld      de,D_BUFFER
     add     hl,de
-    push    hl                  ; stash draw address
+    ld      (iy+_SCRPOSL),l
+    ld      (iy+_SCRPOSH),h
+
     set     7,h                 ; point at background character in mirror map
     res     6,h
 
@@ -83,11 +82,11 @@ _loop:
     push    de                  ; stash for rendering
     ld      (iy+_BCHAR),a       ; store returned character number
     call    copychar
-    ld      (iy+_LCHAR),a      ; left character
+    ld      (iy+_LCHAR),a      ; left character that we'll overwrite, store for collision
     call    copychar
     ld      (iy+_RCHAR),a      ; right character
 
-    ; source character data is inverted, as we only write into UDGs $80-$c0
+    ; source character data is pre-inverted, as we only write into UDGs $80-$c0
 
     ld      a,(iy+_PIXY)       ; vertical offset into bullet character
     and     7
@@ -126,32 +125,16 @@ _loop:
 
     ; all rendered.
 
-    ld      l,(iy+_UNDRAW)     ; undraw bullet
-    ld      h,(iy+_UNDRAW+1)
-    push    hl
-    set     7,h
-    res     6,h
-    ld      a,(hl)
-    inc     hl
-    ld      b,(hl)
-    pop     hl
-    ld      (hl),a
-    inc     hl
-    ld      (hl),b
+    ld      l,(iy+_SCRPOSL)
+    ld      h,(iy+_SCRPOSH)
 
-    pop     hl                  ; recover draw address
-    ld      (bullet1sp),hl
+    ld      (bullet1sp),hl      ; stash the pullet screen location for sub rendering ... na-a-sty
     ld      a,(iy+_BCHAR)
-    ld      (hl),a
-    ld      (iy+_UNDRAW),l     ; stash current address as last undraw
-    ld      (iy+_UNDRAW+1),h
+    call    char2dlist
     inc     hl
     inc     a
-    ld      (hl),a
+    call    char2dlist
     ld      (bullet2sp),hl
-
-    ld      hl,0
-    ld      (bulletHitX),hl ; WRONG PLACE
 
     YIELD
 
@@ -186,19 +169,6 @@ _bulletdie:
     ld      hl,0
     ld      (bullet1sp),hl
     ld      (bullet2sp),hl
-
-    ld      l,(iy+_UNDRAW)     ; undraw both bullet chars
-    ld      h,(iy+_UNDRAW+1)
-    push    hl
-    set     7,h
-    res     6,h
-    ld      a,(hl)
-    inc     hl
-    ld      b,(hl)
-    pop     hl
-    ld      (hl),a
-    inc     hl
-    ld      (hl),b
 
     ld      hl,bulletCount      ; die
     dec     (hl)
@@ -257,8 +227,8 @@ _collisioncheck:
 
     set     7,(hl)              ; kill enemy
 
-    ld      l,(iy+_UNDRAW)      ; remove enemy from mirror
-    ld      h,(iy+_UNDRAW+1)
+    ld      l,(iy+_SCRPOSL)
+    ld      h,(iy+_SCRPOSH)
     inc     hl                  ; always explode at the tip
     push    hl                  ; stash for explosion
     set     7,h
