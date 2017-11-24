@@ -10,7 +10,6 @@ stalfall:
     ld      l,(iy+OUSER)        ; hl = x
     ld      h,(iy+OUSER+1)
     ld      a,(iy+OUSER+2)      ; = y
-    inc     a
 
     ld      (iy+OUSER+3),a      ; keep X & Y around for various comparisons
     ld      (iy+OUSER+4),l
@@ -23,7 +22,8 @@ stalfall:
 
     xor     a
 
--:  ld      (iy+OUSER),l        ; screen pointer
+_loop:
+    ld      (iy+OUSER),l        ; screen pointer
     ld      (iy+OUSER+1),h
     ld      (iy+OUSER+2),a      ; counter
     ld      d,h
@@ -32,15 +32,57 @@ stalfall:
     res     6,d
 
     and     %00000110
-    add     a,CH_STALACBASE+1
-    ld      (hl),a
+    add     a,CH_STALACBASE
+    call    char2dlist
     ld      (de),a
-    dec     a
+    inc     a
     ld      bc,600
-    sbc     hl,bc
+    add     hl,bc
+    call    char2dlist
     ex      de,hl
-    sbc     hl,bc
+    add     hl,bc
     ld      (hl),a
+
+    YIELD
+
+    ld      l,(iy+OUSER+0)      ; restore screen pointers
+    ld      h,(iy+OUSER+1)
+
+    inc     (iy+OUSER+2)        ; only move when frame = 0
+    ld      a,(iy+OUSER+2)
+    and     7
+    jr      nz,_loop
+
+    ; move down and check to see if we've reached ground level.
+
+    ld      bc,600              ; move down one line
+    add     hl,bc
+    push    hl
+
+    add     hl,bc               ; check to see if we should only render top part
+    ld      d,h
+    set     7,d
+    res     6,d
+    ld      e,l
+    pop     hl
+    ld      a,(de)              ; check to see if we're about to hit the ground
+    and     a
+    jr      z,_loop
+
+    and     a
+
+_loop2:
+    ld      (iy+OUSER),l        ; screen pointer
+    ld      (iy+OUSER+1),h
+    ld      (iy+OUSER+2),a      ; counter
+    ld      d,h
+    ld      e,l
+    set     7,d
+    res     6,d
+
+    and     %00000110
+    add     a,CH_STALACBASE
+    call    char2dlist
     ld      (de),a
 
     YIELD
@@ -51,24 +93,6 @@ stalfall:
     inc     (iy+OUSER+2)        ; only move when frame = 0
     ld      a,(iy+OUSER+2)
     and     7
-    jr      nz,{-}
-
-    ld      d,h
-    ld      e,l
-    set     7,d
-    res     6,d
-
-    ld      bc,600
-    add     hl,bc
-
-    ld      a,(hl)              ; are we about to hit some thing?
-    and     a
-    jr      z,{-}
-
-    ; yep, done
-    xor     a
-    sbc     hl,bc
-    ld      (hl),a              ; yep - undraw & stop
-    ld      (de),a              ; yep - undraw & stop
+    jr      nz,_loop2
 
     DIE

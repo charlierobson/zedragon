@@ -66,7 +66,7 @@ _wait:
     cp      CH_CHAIN
     DIENZ
 
-    xor     a                   ; also used in char2dlist
+    xor     a                   ; also used in call to char2dlist
 
     ld      (hl),a              ; remove from mirror
     ld      (iy+OUSER),l
