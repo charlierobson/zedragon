@@ -27,14 +27,9 @@ _loop:
     call    initobject
     call    insertobject_afterthis
 
-    ld      a,(iy+OUSER+0)
-    ld      (hl),a
-    inc     hl
-    ld      a,(iy+OUSER+1)
-    ld      (hl),a
-    inc     hl
-    ld      a,(iy+OUSER+2)
-    ld      (hl),a
+    ldi
+    ldi
+    ldi
 
     jr      _loop
 

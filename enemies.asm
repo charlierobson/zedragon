@@ -101,6 +101,7 @@ _starterator:
     call    initobject
     call    insertobject_afterthis      ; exits with hl-> data area
 
+    ex      de,hl
     pop     de                          ; retrieve X
     ld      (hl),e
     inc     hl

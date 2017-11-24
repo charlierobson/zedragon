@@ -329,9 +329,17 @@ _svNintonew
 _svPintonew
 	ld		(0),de				; write saved prev into newobj.prev
 
-	; leave with hl -> user area
+	; leave with de -> new object user area, hl = current -> user area
 	;
 	ld		de,OUSER
-	add		hl,de
+	add		hl,de				; hl -> new object data
+	ex		de,hl				; de -> new object data, hl = OUSER
 
+	push	de					; stash
+
+	push	iy					; get pointer to current object
+	pop		de					; into de
+	add		hl,de				; hl = OUSER + current object pointer
+
+	pop		de					; recover target pointer
 	ret

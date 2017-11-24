@@ -52,8 +52,7 @@ _resetafterdeath:
 	call	initobject
 	call	insertobject_beforehead
 
-    pop     de                      ; points to restart X,Y (pixel positions)
-    ex      de,hl                   ; de now points to sub's user data area
+    pop     hl                      ; points to restart X,Y (pixel positions)
     ldi
     ldi
 

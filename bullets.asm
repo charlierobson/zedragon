@@ -238,6 +238,7 @@ _collisioncheck:
     push    af
     call    startexplosion      ; start an explosion
     pop     af
+    ex      de,hl
     pop     de
     ld      (hl),e
     inc     hl
@@ -253,6 +254,8 @@ _collisioncheck:
     ld      bc,chaindrop
     call    initobject
     call    insertobject_afterhead
+
+    ex      de,hl
     pop     de
     ld      (hl),e
     inc     hl

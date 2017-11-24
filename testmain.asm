@@ -47,6 +47,7 @@ _testreset:
 	call	initobject
 	call	insertobject_beforehead
 
+    ex      de,hl
     ld      (hl),32                     ; X
     inc     hl
     ld      (hl),32                     ; Y

@@ -72,11 +72,9 @@ _checkfire:
     call    getobject
     call    initobject
     call    insertobject_beforethis
-    ld      a,(iy+_SUBX)
-    ld      (hl),a
-    inc     hl
-    ld      a,(iy+_SUBY)
-    ld      (hl),a
+
+    ldi                         ; copy x & y
+    ldi
 
     ;
     ; render sub
