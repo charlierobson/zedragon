@@ -149,9 +149,6 @@ _subrender:
     call    copycharx
     ld      (iy+_COLLTAB+10),a  ; c.i 5
 
-    ; ok, we'll simplify here for a minute but we need to actually do the
-    ; screen chars update after vsync otherwise we'll be flickering
-
     xor     a                   ; zero out collision bits
     ld      (iy+_COLLTAB+1),a
     ld      (iy+_COLLTAB+3),a
@@ -161,7 +158,7 @@ _subrender:
     ld      (iy+_COLLTAB+11),a
     ld      (collision),a
 
-    ld      a,_COLLTAB
+    ld      a,_COLLTAB+1
     ld      (iy+_COLO),a
 
     ; now we've effectively built our tiny bitmap and cleared out the collision bits,
@@ -219,7 +216,11 @@ _column:
     xor     $ff             ; any 0 bits are collisions
     ld      c,a
 
-    ; we need to know what collision pixels map to which background char
+colidx1 = $+2
+colidx2 = $+6
+    ld      a,(iy+0)        ; update collision bits for this background cell
+    or      c
+    ld      (iy+0),a
 
     ld      a,(iy+_ROWO)   ; when rendering hits row 8 bump collision data index
     inc     a
@@ -233,12 +234,7 @@ _column:
     ld      (colidx1),a
     ld      (colidx2),a
 
-colidx1 = $+2
-colidx2 = $+6
-+:  ld      a,(iy+0)        ; update collision bits for this background cell
-    or      c
-    ld      (iy+0),a
-
++:
     inc     hl
     inc     de
     djnz    _column
@@ -260,7 +256,7 @@ colidx2 = $+6
     pop     bc
     djnz    _rendersub
 
-    ; all rendered. now draw the mini bitmap containing the sub to the screen
+    ; all rendered. now draw the min i bitmap containing the sub to the screen
     ; b0 b2 b4
     ; b1 b3 b5
 
@@ -343,7 +339,7 @@ chkidx2 = $+5
     inc     e
     djnz    _checkcoll
 
-    ;call    showcols
+    call    showcols
 
     ld      a,(airlevel)
     and     a
@@ -431,10 +427,10 @@ showcols:
     ld      bc,32
     xor     a
     call    fillmem
-    ld      a,(iy+_COLLTAB+0)
+    ld      a,(iy+_COLLTAB+0)   ; character occupying top left
     ld      de,TOP_LINE
     call    hexout
-    ld      a,(iy+_COLLTAB+1)
+    ld      a,(iy+_COLLTAB+1)   ; overlapping bits from above
     ld      de,TOP_LINE+2
     call    hexout
     ld      a,(iy+_COLLTAB+2)
@@ -469,5 +465,11 @@ showcols:
     ld      de,TOP_LINE+27
     call    hexout
 
-
+    ld      a,(iy+_SUBX)
+    ld      de,BOTTOM_LINE
+    call    hexout
+    ld      a,(iy+_SUBY)
+    ld      de,BOTTOM_LINE+3
+    call    hexout
+    
     ret
