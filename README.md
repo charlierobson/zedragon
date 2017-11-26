@@ -21,7 +21,6 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * final boss
 
 ### IN PROGRESS
-* sub collisions
 * collision tuning
 
 ### ONGOING
@@ -30,11 +29,11 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 ### BUGS
 * ~~ship parts left behind when reversing~~
 * ~~explosion parts left behind sometimes~~
-* crash when ship goes into line 9
+* ~~crash when ship goes into line 9~~
 * ~~chain sometimes doesn't fall~~
 * ~~laser graphically interferes with bullet~~
-* sub collisions broken
-* enemies can fall below line 10
+* ~~sub collisions broken~~
+* ~~enemies can fall below line 10~~
 
 ### NICE TO HAVE
 * inter-screen wipes

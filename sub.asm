@@ -284,6 +284,10 @@ colidx2 = $+6
     ld      (hl),$b4
     inc     hl
 
+    ld      a,(iy+_SUBY)
+    cp      $47
+    jr      nc,_nosecondline
+
     push    hl
     ld      hl,600-2
     add     hl,de
@@ -311,6 +315,7 @@ colidx2 = $+6
     ld      (hl),$b5
     inc     hl
 
+_nosecondline:
     ld      (dlp),hl
 
     YIELD
