@@ -20,7 +20,7 @@ _loop:
     dec     (iy+OUSER+6)
     jr      nz,_loop
 
-    ld      (iy+OUSER+6),$22
+    ld      (iy+OUSER+6),$28
 
     ld      bc,depthcharge
     call    getobject

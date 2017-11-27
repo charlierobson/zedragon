@@ -327,7 +327,7 @@ SOUNDFN = $+1
 	ld		l,(hl)
 	ld		h,1
 	ld		a,(hl)
-	and		$18
+	and		$08
 
 +:	xor		$ff
 
