@@ -337,24 +337,31 @@ SOUNDFN = $+1
 	ld		(hl),a
 	ld		(de),a
 	inc		hl
+	inc		de
 	ld		(hl),a
 	ld		(de),a
 	inc		hl
+	inc		de
 	ld		(hl),a
 	ld		(de),a
 	inc		hl
+	inc		de
 	ld		(hl),a
 	ld		(de),a
 	inc		hl
+	inc		de
 	ld		(hl),a
 	ld		(de),a
 	inc		hl
+	inc		de
 	ld		(hl),a
 	ld		(de),a
 	inc		hl
+	inc		de
 	ld		(hl),a
 	ld		(de),a
 	inc		hl
+	inc		de
 	ld		(hl),a
 	ld		(de),a
 
