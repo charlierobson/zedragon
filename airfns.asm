@@ -1,3 +1,5 @@
+    .module AIR
+
 AIR_MAX = 25*8
 
 resetair:
@@ -15,13 +17,12 @@ resetair:
 updateair:
     ld      hl,airupdatecounter
 
-    ld      a,6 ;(airflag)         ; sub's usage of air
     cp      6
-    jr      nz,decreaseair
+    jr      nz,_decrease
 
+    ; increase air
 
-increaseair:
-    ld      c,5                 ; increase air every 5 cycles
+    ld      c,4                 ; increase air every 5 cycles
     call    updatecounter
     ret     nz                  ; not time to modify air value yet
 
@@ -31,27 +32,24 @@ increaseair:
 
     inc     a
     ld      (airlevel),a
-    jr      displayair
+    jr      _display
 
-decreaseair:
-    ld      c,11                 ; decrease air every 11 cycles
+_decrease
+    ld      c,11                 ; decrease air every few game cycles
     call    updatecounter
     ret     nz                  ; not time to modify air value yet
 
     ld      a,(airlevel)
-
-    ; quit when air all gone
-    or      a
-    ret     z
-
     dec     a
     ld      (airlevel),a
 
     cp      32
-    jr      nc,displayair
+    jr      nc,_display
 
     bit     0,a
-    jr      nz,displayair
+    jr      nz,_display
+
+    ; make sound
 
     push    af
     and     16
@@ -63,7 +61,7 @@ decreaseair:
     call    AFXPLAY
     pop     af
 
-displayair:
+_display:
     push    af
 
     ld      hl,BOTTOM_LINE+5

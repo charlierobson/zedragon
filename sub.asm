@@ -343,10 +343,10 @@ chkidx2 = $+5
     inc     e
     djnz    _checkcoll
 
-;;;    call    showcols
-
+    ld      a,(iy+_SUBY)
+    call    updateair
     ld      a,(airlevel)
-    and     a
+    or      a
     jp      nz,subfunction
 
     ; sub is dead, explo-o-o-o-ode

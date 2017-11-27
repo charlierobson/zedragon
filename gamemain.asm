@@ -103,7 +103,6 @@ _notscrolled:
     call    checkhi
     call    c,displayhi
 
-    call    updateair
     call    enemyinitiator
 
     ld      a,(FRAMES)          ; play ping sfx (id = 0) every so often
