@@ -70,6 +70,10 @@ _aliveloop:
     ;call    displayocount
     xor     a
     ld      (ocount),a
+
+    ld      a,3
+    ld      (airupdatecounter),a
+
     YIELD
 
     call    enemyinitiator

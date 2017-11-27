@@ -10,8 +10,7 @@ _COLLTAB = OUSER+6
 _EXPLOCT = OUSER+6      ; overloads follow
 _WAIT = OUSER+7
 
-
-#include "testfns.asm"
+;;#include "testfns.asm"
 
 subfunction:
     push    iy
