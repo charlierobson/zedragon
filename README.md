@@ -20,9 +20,8 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * final boss
 
 ### IN PROGRESS
-* collision tuning
-* laser improvements
-
+* final boss
+* occasional non-destruction of enemies
 ### ONGOING
 * map cleanup
 * improve sound effects
@@ -35,12 +34,11 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~laser graphically interferes with bullet~~
 * ~~sub collisions broken~~
 * ~~enemies can fall below line 10~~
+* enemies sometimes don't die
 
 ### NICE TO HAVE
 * hiscore saving
-* inter-screen wipes
 * control customisation
-* high score saving
 * other udg boards
 * chroma
 * game over music

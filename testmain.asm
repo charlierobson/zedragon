@@ -3,6 +3,8 @@
 ;               HEAD
 ;    ...[mines][core][bullets][gamemain/attract][sub][explosions]...
 
+#include "e-depth.1.asm"
+
 testmain:
     ld      l,0
 
@@ -39,6 +41,18 @@ testmain:
     ld      bc,32
     xor     a
     call    fillmem
+
+	call	getobject
+	ld		bc,specialdepthcharge
+	call	initobject
+	call	insertobject_beforehead
+    ex      de,hl
+    ld      de,39
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    inc     hl
+    ld      (hl),1
 
 _testreset:
     ld      hl,titlescreen
