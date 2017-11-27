@@ -7,10 +7,12 @@ _SCRADH = OUSER+3
 _COLO = OUSER+4
 _ROWO = OUSER+5
 _COLLTAB = OUSER+6
+_EXPLOCT = OUSER+6      ; overload
+
+
+#include "testfns.asm"
 
 subfunction:
-
-_substart:
     push    iy
     pop     hl
     ld      de,_SUBY
@@ -54,10 +56,6 @@ _substart:
     cp      $a0
     jr      nc,_checkfire
     inc     (hl)
-
-    ;
-    ; check fire
-    ;
 
 _checkfire:
     ld      a,(fire)
@@ -344,11 +342,11 @@ chkidx2 = $+5
     inc     e
     djnz    _checkcoll
 
-    call    showcols
+;;;    call    showcols
 
     ld      a,(airlevel)
     and     a
-    jp      nz,_substart
+    jp      nz,subfunction
 
     ; sub is dead, explo-o-o-o-ode
 
@@ -358,32 +356,57 @@ _subdead:
 
     ; trigger some explosions
 
+    ld      (iy+_EXPLOCT),6
     ld      hl,explooff
     ld      a,(FRAMES)
-    and     6
-
+    and     3
     add     a,l
     ld      l,a
     adc     a,h
     sub     l
     ld      h,a
-    ld      (exploptr),hl
 
-    call    _subsubexplo
-    call    _subsubexplo
-    call    _subsubexplo
-    call    _subsubexplo
-    call    _subsubexplo
-    call    _subsubexplo
+_subsubexplo:
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    inc     hl
+    ld      (iy+_COLO),l
+    ld      (iy+_COLO+1),h
+
+    ld      l,(iy+_SCRADL)
+    ld      h,(iy+_SCRADH)
+    add     hl,de
+    push    hl
+
+	ld		bc,explosion
+    call	getobject
+	call	initobject
+	call	insertobject_afterthis
+
+    ex      de,hl
+    pop     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+
+-:  YIELD
+    ld      a,(gameframe)
+    and     7
+    jr      nz,{-}
+
+    ld      l,(iy+_COLO)
+    ld      h,(iy+_COLO+1)
+    inc     hl
+
+    dec     (iy+_EXPLOCT)
+    jr      nz,_subsubexplo
 
     ld      a,12-1
     call    AFXPLAY
 
     DIE
 
-    .align 16
-charcache:
-    .fill   48
 
 _testcollision:
     ld      a,c
@@ -393,88 +416,13 @@ _testcollision:
     ret
 
 
-_subsubexplo:
-    ld      hl,(exploptr)
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      (exploptr),hl
-    ld      l,(iy+_SCRADL)
-    ld      h,(iy+_SCRADH)
-    add     hl,de
-    push    hl
+    .align 16
+charcache:
+    .fill   48
 
-    call	getobject
-	ld		bc,explosion
-	call	initobject
-	call	insertobject_afterthis
-
-    pop     de
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-
-    YIELD
-    YIELD
-    YIELD
-    ret
 
 explooff:
     .word   0,601,600,2,1,602
     .word   0,601,600,2,1,602
 exploptr:
     .word   0
-
-
-showcols:
-    ld      hl,TOP_LINE
-    ld      bc,32
-    xor     a
-    call    fillmem
-    ld      a,(iy+_COLLTAB+0)   ; character occupying top left
-    ld      de,TOP_LINE
-    call    hexout
-    ld      a,(iy+_COLLTAB+1)   ; overlapping bits from above
-    ld      de,TOP_LINE+2
-    call    hexout
-    ld      a,(iy+_COLLTAB+2)
-    ld      de,TOP_LINE+5
-    call    hexout
-    ld      a,(iy+_COLLTAB+3)
-    ld      de,TOP_LINE+7
-    call    hexout
-    ld      a,(iy+_COLLTAB+4)
-    ld      de,TOP_LINE+10
-    call    hexout
-    ld      a,(iy+_COLLTAB+5)
-    ld      de,TOP_LINE+12
-    call    hexout
-
-    ld      a,(iy+_COLLTAB+6)
-    ld      de,TOP_LINE+15
-    call    hexout
-    ld      a,(iy+_COLLTAB+7)
-    ld      de,TOP_LINE+17
-    call    hexout
-    ld      a,(iy+_COLLTAB+8)
-    ld      de,TOP_LINE+20
-    call    hexout
-    ld      a,(iy+_COLLTAB+9)
-    ld      de,TOP_LINE+22
-    call    hexout
-    ld      a,(iy+_COLLTAB+10)
-    ld      de,TOP_LINE+25
-    call    hexout
-    ld      a,(iy+_COLLTAB+11)
-    ld      de,TOP_LINE+27
-    call    hexout
-
-    ld      a,(iy+_SUBX)
-    ld      de,BOTTOM_LINE
-    call    hexout
-    ld      a,(iy+_SUBY)
-    ld      de,BOTTOM_LINE+3
-    call    hexout
-    
-    ret

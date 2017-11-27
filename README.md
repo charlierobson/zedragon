@@ -17,14 +17,16 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~depth charges~~
 * ~~pixel movement torpedos~~
 * ~~score~~
-* hiscore
+* hiscore saving
 * final boss
 
 ### IN PROGRESS
 * collision tuning
+* laser
 
 ### ONGOING
 * map cleanup
+* improve sound effects
 
 ### BUGS
 * ~~ship parts left behind when reversing~~
