@@ -30,7 +30,15 @@ testmain:
     ld      bc,16
     ldir
 
-    call    resetair
+    xor     a
+    ld      (airupdatecounter),a
+    ld      a,AIR_MAX
+    ld      (airlevel),a
+
+    ld      hl,BOTTOM_LINE
+    ld      bc,32
+    xor     a
+    call    fillmem
 
 _testreset:
     ld      hl,titlescreen
@@ -59,14 +67,12 @@ _aliveloop:
     inc     hl
     ld      (gameframe),hl
 
-    call    displayocount
+    ;call    displayocount
     xor     a
     ld      (ocount),a
     YIELD
 
     call    enemyinitiator
-
-    ;call    showcols
 
     ld      a,(collision)
     and     a
@@ -76,7 +82,7 @@ _aliveloop:
 
     ld      (iy+OUSER),$80
 
--:  call    displayocount
+-:  ;call    displayocount
     xor     a
     ld      (ocount),a
     YIELD

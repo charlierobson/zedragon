@@ -58,8 +58,12 @@ _loop:
     ld      bc,600              ; move down one line
     add     hl,bc
     push    hl
+    inc     (iy+OUSER+5)
+    ld      a,(iy+OUSER+5)
+    cp      9
+    jr      z,_sink
 
-    add     hl,bc               ; check to see if we should only render top part
+    add     hl,bc
     ld      d,h
     set     7,d
     res     6,d
@@ -69,7 +73,10 @@ _loop:
     and     a
     jr      z,_loop
 
-    and     a
+_sink:
+    xor     a
+
+    ; 'sink' into the ground
 
 _loop2:
     ld      (iy+OUSER),l        ; screen pointer
@@ -90,7 +97,7 @@ _loop2:
     ld      l,(iy+OUSER+0)      ; restore screen pointers
     ld      h,(iy+OUSER+1)
 
-    inc     (iy+OUSER+2)        ; only move when frame = 0
+    inc     (iy+OUSER+2)
     ld      a,(iy+OUSER+2)
     and     7
     jr      nz,_loop2

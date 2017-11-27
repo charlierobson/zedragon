@@ -17,26 +17,27 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~depth charges~~
 * ~~pixel movement torpedos~~
 * ~~score~~
-* ~~hiscore~~
 * final boss
 
 ### IN PROGRESS
-* sub collisions
 * collision tuning
+* laser improvements
 
 ### ONGOING
 * map cleanup
+* improve sound effects
 
 ### BUGS
 * ~~ship parts left behind when reversing~~
 * ~~explosion parts left behind sometimes~~
-* crash when ship goes into line 9
+* ~~crash when ship goes into line 9~~
 * ~~chain sometimes doesn't fall~~
 * ~~laser graphically interferes with bullet~~
-* sub collisions broken
-* enemies can fall below line 10
+* ~~sub collisions broken~~
+* ~~enemies can fall below line 10~~
 
 ### NICE TO HAVE
+* hiscore saving
 * inter-screen wipes
 * control customisation
 * high score saving

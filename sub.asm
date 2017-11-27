@@ -7,10 +7,13 @@ _SCRADH = OUSER+3
 _COLO = OUSER+4
 _ROWO = OUSER+5
 _COLLTAB = OUSER+6
+_EXPLOCT = OUSER+6      ; overloads follow
+_WAIT = OUSER+7
+
+
+#include "testfns.asm"
 
 subfunction:
-
-_substart:
     push    iy
     pop     hl
     ld      de,_SUBY
@@ -54,10 +57,6 @@ _substart:
     cp      $a0
     jr      nc,_checkfire
     inc     (hl)
-
-    ;
-    ; check fire
-    ;
 
 _checkfire:
     ld      a,(fire)
@@ -149,9 +148,6 @@ _subrender:
     call    copycharx
     ld      (iy+_COLLTAB+10),a  ; c.i 5
 
-    ; ok, we'll simplify here for a minute but we need to actually do the
-    ; screen chars update after vsync otherwise we'll be flickering
-
     xor     a                   ; zero out collision bits
     ld      (iy+_COLLTAB+1),a
     ld      (iy+_COLLTAB+3),a
@@ -161,7 +157,7 @@ _subrender:
     ld      (iy+_COLLTAB+11),a
     ld      (collision),a
 
-    ld      a,_COLLTAB
+    ld      a,_COLLTAB+1
     ld      (iy+_COLO),a
 
     ; now we've effectively built our tiny bitmap and cleared out the collision bits,
@@ -219,7 +215,11 @@ _column:
     xor     $ff             ; any 0 bits are collisions
     ld      c,a
 
-    ; we need to know what collision pixels map to which background char
+colidx1 = $+2
+colidx2 = $+6
+    ld      a,(iy+0)        ; update collision bits for this background cell
+    or      c
+    ld      (iy+0),a
 
     ld      a,(iy+_ROWO)   ; when rendering hits row 8 bump collision data index
     inc     a
@@ -233,12 +233,7 @@ _column:
     ld      (colidx1),a
     ld      (colidx2),a
 
-colidx1 = $+2
-colidx2 = $+6
-+:  ld      a,(iy+0)        ; update collision bits for this background cell
-    or      c
-    ld      (iy+0),a
-
++:
     inc     hl
     inc     de
     djnz    _column
@@ -260,7 +255,7 @@ colidx2 = $+6
     pop     bc
     djnz    _rendersub
 
-    ; all rendered. now draw the mini bitmap containing the sub to the screen
+    ; all rendered. now draw the min i bitmap containing the sub to the screen
     ; b0 b2 b4
     ; b1 b3 b5
 
@@ -287,6 +282,10 @@ colidx2 = $+6
     inc     hl
     ld      (hl),$b4
     inc     hl
+
+    ld      a,(iy+_SUBY)
+    cp      $47
+    jr      nc,_nosecondline
 
     push    hl
     ld      hl,600-2
@@ -315,6 +314,7 @@ colidx2 = $+6
     ld      (hl),$b5
     inc     hl
 
+_nosecondline:
     ld      (dlp),hl
 
     YIELD
@@ -343,11 +343,11 @@ chkidx2 = $+5
     inc     e
     djnz    _checkcoll
 
-    ;call    showcols
+;;;    call    showcols
 
     ld      a,(airlevel)
     and     a
-    jp      nz,_substart
+    jp      nz,subfunction
 
     ; sub is dead, explo-o-o-o-ode
 
@@ -357,32 +357,60 @@ _subdead:
 
     ; trigger some explosions
 
+    ld      (iy+_EXPLOCT),6
     ld      hl,explooff
     ld      a,(FRAMES)
     and     6
-
     add     a,l
     ld      l,a
     adc     a,h
     sub     l
     ld      h,a
-    ld      (exploptr),hl
 
-    call    _subsubexplo
-    call    _subsubexplo
-    call    _subsubexplo
-    call    _subsubexplo
-    call    _subsubexplo
-    call    _subsubexplo
+_subsubexplo:
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    inc     hl
+    ld      (iy+_COLO),l
+    ld      (iy+_COLO+1),h
+
+    ld      l,(iy+_SCRADL)
+    ld      h,(iy+_SCRADH)
+    add     hl,de
+    push    hl
+
+    ld      bc,explosion
+    call    getobject
+    call    initobject
+    call    insertobject_afterthis
+
+    ex      de,hl
+    pop     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+
+    ld      a,r
+    and     3
+    add     a,5
+    ld      (iy+_WAIT),a
+
+-:  YIELD
+    dec     (iy+_WAIT)
+    jr      nz,{-}
+
+    ld      l,(iy+_COLO)
+    ld      h,(iy+_COLO+1)
+
+    dec     (iy+_EXPLOCT)
+    jr      nz,_subsubexplo
 
     ld      a,12-1
     call    AFXPLAY
 
     DIE
 
-    .align 16
-charcache:
-    .fill   48
 
 _testcollision:
     ld      a,c
@@ -392,82 +420,13 @@ _testcollision:
     ret
 
 
-_subsubexplo:
-    ld      hl,(exploptr)
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-    ld      (exploptr),hl
-    ld      l,(iy+_SCRADL)
-    ld      h,(iy+_SCRADH)
-    add     hl,de
-    push    hl
+    .align 16
+charcache:
+    .fill   48
 
-    call	getobject
-	ld		bc,explosion
-	call	initobject
-	call	insertobject_afterthis
-
-    pop     de
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-
-    YIELD
-    YIELD
-    YIELD
-    ret
 
 explooff:
     .word   0,601,600,2,1,602
     .word   0,601,600,2,1,602
 exploptr:
     .word   0
-
-
-showcols:
-    ld      hl,TOP_LINE
-    ld      bc,32
-    xor     a
-    call    fillmem
-    ld      a,(iy+_COLLTAB+0)
-    ld      de,TOP_LINE
-    call    hexout
-    ld      a,(iy+_COLLTAB+1)
-    ld      de,TOP_LINE+2
-    call    hexout
-    ld      a,(iy+_COLLTAB+2)
-    ld      de,TOP_LINE+5
-    call    hexout
-    ld      a,(iy+_COLLTAB+3)
-    ld      de,TOP_LINE+7
-    call    hexout
-    ld      a,(iy+_COLLTAB+4)
-    ld      de,TOP_LINE+10
-    call    hexout
-    ld      a,(iy+_COLLTAB+5)
-    ld      de,TOP_LINE+12
-    call    hexout
-
-    ld      a,(iy+_COLLTAB+6)
-    ld      de,TOP_LINE+15
-    call    hexout
-    ld      a,(iy+_COLLTAB+7)
-    ld      de,TOP_LINE+17
-    call    hexout
-    ld      a,(iy+_COLLTAB+8)
-    ld      de,TOP_LINE+20
-    call    hexout
-    ld      a,(iy+_COLLTAB+9)
-    ld      de,TOP_LINE+22
-    call    hexout
-    ld      a,(iy+_COLLTAB+10)
-    ld      de,TOP_LINE+25
-    call    hexout
-    ld      a,(iy+_COLLTAB+11)
-    ld      de,TOP_LINE+27
-    call    hexout
-
-
-    ret
