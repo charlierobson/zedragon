@@ -42,7 +42,7 @@ pssubssz    = $ - pssubs
 
     ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)
-	RET
+    RET
 
 #include "readisplay.asm"
 #include "yield.asm"

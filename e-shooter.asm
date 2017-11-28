@@ -50,8 +50,14 @@ _pewpew:
     ld      (iy+OUSER+ITERS),SHOOTITERS
 
 _shoot_on_main:
+    ld      a,7
+    call    z,AFXPLAY
+
     call    _shootahoopa
     inc     (iy+OUSER+FFLOP)
+
+    ld      a,7
+    call    nz,AFXPLAY
 
     call    _shootahoopa
     dec     (iy+OUSER+FFLOP)
@@ -77,17 +83,17 @@ _shoot_off_main:
 
     call    nextframe
 
-    dec     (iy+OUSER+ITERS)                    ; number of positions in offtabs
+    dec     (iy+OUSER+ITERS)            ; number of positions in offtabs
     jr      nz,_shoot_off_main
 
     ; shoot sequence finished, wait a couple of seconds
 
-    ld      (iy+OUSER+DLAY),50                 ; delay counter
+    ld      (iy+OUSER+DLAY),50          ; delay counter
 
 _soy2:
 -:  YIELD
 
-    ld      a,(collision)                   ; die if sub died
+    ld      a,(collision)               ; die if sub died
     or      (iy+OUSER+COLL)
     DIENZ
     call    cIfOffscreenLeft
