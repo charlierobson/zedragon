@@ -19,11 +19,10 @@ specialdepthcharge:
 
     ld      (iy+OUSER+5),0
 
-_loop0:  ; reset
     ld      (iy+OUSER+3),l      ; screen pos
     ld      (iy+OUSER+4),h
 
-_loop1:
+_loop1: 
     ld      l,(iy+OUSER+3)
     ld      h,(iy+OUSER+4)    
     ld      a,CH_DEPTHBASE+0
@@ -32,19 +31,16 @@ _loop1:
     res     6,h
     ld      (hl),a
     YIELD
-
-    call    _hittest            ; doesn't return if we're hit
-
-    inc     (iy+OUSER+5)
-    bit     3,(iy+OUSER+5)
-    jr      z,_loop1
-
-    jp      _loop0
+    nop
+    nop
+    nop
+    call    _hittestc            ; doesn't return if we're hit
+    jr      _loop1
 
 
 
 
-_hittest:
+_hittestc:
     ld      de,(bulletHitX)     ; early exit if no hit signalled
     ld      a,d
     or      e
@@ -67,19 +63,23 @@ _hittest:
     cp      b
     ret     c
 
-    pop     hl                  ; sink return address as we're not returning
-
     ; become explosion
+_dedded:
+
+;    pop     hl                  ; sink return address as we're not returning
 
     ld      l,(iy+OUSER+3)
-    ld      (iy+OUSER+0),l
     ld      h,(iy+OUSER+4)
-    ld      (iy+OUSER+1),h
-
-    ld      (hl),0              ; remove mine from screen & shadow map
-    set     7,h
-    res     6,h
-    ld      (hl),0
-
-    ld      (iy+OUSER+2),16     ; start later in sequence = short explosion
-    jp      becomeexplosion
+    ld      de,600
+    add     hl,de
+    push    hl
+    call    getobject
+    ld      bc,explosion
+    call    initobject
+    call    insertobject_afterhead
+    ex      de,hl
+    pop     de
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    ret

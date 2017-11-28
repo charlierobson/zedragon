@@ -1,9 +1,10 @@
+#include "e-depth.1.asm"
+
+
     .module TESTMAIN
 
 ;               HEAD
 ;    ...[mines][core][bullets][gamemain/attract][sub][explosions]...
-
-#include "e-depth.1.asm"
 
 testmain:
     ld      l,0
@@ -47,7 +48,7 @@ testmain:
 	call	initobject
 	call	insertobject_beforehead
     ex      de,hl
-    ld      de,39
+    ld      de,41
     ld      (hl),e
     inc     hl
     ld      (hl),d

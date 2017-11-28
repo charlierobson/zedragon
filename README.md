@@ -22,6 +22,7 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 ### IN PROGRESS
 * final boss
 * occasional non-destruction of enemies
+
 ### ONGOING
 * map cleanup
 * improve sound effects
