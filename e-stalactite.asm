@@ -4,7 +4,7 @@
 ;
 
 stalfall:
-    ld      a,5
+    ld      a,SFX_STALAC
     call    AFXPLAY
 
     ld      l,(iy+OUSER)        ; hl = x

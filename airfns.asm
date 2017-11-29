@@ -57,7 +57,7 @@ _decrease
     rrca
     rrca
     rrca
-    add     a,13
+    add     a,SFX_ALARM0
     call    AFXPLAY
     pop     af
 

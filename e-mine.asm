@@ -9,7 +9,7 @@ _YPOS = OUSER+3
 _XPOS = OUSER+4
 
 minearise:
-    ld      a,5
+    ld      a,SFX_MINERELEASE
     call    AFXPLAY
 
     ld      l,(iy+_SCRPOS+0)        ; hl = x
@@ -110,7 +110,8 @@ _gobang:
     add     hl,bc
     ld      (hl),0
 
-    call    explosound
+    ld      a,SFX_MINEBREACH
+    call    AFXPLAY
 
     ld      (iy+_COUNTER),0      ; swap to explosion coroutine
     jp      becomeexplosion

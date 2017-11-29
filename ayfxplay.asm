@@ -24,6 +24,28 @@
 ;                                                              ;
 ;--------------------------------------------------------------;
 
+SFX_EXPLODE = 7
+SFX_SONAR = 1
+SFX_MINEBREACH = 2
+SFX_STALAC = 3
+SFX_MINERELEASE = 4
+SFX_SHOOTERSHOT = 5
+SFX_EXPLODE0 = 6
+SFX_EXPLODE1 = 7
+SFX_EXPLODE2 = 8
+SFX_EXPLODE3 = 9
+SFX_ZONEREACH = 10
+SFX_ALARM0 = 11
+SFX_ALARM1 = 12
+SFX_SUBSURFACE = 13
+SFX_LECTRIC = 14
+SFX_SUBDEAD = 15
+SFX_EXTRASUB = 16
+SFX_HIGHSCORE = 17
+SFX_TORPED0 = 18
+SFX_TORPED1 = 19
+SFX_TORPED2 = 20
+SFX_TORPED3 = 21
 
 ; channel descriptors, 4 bytes per channel:
 ; +0 (2) current address (the channel is free if the high byte =$00)
@@ -200,10 +222,14 @@ afxNseMix
 ;--------------------------------------------------------------;
 ; Launch the effect on a free channel. Without                 ;
 ; free channels is selected the longest sounding.              ;
-; Input: A = Effect number 0..255                              ;
+; Input: A = Effect number 1..255                              ;
 ;--------------------------------------------------------------;
 
+AFXPLAY2:	; pre-inc A for wnen sfx number is pre-adjusted
+	inc		a
+
 AFXPLAY:
+	dec		a
 	ld de,0				;in DE the longest time in search
 	ld h,e
 	ld l,a

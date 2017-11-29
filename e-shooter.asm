@@ -18,6 +18,7 @@ shootemupperhaps:
     ld      h,(iy+OUSER+1)
     ld      de,(scrollpos)
     sbc     hl,de
+    ld      a,l
     cp      10
     DIEC
 
@@ -57,13 +58,13 @@ _pewpew:
     ld      (iy+OUSER+ITERS),SHOOTITERS
 
 _shoot_on_main:
-    ld      a,7
+    ld      a,SFX_SHOOTERSHOT
     call    z,AFXPLAY
 
     call    _shootahoopa
     inc     (iy+OUSER+FFLOP)
 
-    ld      a,7
+    ld      a,SFX_SHOOTERSHOT
     call    nz,AFXPLAY
 
     call    _shootahoopa

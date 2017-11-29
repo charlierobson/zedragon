@@ -10,13 +10,10 @@ _COUNTER = OUSER+2
 ; explosion
 ;
 
-SFX_EXPLODE = 7
-
-
 explosound:
     ld      a,(FRAMES)
     and     3
-    add     a,SFX_EXPLODE
+    add     a,SFX_EXPLODE0
     jp      AFXPLAY
 
 

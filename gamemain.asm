@@ -91,7 +91,7 @@ _gameloop:
     ld      (iy+_RSPL),l        ; store the new restart info pointer
     ld      (iy+_RSPH),h
 
-    ld      a,12                ; let player know
+    ld      a,SFX_ZONEREACH     ; let player know
     call    AFXPLAY
 
 _notscrolled:
@@ -107,7 +107,7 @@ _notscrolled:
 
     ld      a,(FRAMES)          ; play ping sfx (id = 0) every so often
     and     127
-    call    z,AFXPLAY
+    call    z,AFXPLAY2
 
     ld      a,(collision)       ; loop until the sub has collided with something
     and     a

@@ -27,6 +27,9 @@ subfunction:
     cp      0
     jr      z,{+}
     dec     (hl)
+    cp      7
+    ld      a,SFX_SUBSURFACE
+    call    z,AFXPLAY
 
 +:  ld      a,(down)        ; max y = $48
     and     1
@@ -405,7 +408,7 @@ _subsubexplo:
     dec     (iy+_EXPLOCT)
     jr      nz,_subsubexplo
 
-    ld      a,12-1
+    ld      a,SFX_SUBDEAD
     call    AFXPLAY
 
     DIE
