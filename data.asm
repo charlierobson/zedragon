@@ -64,7 +64,7 @@ inputstates:
     .byte	%00010000,7,%00000100,0        ; right   (M)
     .byte	%00001000,7,%00000001,0        ; fire    (SP)
     .byte	%11111111,3,%00000001,0        ; advance (1)
-    .byte	%11111111,0,$00000101,0        ; quit    (SH-X)
+    .byte	%11111111,4,%00000001,0        ; feature (0)
 
 ; calculate actual input impulse addresses
 up      = inputstates + 3
@@ -73,7 +73,7 @@ left    = inputstates + 11
 right   = inputstates + 15
 fire    = inputstates + 19
 advance = inputstates + 23
-quit    = inputstates + 27
+feature = inputstates + 27
 
 scrolltick:
 	.byte	0

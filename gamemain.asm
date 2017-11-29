@@ -60,6 +60,7 @@ _resetafterdeath:
 
 _gameloop:
     call    _advancecheck
+    call    featurecheck
 
     ld      hl,(gameframe)
     inc     hl
@@ -162,6 +163,9 @@ _advancecheck:
     dec     a
     ret     nz
 
+    ld      a,SFX_ZONEREACH     ; let player know
+    call    AFXPLAY
+
     ld      l,(iy+_RSPL)
     ld      h,(iy+_RSPH)
     inc     hl
@@ -170,4 +174,15 @@ _advancecheck:
     inc     hl
     ld      (iy+_RSPL),l
     ld      (iy+_RSPH),h
+    ret
+
+
+featurecheck:
+    ld      a,(feature)
+    cp      1
+    ret     nz
+
+    ld      a,(UDG+3)
+    xor     $8
+    ld      (UDG+3),a
     ret

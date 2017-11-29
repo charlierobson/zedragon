@@ -93,6 +93,8 @@ _aliveloop:
 
     call    enemyinitiator
 
+    call    featurecheck
+
     ld      a,(collision)
     and     a
     jr      z,_aliveloop

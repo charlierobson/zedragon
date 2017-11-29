@@ -18,21 +18,28 @@ attract:
     ld      (hl),0
     YIELD
 
--:  ld      a,(FRAMES)
+_attractloop:
+    ld      a,(FRAMES)
     and     127
     call    z,updatecredits
 
     YIELD
 
+	ld		bc,gamemain
     ld      a,(fire)
     cp      1
-    jr      nz,{-}
+    jr      z,_gamestart
 
+    ld      bc,testmain
+    ld      a,(feature)
+    cp      1
+    jr      nz,_attractloop
+    
+_gamestart:
+    push    bc
     call    silencesound
-
+    pop     bc
 	call	getobject
-	ld		bc,gamemain ; testmain ; 
 	call	initobject
 	call	insertobject_afterhead
-
 	DIE

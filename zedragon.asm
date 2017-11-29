@@ -14,10 +14,10 @@ D_BUFFER = $
 
 UDG         = $2000
 PUREMAP     = $2600
-OSTORE      = $2d00
-enemydat    = $3500
-subpix      = $3600
-enemyidx    = $36c0
+OSTORE      = $2e00
+enemydat    = $3600
+subpix      = $3700
+enemyidx    = $37c0
 
 FREELIST    = $8000
 D_MIRROR    = $808a
