@@ -136,13 +136,6 @@ _loop:
     call    char2dlist
     ld      (bullet2sp),hl
 
-    YIELD
-
-    ld      hl,0
-    ld      (bulletHitX),hl
-
-    ; when we arrive back here the previously rendered bullet will be on screen
-
     ld      c,(iy+_RCHAR)
     ld      a,(iy+_RCOLB)
     or      a
@@ -150,6 +143,12 @@ _loop:
 
     dec     (iy+_COLNF)
     jr      z,_bulletdie
+
+    YIELD
+
+;    ld      hl,collisionstore       ; should only reset collision store once per frame.
+;    dec     (hl)
+;    call    z,resetcollisionstore   ; if we've made the flag = 0 then reset the store
 
     ld      a,(iy+_SPEED)
     cp      28
@@ -166,14 +165,18 @@ _loop:
     ; off screen or collided, stop
 
 _bulletdie:
-    ld      hl,0
+    ld      hl,0                ; don't render me no more bro
     ld      (bullet1sp),hl
     ld      (bullet2sp),hl
 
     ld      hl,bulletCount      ; die
     dec     (hl)
 
+    ; leave collision info in place for testers
+
     YIELD
+
+    ; delete bullet collision info
 
     ld      hl,0
     ld      (bulletHitX),hl

@@ -20,7 +20,6 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * final boss
 
 ### IN PROGRESS
-* final boss
 * occasional non-destruction of enemies
 
 ### ONGOING
