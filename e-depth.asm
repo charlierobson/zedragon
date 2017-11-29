@@ -154,5 +154,7 @@ _hittest:
     res     6,h
     ld      (hl),0
 
+    call    explosound
+
     ld      (iy+OUSER+2),16     ; start later in sequence = short explosion
     jp      becomeexplosion

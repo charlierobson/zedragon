@@ -110,5 +110,7 @@ _gobang:
     add     hl,bc
     ld      (hl),0
 
+    call    explosound
+
     ld      (iy+_COUNTER),0      ; swap to explosion coroutine
     jp      becomeexplosion

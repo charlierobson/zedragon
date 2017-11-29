@@ -22,7 +22,7 @@ _considertable:
     .word   considermine, minearise
     .word   considernull, 0     ; never consider static mines
     .word   considerdepth, depthchargeGenerator
-    .word   considershooter, shootemup
+    .word   considershooter, shootemupperhaps
     .word   considerlaser, laseremup
 
 

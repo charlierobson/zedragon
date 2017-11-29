@@ -13,6 +13,13 @@ ITERS = 8
 FFLOP = 9
 ;10/11
 COLL = 12
+shootemupperhaps:
+    ld      l,(iy+OUSER)        ; x
+    ld      h,(iy+OUSER+1)
+    ld      de,(scrollpos)
+    sbc     hl,de
+    cp      10
+    DIEC
 
 shootemup:
     ld      l,(iy+OUSER)        ; x

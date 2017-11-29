@@ -12,12 +12,16 @@ _COUNTER = OUSER+2
 
 SFX_EXPLODE = 7
 
-explosion:
+
+explosound:
     ld      a,(FRAMES)
     and     3
     add     a,SFX_EXPLODE
-    call    AFXPLAY
+    jp      AFXPLAY
 
+
+explosion:
+    call    explosound
     xor     a
 
 _exploop:
