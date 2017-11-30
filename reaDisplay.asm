@@ -331,7 +331,7 @@ SOUNDFN = $+1
 
 +:	xor		$ff
 
-	ld		hl,$22b8			; character $97
+	ld		hl,UDG+$2b8			; character $97 - laser  we want a shimmering laser effect
 	ld		de,CHARSETS+$2b8
 
 	ld		(hl),a
@@ -383,12 +383,3 @@ VID_STACK:
 
 JUST_TWO_BYTES:
 	.byte 0,0
-
-TOP_LINE:
-	.fill 32,0
-	RET
-
-	.align	32	; to assist in air display calculations
-BOTTOM_LINE:
-	.fill 32,0
-	RET

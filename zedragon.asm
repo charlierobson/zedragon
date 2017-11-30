@@ -21,7 +21,7 @@ enemyidx    = $37c0
 
 FREELIST    = $8000
 D_MIRROR    = $808a
-CHARSETS    = $97fa
+CHARSETS    = $9800
 DRAWLIST_0  = $9c00
 DRAWLIST_1  = $9e00
 
@@ -43,6 +43,15 @@ pssubssz    = $ - pssubs
     ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)
     RET
+
+TOP_LINE:
+	.fill 32,0
+	RET
+
+	.align	32	; to assist in air display calculations
+BOTTOM_LINE:
+	.fill 32,0
+	RET
 
 #include "readisplay.asm"
 #include "yield.asm"

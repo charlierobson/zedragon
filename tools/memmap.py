@@ -51,7 +51,7 @@ end = start + 6000
 #print(hex(start) + " - " + hex(end) + " : mirror map")
 print("D_MIRROR = $" + format(start, 'x'));
 
-start = end
+start = roundup(end)
 end = start + 1024
 #print(hex(start) + " - " + hex(end) + " : charsets")
 print("CHARSETS = $" + format(start, 'x'));
