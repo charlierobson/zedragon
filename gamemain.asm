@@ -156,6 +156,10 @@ _advancecheck:
     dec     a
     ret     nz
 
+    ld      a,(zone)
+    cp      6
+    ret     z
+
     ld      a,SFX_ZONEREACH     ; let player know
     call    AFXPLAY
 
