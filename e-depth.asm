@@ -54,12 +54,9 @@ depthcharge:
     sla     (iy+OUSER+2)
 
     ld      (iy+OUSER+5),0
-
-_loop0:  ; reset
     ld      (iy+OUSER+3),l      ; screen pos
     ld      (iy+OUSER+4),h
 
-_loop1:
     ld      l,(iy+OUSER+3)
     ld      h,(iy+OUSER+4)    
     ld      a,CH_DEPTHBASE+0
@@ -67,54 +64,103 @@ _loop1:
     set     7,h
     res     6,h
     ld      (hl),a
+
     YIELD
 
     call    _hittest            ; doesn't return if we're hit
 
-    inc     (iy+OUSER+5)
-    bit     3,(iy+OUSER+5)
-    jr      z,_loop1
+_loop0:
+    inc     (iy+OUSER+2)      ; bump y
+    inc     (iy+OUSER+2)
 
-    ld      a,(iy+OUSER+2)      ; bump y
-    add     a,4
-    ld      (iy+OUSER+2),a
-
-_loop2:
     ld      l,(iy+OUSER+3)
-    ld      h,(iy+OUSER+4)
+    ld      h,(iy+OUSER+4)    
     ld      a,CH_DEPTHBASE+1
     call    char2dlist
     set     7,h
     res     6,h
     ld      (hl),a
+
     YIELD
 
-    call    _hittest
+    call    _hittest            ; doesn't return if we're hit
 
-    inc     (iy+OUSER+5)
-    bit     3,(iy+OUSER+5)
-    jr      nz,_loop2
+    inc     (iy+OUSER+2)      ; bump y
+    inc     (iy+OUSER+2)
 
-    ld      a,(iy+OUSER+2)      ; bump y
-    add     a,4
-    ld      (iy+OUSER+2),a
-
-    ld      l,(iy+OUSER+3)      ; clear old mine from screen
-    ld      h,(iy+OUSER+4)
-    ld      (hl),0
+    ld      l,(iy+OUSER+3)
+    ld      h,(iy+OUSER+4)    
+    ld      a,CH_DEPTHBASE+2
+    call    char2dlist
     set     7,h
     res     6,h
-    ld      (hl),0              ; write to shadow
+    ld      (hl),a
 
-    ld      bc,600              ; next line
-    add     hl,bc
-    ld      a,(hl)              ; reading from shadow map
-    res     7,h
-    set     6,h
+    YIELD
+
+    call    _hittest            ; doesn't return if we're hit
+
+    inc     (iy+OUSER+2)      ; bump y
+    inc     (iy+OUSER+2)
+
+    ld      l,(iy+OUSER+3)
+    ld      h,(iy+OUSER+4)    
+    ld      de,600
+    add     hl,de
+    set     7,h
+    res     6,h
+    ld      a,(hl)
     or      a
-    jp      z,_loop0
+    DIENZ
 
-    DIE
+    ld      l,(iy+OUSER+3)
+    ld      h,(iy+OUSER+4)    
+    ld      a,CH_DEPTHBASE+3
+    call    char2dlist
+    push    hl
+    set     7,h
+    res     6,h
+    ld      (hl),a
+
+    pop     hl
+    ld      de,600
+    add     hl,de
+    ld      a,CH_DEPTHBASE+4
+    call    char2dlist
+    set     7,h
+    res     6,h
+    ld      (hl),a
+
+    YIELD
+
+    call    _hittest            ; doesn't return if we're hit
+
+    inc     (iy+OUSER+2)      ; bump y
+    inc     (iy+OUSER+2)
+
+    ld      l,(iy+OUSER+3)
+    ld      h,(iy+OUSER+4)
+    xor     a
+    call    char2dlist
+    push    hl
+    set     7,h
+    res     6,h
+    ld      (hl),a
+    pop     hl
+
+    ld      de,600
+    add     hl,de
+    ld      (iy+OUSER+3),l
+    ld      (iy+OUSER+4),h
+    ld      a,CH_DEPTHBASE+0
+    call    char2dlist
+    set     7,h
+    res     6,h
+    ld      (hl),a
+
+    YIELD
+
+    jp      _loop0
 
 
 _hittest:

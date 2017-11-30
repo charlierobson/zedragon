@@ -153,10 +153,10 @@ animatecharacters:
     add     a,l
     ld      l,a
     ld      a,(hl)
-    ld      (UDG+$1a8),a         ; ship rear end, $35
+    ld      (UDG+$198),a         ; ship rear end, $33
     inc     hl
     ld      a,(hl)
-    ld      (UDG+$1a8+1),a
+    ld      (UDG+$199),a
 
     ld      a,(UDG+$181)        ; shooter, $30
     xor     $66 ^ $7e

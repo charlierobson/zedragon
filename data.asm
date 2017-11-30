@@ -1,4 +1,4 @@
-    CH_DEPTHBASE    = $32
+    CH_DEPTHBASE    = $34
     CH_MINEBASE     = $80
     CH_MINE         = $87
     CH_STALACBASE   = $88
