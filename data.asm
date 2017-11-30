@@ -12,7 +12,7 @@
     .asciimap ' ', '_', {*}-' '
 
 scoreline:
-	.asc    "SCORE: 000000  HI: 000000  ^_: 4"
+	.asc    "SCORE:00000  HI:00000  Z:0  ^_:4"
         	;--------========--------========
 
 airline:
@@ -115,6 +115,9 @@ airupdatecounter:
 airlevel:
     .byte   0
 
+
+zone:
+    .byte   0
 
     ; Restart scroll and sub positions
 dofs:

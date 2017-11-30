@@ -18,6 +18,8 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~pixel movement torpedos~~
 * ~~score~~
 * final boss
+* "laser" sounds
+* tackle slowdown
 
 ### IN PROGRESS
 * occasional non-destruction of enemies
@@ -25,6 +27,7 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 ### ONGOING
 * map cleanup
 * improve sound effects
+* check limits for life, zone, score..
 
 ### BUGS
 * ~~ship parts left behind when reversing~~
@@ -34,7 +37,7 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~laser graphically interferes with bullet~~
 * ~~sub collisions broken~~
 * ~~enemies can fall below line 10~~
-* enemies sometimes don't die
+* torpedo passes through mine sometimes
 
 ### NICE TO HAVE
 * hiscore saving

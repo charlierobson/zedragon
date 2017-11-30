@@ -32,6 +32,9 @@ gamemain:
     ld      (iy+_LIVES),a
     call    _showlives
 
+    xor     a
+    ld      (zone),a
+
     ld      a,(laserframe)
     ld      (laserframe+1),a
 
@@ -71,29 +74,7 @@ _gameloop:
     rlca
     jr      nc,_notscrolled     ; haven't scrolled the bg, so we don't need to update any pointers
 
-    ; check if we've hit a restart point
-
-    ld      l,(iy+_RSPL)        ; this is definitely a bit starbucks
-    ld      h,(iy+_RSPH)
-    inc     hl                  ; look past the current restart info
-    inc     hl
-    inc     hl
-    inc     hl
-    push    hl
-    ld      e,(hl)              ; next restart x into de
-    inc     hl
-    ld      d,(hl)
-    ld      hl,(scrollpos)
-    and     a
-    sbc     hl,de
-    pop     hl
-    jr      nz,_notscrolled     ; we haven't reached the restart yet
-
-    ld      (iy+_RSPL),l        ; store the new restart info pointer
-    ld      (iy+_RSPH),h
-
-    ld      a,SFX_ZONEREACH     ; let player know
-    call    AFXPLAY
+    call    zonecheck
 
 _notscrolled:
     xor     a
@@ -158,6 +139,18 @@ _showlives:
 
 
 
+featurecheck:
+    ld      a,(feature)
+    cp      1
+    ret     nz
+
+    ld      a,(UDG+3)
+    xor     $8
+    ld      (UDG+3),a
+    ret
+
+
+
 _advancecheck:
     ld      a,(advance)
     dec     a
@@ -174,15 +167,35 @@ _advancecheck:
     inc     hl
     ld      (iy+_RSPL),l
     ld      (iy+_RSPH),h
-    ret
+    jr      _showzone
 
 
-featurecheck:
-    ld      a,(feature)
-    cp      1
-    ret     nz
+zonecheck:
+    ; check if we've hit a restart point
 
-    ld      a,(UDG+3)
-    xor     $8
-    ld      (UDG+3),a
-    ret
+    ld      l,(iy+_RSPL)        ; this is definitely a bit starbucks
+    ld      h,(iy+_RSPH)
+    inc     hl                  ; look past the current restart info
+    inc     hl
+    inc     hl
+    inc     hl
+    push    hl
+    ld      e,(hl)              ; next restart x into de
+    inc     hl
+    ld      d,(hl)
+    ld      hl,(scrollpos)
+    and     a
+    sbc     hl,de
+    pop     hl
+    ret     nz                  ; we haven't reached the restart yet
+
+    ld      (iy+_RSPL),l        ; store the new restart info pointer
+    ld      (iy+_RSPH),h
+
+_showzone:
+    ld      hl,zone
+    inc     (hl)
+    call    displayzone
+
+    ld      a,SFX_ZONEREACH     ; let player know
+    jp      AFXPLAY

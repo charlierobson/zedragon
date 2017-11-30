@@ -51,7 +51,7 @@ addscore:
 
 
 displayscore:
-    ld      de,TOP_LINE+8
+    ld      de,TOP_LINE+6
     ld      hl,(_score)
     ld      a,h
     call    _bcd_a
@@ -79,10 +79,19 @@ show_char:
 
 
 displayhi:
-    ld      de,TOP_LINE+20
+    ld      de,TOP_LINE+16
     ld      hl,(_hiscore)
     ld      a,h
     call    _bcd_a
 
     ld      a,l
     jp      _bcd_a
+
+
+displayzone:
+    ld      de,TOP_LINE+25
+    ld      a,(zone)
+    add     a,17
+    ld      (de),a
+    ret
+
