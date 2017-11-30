@@ -152,9 +152,11 @@ void draw()
 
       if(t == 0) image(characterSetE.get(0x4f), (i - scrollpos) * 16, y * 16, 16, 16);
       if(t == 1 || t == 2) image(characterSetE.get(0x47), (i - scrollpos) * 16, y * 16, 16, 16);
-      if(t == 3) image(characterSetE.get(0x35), (i - scrollpos) * 16, y * 16, 16, 16);
+      if(t == 3) image(characterSetE.get(0x33), (i - scrollpos) * 16, y * 16, 16, 16);
       if(t == 4) image(characterSetE.get(0x30), (i - scrollpos) * 16, y * 16, 16, 16);
       if(t == 5) image(characterSetE.get(0x31), (i - scrollpos) * 16, y * 16, 16, 16);
+      if(t == 6) image(characterSetE.get(0x3f), (i - scrollpos) * 16, y * 16, 16, 16);
+      if(t == 7) image(characterSetE.get(0x3d), (i - scrollpos) * 16, y * 16, 16, 16);
       
     }
   }
@@ -165,9 +167,11 @@ int enemyType(int c)
   c &= 0xff;
   if (c == 0x8f) return 0; // stal
   if (c == 0x87) return 1; // mine
-  if (c == 0x35) return 3; // depth
+  if (c == 0x33) return 3; // depth
   if (c == 0x30) return 4; // shooter
   if (c == 0x31) return 5; // laser
+  if (c == 0x3f) return 6; // boss switch
+  if (c == 0x3d) return 7; // boss
 
   return -1;
 }

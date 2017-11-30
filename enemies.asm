@@ -11,19 +11,22 @@ NME_STATMINE = $20
 NME_DEPTH    = $30
 NME_SHOOT    = $40
 NME_LASER    = $50
+NME_BOSSKEY  = $60
+NME_BOSSDOOR = $70
 
 ; TODO - make x,y to screenpos function to share amongst objects
 ;        make function that creates & initialises object
 
-
-    .align  32
+    .align  64
 _considertable:
     .word   considerstal, stalfall
     .word   considermine, minearise
-    .word   considernull, 0     ; never consider static mines
+    .word   considernull, 0                         ; never consider static mines
     .word   considerdepth, depthchargeGenerator
     .word   considershooter, shootemupperhaps
     .word   considerlaser, laseremup
+    .word   considerboss, bosskey
+    .word   considerboss, bossdoor
 
 
 enemyinitiator:
@@ -118,12 +121,14 @@ _starterator:
 ; consideration functions - return with carry set to go with
 ; this object.
 ;
-considerdepth:          ; always starts
+considerdepth:          ; always start
 considershooter:
 considerlaser:
+considerboss:
     scf
 considernull:           ; never starts
     ret
+
 
 considermine:
     push    bc
@@ -158,4 +163,4 @@ cIfOffscreenLeft:
     .include "e-shooter.asm"
     .include "e-depth.asm"
     .include "e-laser.asm"
-    
+    .include "e-boss.asm"
