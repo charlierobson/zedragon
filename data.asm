@@ -1,4 +1,5 @@
     CH_DEPTHBASE    = $34
+    CH_BOSSKEY      = $3F
     CH_MINEBASE     = $80
     CH_MINE         = $87
     CH_STALACBASE   = $88

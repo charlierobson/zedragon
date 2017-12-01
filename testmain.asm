@@ -55,6 +55,8 @@ testmain:
     inc     hl
     ld      (hl),1
 
+    call    enablegamesound
+
 _testreset:
     ld      hl,titlescreen
     ld      de,D_MIRROR
