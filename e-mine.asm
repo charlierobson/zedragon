@@ -68,7 +68,12 @@ _loop:
     ld      d,(iy+_XPOS+1)
     and     a
     sbc     hl,de
-    jr      z,_gobang
+    jr      nz,_update
+
+    ld      bc,1
+    call    addscore
+    call    explosound
+    jr      _gobang
 
 _update:
     ld      l,(iy+_SCRPOS+0)    ; restore screen pointer
@@ -80,7 +85,7 @@ _update:
     jr      nz,_loop
 
     dec     (iy+_YPOS)          ; explode when mine hits the top
-    jr      z,_gobang
+    jr      z,_breach
 
     ld      de,600              ; move mine up
     and     a
@@ -100,6 +105,10 @@ _update:
 
     ; all done - become an explosion
 
+_breach:
+    ld      a,SFX_MINEBREACH
+    call    AFXPLAY
+
 _gobang:
     ld      l,(iy+_SCRPOS+0)    ; remove characters from the mirror
     ld      h,(iy+_SCRPOS+1)
@@ -109,9 +118,6 @@ _gobang:
     ld      bc,600
     add     hl,bc
     ld      (hl),0
-
-    ld      a,SFX_MINEBREACH
-    call    AFXPLAY
 
     ld      (iy+_COUNTER),0      ; swap to explosion coroutine
     jp      becomeexplosion

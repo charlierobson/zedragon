@@ -187,6 +187,9 @@ _hittest:
 
     ; become explosion
 
+    ld      bc,2
+    call    addscore
+
     ld      l,(iy+OUSER+3)
     ld      (iy+OUSER+0),l
     ld      h,(iy+OUSER+4)

@@ -15,10 +15,20 @@ _BCHAR = OUSER+8
 _COLNF = OUSER+9
 _SCRPOSL = OUSER+10
 _SCRPOSH = OUSER+11
+_WORLDXL = OUSER+12
+_WORLDXH = OUSER+13
 
     .align  16
 bchar:
     .fill   16
+
+_tempnmecolpos:
+    .word   0
+_tempbltx:
+    .word   0
+
+enemycollision:
+    .word   0
 
 allocbrender:
     ld      de,bchar
@@ -63,7 +73,10 @@ _loop:
     ld      l,a
     jr      nc,{+}
     inc     h
-+:  ld      a,(iy+_PIXY)       ; calculate y character
++:  ld      (iy+_WORLDXL),l
+    ld      (iy+_WORLDXH),h
+
+    ld      a,(iy+_PIXY)       ; calculate y character
     and     $f8
     rrca
     rrca
@@ -78,7 +91,7 @@ _loop:
     set     7,h                 ; point at background character in mirror map
     res     6,h
 
-    call    allocbrender        ; get pointer to bullet udg slot in de
+    call    allocbrender        ; get 'pointer to bullet udg' slot in de
     push    de                  ; stash for rendering
     ld      (iy+_BCHAR),a       ; store returned character number
     call    copychar
@@ -128,7 +141,7 @@ _loop:
     ld      l,(iy+_SCRPOSL)
     ld      h,(iy+_SCRPOSH)
 
-    ld      (bullet1sp),hl      ; stash the pullet screen location for sub rendering ... na-a-sty
+    ld      (bullet1sp),hl      ; stash the bullet screen location for sub rendering ... na-a-sty
     ld      a,(iy+_BCHAR)
     call    char2dlist
     inc     hl
@@ -136,11 +149,36 @@ _loop:
     call    char2dlist
     ld      (bullet2sp),hl
 
-    ld      c,(iy+_RCHAR)
-    ld      a,(iy+_RCOLB)
-    or      a
+    dec     hl
+    ld      (_tempnmecolpos),hl
+    ld      e,(iy+_WORLDXL)
+    ld      d,(iy+_WORLDXH)
+    ld      (_tempbltx),de
+
+    ld      c,(iy+_LCHAR)
+    ld      a,(iy+_LCOLB)
+    and     a
     call    nz,_collisioncheck
 
+    ld      a,(iy+_PIXX)                ; no need to check forward part if x mod 7 = 0
+    and     7
+    jr      z,_coldone
+
+    ld      a,(iy+_RCOLB)
+    and     a
+    jr      z,_coldone
+
+    ld      hl,(_tempnmecolpos)
+    inc     hl
+    ld      (_tempnmecolpos),hl
+    ld      e,(iy+_WORLDXL)
+    ld      d,(iy+_WORLDXH)
+    inc     de
+    ld      (_tempbltx),de
+    ld      c,(iy+_RCHAR)
+    call    _collisioncheck
+
+_coldone:
     dec     (iy+_COLNF)
     jr      z,_bulletdie
 
@@ -188,54 +226,37 @@ _collisioncheck:
     ld      (iy+_COLNF),0 
 
     ld      a,c
-    or      a
-    ret     z
 
     cp      $90
-    ret     nc                  ; no hit, carry on
+    ret     nc                  ; collided with a 'no collision' character, carry on
 
-    inc     (iy+_COLNF)
+    ld      (iy+_COLNF),1       ; indicate that we've collided with something solid
 
     cp      $30
     ret      c                  ; we've hit scenery, just stop
 
     ; enemy, probably
 
-    ld      a,(iy+_PIXX)        ; convert pixel x of torpedo tip to map character x
-    add     a,7
-    and     $f8
-    rrca
-    rrca
-    rrca
-    ld      de,(scrollpos)
-    ADD_DE_A
-    ld      (bulletHitX),de     ; let any object enemies know there's been a collision
+    ld      de,(_tempbltx)      ; there should be an enemy at this X
+    call    getenemy
+    cp      $ff
+    ret     z
+
+    and     $80                 ; is enemy dormant
+    jr      z,{+}
+
+    ld      hl,(_tempbltx)      ; there was something, but what? most likely an active enemy
+    ld      (bulletHitX),hl
     ld      a,(iy+_PIXY)
     ld      (bulletHitY),a
+    ret
 
-    call    getenemy
-    and     a
-    ret     m
-
-    and     $0f                 ; enemy Y
-    ld      e,a
-
-    ld      a,(iy+_PIXY)        ; convert pixel y of torpedo to map row
-    and     $f8
-    rrca
-    rrca
-    rrca
-    cp      e
-    ret     nz
-
-    set     7,(hl)              ; kill enemy
++:  set     7,(hl)              ; kill enemy
 
     ld      bc,1
     call    addscore
 
-    ld      l,(iy+_SCRPOSL)
-    ld      h,(iy+_SCRPOSH)
-    inc     hl                  ; always explode at the tip
+    ld      hl,(_tempnmecolpos)
     push    hl                  ; stash for explosion
     set     7,h
     res     6,h
