@@ -58,8 +58,8 @@ _loop:
     ld      bc,600              ; move down one line
     add     hl,bc
     push    hl
-    inc     (iy+OUSER+5)
-    ld      a,(iy+OUSER+5)
+    inc     (iy+OUSER+3)
+    ld      a,(iy+OUSER+3)
     cp      9
     jr      z,_sink
 
