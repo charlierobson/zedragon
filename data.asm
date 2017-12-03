@@ -89,6 +89,9 @@ gameframe:
 collision:
     .byte   0
 
+cheat:
+    .byte   1
+
 bulletHitX:
     .word   0
 bulletHitY:
@@ -137,7 +140,7 @@ dofs:
     .word   $0181
 	.byte	56,6
 
-    .word   $01dd
+    .word   $01d8
 	.byte	56,8
 
     .word   $021a

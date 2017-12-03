@@ -96,9 +96,10 @@ _notscrolled:
     jp      z,_gameloop
 
     ; sub's dead
-
+    ld      a,(cheat)
+    ld      l,a
     ld      a,(iy+_LIVES)
-    dec     a
+    sub     l
     ld      (iy+_LIVES),a
     call    _showlives
 
@@ -144,10 +145,18 @@ featurecheck:
     cp      1
     ret     nz
 
-    ld      a,(UDG+3)
-    xor     $8
-    ld      (UDG+3),a
+    ld      a,SFX_LECTRIC    ; let player know
+    call    AFXPLAY
+
+    ld      a,(cheat)
+    xor     1
+    ld      (cheat),a
     ret
+    
+;    ld      a,(UDG+3)
+ ;   xor     $8
+  ;  ld      (UDG+3),a
+   ; ret
 
 
 

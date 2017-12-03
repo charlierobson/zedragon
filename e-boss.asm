@@ -1,6 +1,6 @@
 ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ;
-    .module BOSS
+    .module BOSSKEY
 ;
 
 _XPL = OUSER+3
@@ -22,8 +22,7 @@ bosskey:
     add     hl,de
     ld      (iy+OUSER+0),l          ; hl = x
     ld      (iy+OUSER+1),h
-
-    ld      (iy+_HEALTH),10
+    ld      (iy+OUSER+2),16         ; resdy for copying to explosion, short one please
 
     ld      hl,579+D_BUFFER+600
 
@@ -52,8 +51,15 @@ _close1:
     and     a
     jr      z,_close0
 
+_reset:
+    ld      (iy+_HEALTH),3
+
 _loop:
     YIELD
+
+    ld      a,(collision)
+    and     a
+    DIENZ
 
     ld      hl,(bulletHitX)
     ld      a,l
@@ -69,14 +75,80 @@ _loop:
     dec     (iy+_HEALTH)
     jr      nz,_loop
 
-    ld      l,(iy+OUSER+0)          ; replace boss key with wreckage
-    ld      h,(iy+OUSER+1)
-    set     7,h
-    res     6,h
-    ld      (hl),$8b
+    call    startexplosion
+    ldi
+    ldi
+    ldi
 
-    jp      explosion
+    call    getobject
+    ld      bc,bossdoor
+    call    initobject
+    call    insertobject_afterthis
 
+    jr      _reset
+
+
+
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+    .module BOSSDOOR
+;
 
 bossdoor:
+    ; 595,5
+    ld      (iy+OUSER+0),12
+
+    ld      a,(gameframe)
+    and     1
+    ld      b,a
+
+    ld      a,$1e
+    add     a,b
+    ld      (iy+OUSER+1),a
+    ld      a,$28
+    add     a,b
+    ld      (iy+OUSER+2),a
+
+_loop00:
+    YIELD
+    dec     (iy+OUSER+0)
+    jr      nz,_loop00
+
+    ld      a,(iy+OUSER+1)
+    call    _setchr
+
+_loop01:
+    YIELD
+    dec     (iy+OUSER+0)
+    jr      nz,_loop01
+
+    ld      a,(iy+OUSER+2)
+    call    _setchr
+
+    ld      (iy+OUSER+0),100
+
+_loop02:
+    YIELD
+    dec     (iy+OUSER+0)
+    jr      nz,_loop02
+
+    ld      a,(iy+OUSER+1)
+    call    _setchr
+
+_loop03:
+    YIELD
+    dec     (iy+OUSER+0)
+    jr      nz,_loop03
+
+    ld      a,1
+    call    _setchr
     DIE
+
+
+_setchr:
+    ld      (iy+OUSER+0),12
+    ld      hl,595+(600*5)+D_BUFFER
+    ld      de,595+(600*5)+D_BUFFER+$4000
+    ld      (hl),a
+    ld      (de),a
+    ret
