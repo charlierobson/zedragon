@@ -18,6 +18,7 @@ OSTORE      = $2e00
 enemydat    = $3600
 subpix      = $3700
 enemyidx    = $37c0
+titlescreen = $3a18
 
 FREELIST    = $8000
 D_MIRROR    = $808a
@@ -39,6 +40,9 @@ enemyidxxsz = $ - enemyidxx
 
 pssubs:      .incbin "prescrolledsubs.bin"
 pssubssz    = $ - pssubs
+
+tsx:         .incbin  "titlescrn.binlz"
+tsxsz:      = $ - tsx
 
     ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)

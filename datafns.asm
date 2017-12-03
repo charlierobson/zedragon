@@ -14,6 +14,11 @@ initmovedata:
     ld      bc,pssubssz
     ldir
 
+    ld      hl,tsx
+    ld      de,titlescreen
+    ld      bc,tsxsz
+    ldir
+
     ret
 
 

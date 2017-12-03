@@ -149,9 +149,6 @@ dofs:
     .word   $ffff
 
 
-titlescreen:
-    .incbin  "titlescrn.binlz"
-
 shooterframe:
 	.byte		0
 shooteranimation:

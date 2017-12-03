@@ -26,7 +26,7 @@ _considertable:
     .word   considershooter, shootemupperhaps
     .word   considerlaser, laseremup
     .word   considerboss, bosskey
-    .word   considerboss, bossdoor
+    .word   considerboss, boss
 
 
 enemyinitiator:

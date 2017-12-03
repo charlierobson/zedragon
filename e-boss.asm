@@ -61,6 +61,10 @@ _loop:
     and     a
     DIENZ
 
+    ld      a,(bda)                 ; don't trigger the boss door if there's already one active
+    and     a
+    jr      nz,_reset
+
     ld      hl,(bulletHitX)
     ld      a,l
     or      h
@@ -94,27 +98,22 @@ _loop:
     .module BOSSDOOR
 ;
 
+bda:
+    .byte   0
+
 bossdoor:
     ; 595,5
+    ld      hl,bda
+    inc     (hl)
+
     ld      (iy+OUSER+0),12
-
-    ld      a,(gameframe)
-    and     1
-    ld      b,a
-
-    ld      a,$1e
-    add     a,b
-    ld      (iy+OUSER+1),a
-    ld      a,$28
-    add     a,b
-    ld      (iy+OUSER+2),a
 
 _loop00:
     YIELD
     dec     (iy+OUSER+0)
     jr      nz,_loop00
 
-    ld      a,(iy+OUSER+1)
+    ld      a,$1f
     call    _setchr
 
 _loop01:
@@ -122,7 +121,7 @@ _loop01:
     dec     (iy+OUSER+0)
     jr      nz,_loop01
 
-    ld      a,(iy+OUSER+2)
+    ld      a,$29
     call    _setchr
 
     ld      (iy+OUSER+0),100
@@ -132,7 +131,7 @@ _loop02:
     dec     (iy+OUSER+0)
     jr      nz,_loop02
 
-    ld      a,(iy+OUSER+1)
+    ld      a,$1f
     call    _setchr
 
 _loop03:
@@ -140,9 +139,14 @@ _loop03:
     dec     (iy+OUSER+0)
     jr      nz,_loop03
 
-    ld      a,1
+    ld      a,$01
     call    _setchr
+
+    ld      hl,bda
+    dec     (hl)
+
     DIE
+
 
 
 _setchr:
@@ -152,3 +156,45 @@ _setchr:
     ld      (hl),a
     ld      (de),a
     ret
+
+
+
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+    .module BOSS
+;
+
+boss:
+    ld      hl,597+(600*5)+D_BUFFER
+    ld      (iy+OUSER+0),l
+    ld      (iy+OUSER+1),h
+    ld      (iy+OUSER+2),0
+
+    ld      (iy+OUSER+3),3
+
+_loop:
+    YIELD
+
+    ld      a,(collision)
+    and     a
+    DIENZ
+
+    ld      hl,(bulletHitX)
+    ld      a,l
+    or      h
+    jr      z,_loop                 ; skip column check if no x position reported
+
+    ld      de,597
+    and     a
+    sbc     hl,de
+    jr      nz,_loop
+
+    call    startexplosion
+    ldi
+    ldi
+    ldi
+
+    dec     (iy+OUSER+3)
+    jr      nz,_loop
+
+    DIE
