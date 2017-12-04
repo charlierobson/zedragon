@@ -38,6 +38,7 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~sub collisions broken~~
 * ~~enemies can fall below line 10~~
 * ~~torpedo passes through mine sometimes~~
+* ~~sub exploding on line 9 crashes the game~~
 
 ### NICE TO HAVE
 * hiscore saving

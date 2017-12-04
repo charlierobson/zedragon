@@ -211,14 +211,16 @@ _bigbangloop:
     ld      b,a
     and     $0f
     call    mulby600
+    ld      hl,D_BUFFER+590
+    add     hl,de
     ld      a,b
+    and     $f0
+    rrca
     rrca
     rrca
     rrca
     ld      d,0
     ld      e,a
-    add     hl,de
-    ld      de,D_BUFFER+590
     add     hl,de
     ld      (iy+OUSER+0),l
     ld      (iy+OUSER+1),h
@@ -230,11 +232,12 @@ _bigbangloop:
     call    startexplosion
     ldi
     ldi
+    ldi
 
     ld      a,r
     and     7
-    add     a,8
-    ld      (iy+OUSER+6),h
+    add     a,3
+    ld      (iy+OUSER+6),a
 
 -:  YIELD
     dec     (iy+OUSER+6)

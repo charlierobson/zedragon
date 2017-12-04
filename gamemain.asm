@@ -152,7 +152,7 @@ featurecheck:
     xor     1
     ld      (cheat),a
     ret
-    
+
 ;    ld      a,(UDG+3)
  ;   xor     $8
   ;  ld      (UDG+3),a

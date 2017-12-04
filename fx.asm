@@ -21,6 +21,12 @@ explosion:
     call    explosound
     xor     a
 
+    ld      l,(iy+_SCRADDL)     ; no explosions off screen please ;)
+    ld      h,(iy+_SCRADDH)
+    ld      de,D_BUFFER+6000
+    sbc     hl,de
+    DIENC
+
 _exploop:
     ld      (iy+_COUNTER),a
     ld      l,(iy+_SCRADDL)
