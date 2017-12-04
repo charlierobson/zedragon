@@ -337,7 +337,7 @@ chkidx2 = $+5
     ld      a,(iy+0)                ; pixel collision data
     and     a                       ; clears carry
     call    nz,_testcollision        ; test the collision
-    jr      c,_subdead
+  ;  jr      c,_subdead
 
     inc     d
     inc     d

@@ -197,4 +197,61 @@ _loop:
     dec     (iy+OUSER+3)
     jr      nz,_loop
 
+    ld      (iy+OUSER+3),4
+
+_bigbangreset:
+    ld      (iy+OUSER+2),22
+    ld      hl,_explosequence
+
+_bigbangloop:
+    ld      (iy+OUSER+4),l
+    ld      (iy+OUSER+5),h
+
+    ld      a,(hl)
+    ld      b,a
+    and     $0f
+    call    mulby600
+    ld      a,b
+    rrca
+    rrca
+    rrca
+    ld      d,0
+    ld      e,a
+    add     hl,de
+    ld      de,D_BUFFER+590
+    add     hl,de
+    ld      (iy+OUSER+0),l
+    ld      (iy+OUSER+1),h
+
+    ld      de,$4000
+    add     hl,de
+    ld      (hl),0
+
+    call    startexplosion
+    ldi
+    ldi
+
+    ld      a,r
+    and     7
+    add     a,8
+    ld      (iy+OUSER+6),h
+
+-:  YIELD
+    dec     (iy+OUSER+6)
+    jr      nz,{-}
+
+    ld      l,(iy+OUSER+4)
+    ld      h,(iy+OUSER+5)
+    inc     hl
+    dec     (iy+OUSER+2)
+    jr      nz,_bigbangloop
+
+    dec     (iy+OUSER+3)
+    jr      nz,_bigbangreset
+
     DIE
+
+_explosequence:
+    .byte   $97,$73,$83,$55,$56,$94,$93,$81,
+    .byte   $77,$66,$96,$64,$67,$87,$63,$88,
+    .byte   $98,$78,$92,$82,$72,$54
