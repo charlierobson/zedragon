@@ -200,7 +200,7 @@ _loop:
     ld      (iy+OUSER+3),4
 
 _bigbangreset:
-    ld      (iy+OUSER+2),22
+    ld      (iy+OUSER+2),30
     ld      hl,_explosequence
 
 _bigbangloop:
@@ -255,6 +255,11 @@ _bigbangloop:
     DIE
 
 _explosequence:
-    .byte   $97,$73,$83,$55,$56,$94,$93,$81,
-    .byte   $77,$66,$96,$64,$67,$87,$63,$88,
-    .byte   $98,$78,$92,$82,$72,$54
+    .byte   $94,$56,$54,$98,$97,$81,$74,$93
+    .byte   $86,$77,$65,$76,$85,$63,$64,$82
+    .byte   $96,$78,$55,$73,$88,$84,$95,$72
+    .byte   $66,$75,$92,$67,$83,$87
+
+
+
+
