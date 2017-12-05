@@ -23,12 +23,6 @@ checkhi:
 
 
 
-_score:
-    .word   0
-_hiscore:
-    .word   $0750
-
-
 addscore:
     ld      hl,(_score)
     ld      d,h
