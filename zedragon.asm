@@ -64,7 +64,8 @@ BOTTOM_LINE:
 starthere:
     out     ($fd),a
 
-    call    golow
+    call    detectzxp
+    call    z,enablezxpandfeatures
 
     call    initmap
     call    initmovedata
@@ -147,7 +148,7 @@ fnmain:
 #include "stcplay.asm"
 #include "ayfxplay.asm"
 #include "zxpand.asm"
-#include "lz48decrunch_v006.asm"
+#include "decrunch.asm"
 #include "data.asm"
 
 endhere:

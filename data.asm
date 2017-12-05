@@ -76,11 +76,6 @@ fire    = inputstates + 19
 advance = inputstates + 23
 feature = inputstates + 27
 
-_score:
-    .word   0
-_hiscore:
-    .word   $0200
-
 scrolltick:
 	.byte	0
 scrollpos:

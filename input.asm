@@ -2,9 +2,13 @@
 kbin:
     .fill   8
 
+nullstick:
+    ld      a,$ff
+    ret
+
 readinput:
-    call    $1ffe               ; get the joystick bits
-    or      %00000111           ; we need some 1 bits for 'no joy' test
+jsreadfn = $+1
+    call    nullstick
     ld      (LAST_J),a
 
     ld      de,kbin             ; read the keyboard, building a table at (de)

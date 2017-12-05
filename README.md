@@ -17,17 +17,18 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~depth charges~~
 * ~~pixel movement torpedos~~
 * ~~score~~
-* final boss
+* ~~final boss~~
 * ~~"laser" sounds~~
+* sub moves off after boss death
+* instructions
 * tackle slowdown
+* zxpand detection
 
 ### IN PROGRESS
-* boss screen
 
 ### ONGOING
 * map cleanup
 * improve sound effects
-* check limits for life, ~~zone~~, score..
 
 ### BUGS
 * ~~ship parts left behind when reversing~~

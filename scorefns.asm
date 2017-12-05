@@ -1,5 +1,11 @@
     .module SCORE
 
+_score:
+    .word   0
+
+_hiscore:
+    .word   $0200
+
 
 resetscore:
     ld      hl,0
