@@ -22,7 +22,8 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * sub moves off after boss death
 * instructions
 * tackle slowdown
-* zxpand detection
+* ~~zxpand detection~~
+* twin bullets
 
 ### IN PROGRESS
 
