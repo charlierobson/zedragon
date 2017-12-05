@@ -344,8 +344,10 @@ chkidx2 = $+5
     inc     e
     djnz    _checkcoll
 
+    ld      a,(collision)
+    and     a
     ld      a,(iy+_SUBY)
-    call    updateair
+    call    z,updateair
     ld      a,(airlevel)
     or      a
     jp      nz,subfunction

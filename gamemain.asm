@@ -96,7 +96,7 @@ _notscrolled:
     jp      z,_gameloop
 
     ; sub's dead
-    ld      a,(cheat)
+    ld      a,(gamemode)
     ld      l,a
     ld      a,(iy+_LIVES)
     sub     l
@@ -133,8 +133,14 @@ _nomoreo:
 
 
 _showlives:
+    ld      a,(gamemode)
+    and     a
     ld      a,(iy+_LIVES)
-    add     a,16
+    jr      nz,{+}
+
+    ld      a,14 - 16
+
++:  add     a,16
     ld      (TOP_LINE+31),a
     ret
 
@@ -148,9 +154,10 @@ featurecheck:
     ld      a,SFX_LECTRIC    ; let player know
     call    AFXPLAY
 
-    ld      a,(cheat)
+    ld      a,(gamemode)
     xor     1
-    ld      (cheat),a
+    ld      (gamemode),a
+    call    _showlives
     ret
 
 ;    ld      a,(UDG+3)

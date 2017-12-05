@@ -89,8 +89,8 @@ gameframe:
 collision:
     .byte   0
 
-cheat:
-    .byte   1
+gamemode:
+    .byte   1           ; 0 = explorer, 1 = normal
 
 bulletHitX:
     .word   0
