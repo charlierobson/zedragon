@@ -5,11 +5,6 @@ _RSPL = OUSER+1
 _RSPH = OUSER+2
 _COUNTER = OUSER+3
 
-; for debugging
-dofspecial:
-    .word   $70
-    .byte   $78,$28
-
 
 gamemain:
     call    cls
@@ -24,7 +19,7 @@ gamemain:
     ld      hl,scrollflags          ; enable scrolling
     set     0,(hl)
 
-    ld      hl,dofs ;; dofspecial
+    ld      hl,dofs7
     ld      (iy+_RSPL),l
     ld      (iy+_RSPH),h
 
@@ -39,6 +34,9 @@ gamemain:
     ld      (laserframe+1),a
 
 _resetafterdeath:
+    xor     a                       ; reset collision flag that gets set when sub dies
+    ld      (collision),a
+
     call    refreshmap
     call    resetair
     call    resetenemies
@@ -91,8 +89,10 @@ _notscrolled:
     and     127
     call    z,AFXPLAY2
 
-    ld      a,(collision)       ; loop until the sub has collided with something
-    and     a
+    ld      a,(collision)       ; loop until the sub has collided with something or beaten the boss
+    cp      $ff
+    DIEZ
+    cp      0
     jp      z,_gameloop
 
     ; sub's dead

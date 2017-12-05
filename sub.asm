@@ -157,7 +157,6 @@ _subrender:
     ld      (iy+_COLLTAB+7),a
     ld      (iy+_COLLTAB+9),a
     ld      (iy+_COLLTAB+11),a
-    ld      (collision),a
 
     ld      a,_COLLTAB+1
     ld      (iy+_COLO),a
@@ -337,7 +336,7 @@ chkidx2 = $+5
     ld      a,(iy+0)                ; pixel collision data
     and     a                       ; clears carry
     call    nz,_testcollision        ; test the collision
-  ;  jr      c,_subdead
+    jr      c,_subdead
 
     inc     d
     inc     d

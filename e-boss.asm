@@ -58,10 +58,25 @@ _loop:
     YIELD
 
     ld      a,(collision)
+    cp      $ff
+    jr      nz,_subddeathtest
+
+    call    startexplosion
+    ldi
+    ldi
+    ldi
+
+    ld      l,(iy+OUSER+0)
+    ld      h,(iy+OUSER+1)
+    ld      de,$4000
+    add     hl,de
+    ld      (hl),$8b ; $8d
+
+_subddeathtest:
     and     a
     DIENZ
 
-    ld      a,(bda)                 ; don't trigger the boss door if there's already one active
+    ld      a,(bda)                 ; don't trigger the boss door if it's active
     and     a
     jr      nz,_reset
 
@@ -102,43 +117,37 @@ bda:
     .byte   0
 
 bossdoor:
-    ; 595,5
-    ld      hl,bda
+    ld      hl,bda              ; lock
     inc     (hl)
 
-    ld      (iy+OUSER+0),12
+    ld      a,$1f
+    call    _setchr
+    ld      (iy+OUSER+0),9
 
 _loop00:
     YIELD
     dec     (iy+OUSER+0)
     jr      nz,_loop00
 
-    ld      a,$1f
+    ld      a,$29
     call    _setchr
+    ld      (iy+OUSER+0),50
 
 _loop01:
     YIELD
     dec     (iy+OUSER+0)
     jr      nz,_loop01
 
-    ld      a,$29
+    ld      a,$1f
     call    _setchr
-
-    ld      (iy+OUSER+0),100
+    ld      (iy+OUSER+0),9
 
 _loop02:
     YIELD
     dec     (iy+OUSER+0)
     jr      nz,_loop02
 
-    ld      a,$1f
-    call    _setchr
-
-_loop03:
-    YIELD
-    dec     (iy+OUSER+0)
-    jr      nz,_loop03
-
+_close2:
     ld      a,$01
     call    _setchr
 
@@ -150,7 +159,6 @@ _loop03:
 
 
 _setchr:
-    ld      (iy+OUSER+0),12
     ld      hl,595+(600*5)+D_BUFFER
     ld      de,595+(600*5)+D_BUFFER+$4000
     ld      (hl),a
@@ -170,7 +178,7 @@ boss:
     ld      (iy+OUSER+1),h
     ld      (iy+OUSER+2),0
 
-    ld      (iy+OUSER+3),3
+    ld      (iy+OUSER+3),3          ; boss hit count
 
 _loop:
     YIELD
@@ -196,6 +204,9 @@ _loop:
 
     dec     (iy+OUSER+3)
     jr      nz,_loop
+
+    ld      a,$ff
+    ld      (collision),a                   ; turn off shooters, quite gameloop
 
     ld      (iy+OUSER+3),4
 

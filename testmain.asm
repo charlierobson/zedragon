@@ -1,5 +1,3 @@
-#include "e-depth.1.asm"
-
 
     .module TESTMAIN
 
@@ -42,18 +40,6 @@ testmain:
     ld      bc,32
     xor     a
     call    fillmem
-
-	call	getobject
-	ld		bc,specialdepthcharge
-	call	initobject
-	call	insertobject_beforehead
-    ex      de,hl
-    ld      de,41
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
-    inc     hl
-    ld      (hl),1
 
     call    enablegamesound
 

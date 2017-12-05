@@ -142,7 +142,7 @@ dofs:
 
     .word   $01d8
 	.byte	56,8
-
+dofs7:
     .word   $021a
 	.byte	80,6
 
