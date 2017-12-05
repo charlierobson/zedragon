@@ -15,6 +15,10 @@ resetair:
 
 
 updateair:
+    ld      a,(collision)
+    and     a
+    ret     nz
+
     ld      hl,airupdatecounter
 
     cp      6
