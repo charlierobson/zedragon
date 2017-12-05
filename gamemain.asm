@@ -13,24 +13,23 @@ gamemain:
     call    displayhi
     call    enablegamesound
 
-    ld      a,r
+    ld      a,r                     ; seed the rng
     ld      (rng+1),a
 
     ld      hl,scrollflags          ; enable scrolling
     set     0,(hl)
 
-    ld      hl,dofs7
+    ld      hl,dofs                 ; set starting zone
     ld      (iy+_RSPL),l
     ld      (iy+_RSPH),h
+    xor     a                       ; zone number
+    ld      (zone),a
 
-    ld      a,4
+    ld      a,4                     ; set initial lives
     ld      (iy+_LIVES),a
     call    _showlives
 
-    xor     a
-    ld      (zone),a
-
-    ld      a,(laserframe)
+    ld      a,(laserframe)          ; can't remember why but reasons
     ld      (laserframe+1),a
 
 _resetafterdeath:
@@ -41,7 +40,7 @@ _resetafterdeath:
     call    resetair
     call    resetenemies
 
-    ld      l,(iy+_RSPL)
+    ld      l,(iy+_RSPL)            ; get sub position from the restart info
     ld      h,(iy+_RSPH)
     ld      c,(hl)
     inc     hl
@@ -50,7 +49,7 @@ _resetafterdeath:
     ld      (scrollpos),bc
     push    hl
 
-	call	getobject
+	call	getobject               ; spawn the sub
 	ld		bc,subfunction
 	call	initobject
 	call	insertobject_beforehead
@@ -130,6 +129,7 @@ _nomoreo:
 	call	insertobject_afterhead
 
 	DIE
+
 
 
 _showlives:
