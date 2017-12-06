@@ -19,13 +19,14 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~score~~
 * ~~final boss~~
 * ~~"laser" sounds~~
+* ~~sub moves off after boss death~~
+* ~~zxpand detection~~
 * instructions
 * tackle slowdown
-* ~~zxpand detection~~
-* twin bullets
+  * stop enemies after ship has passed
 
 ### IN PROGRESS
-* sub moves off after boss death
+* twin bullets
 
 ### ONGOING
 * map cleanup
