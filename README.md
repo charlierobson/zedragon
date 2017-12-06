@@ -19,13 +19,13 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~score~~
 * ~~final boss~~
 * ~~"laser" sounds~~
-* sub moves off after boss death
 * instructions
 * tackle slowdown
 * ~~zxpand detection~~
 * twin bullets
 
 ### IN PROGRESS
+* sub moves off after boss death
 
 ### ONGOING
 * map cleanup

@@ -1,4 +1,7 @@
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
     .module SUB
+;
 
 _SUBX = OUSER+0          ; don't change
 _SUBY = OUSER+1          ; don't change
@@ -12,86 +15,26 @@ _WAIT = OUSER+7
 
 ;;#include "testfns.asm"
 
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+; The submarine object.
+;
+
 subfunction:
-    push    iy
-    pop     hl
-    ld      de,_SUBY
-    add     hl,de
+submvfunc = $+1
+    call    playermovesub       ; listen to controls by default, can be changed though
 
-    ld      a,(up)          ; min y = 6
-    and     1
-    jr      z,{+}
-    ld      a,(hl)
-    cp      7
-    jr      c,{+}
-    cp      0
-    jr      z,{+}
-    dec     (hl)
-    cp      7
-    ld      a,SFX_SUBSURFACE
-    call    z,AFXPLAY
-
-+:  ld      a,(down)        ; max y = $48
-    and     1
-    jr      z,{+}
-    ld      a,(hl)
-    cp      $48
-    jr      nc,{+}
-    inc     (hl)
-
-+:  push    iy
-    pop     hl
-    ld      de,_SUBX
-    add     hl,de
-
-    ld      a,(left)        ; min x = 0
-    and     1
-    jr      z,{+}
-    ld      a,(hl)
-    and     a
-    jr      z,{+}
-    dec     (hl)
-
-+:  ld      a,(right)       ; max x = 160
-    and     1
-    jr      z,_checkfire
-    ld      a,(hl)
-    cp      $a0
-    jr      nc,_checkfire
-    inc     (hl)
-
-_checkfire:
-    ld      a,(fire)
-    cp      1
-    jr      nz,_subrender
-
-    ld      a,(bulletCount)
-    or      a
-    jr      nz,_subrender
-
-    ld      bc,obullet
-    call    getobject
-    call    initobject
-    call    insertobject_beforethis
-
-    ldi                         ; copy x & y
-    ldi
-
-    ;
-    ; render sub
-    ;
-
-_subrender:
     ; calculate address of sub in the map, relative to the current scroll position
 
-    ld      a,(iy+_SUBX)       ; pixel -> char conversion
+_drawsub:
+    ld      a,(iy+_SUBX)        ; pixel -> char conversion
     srl     a
     srl     a
     srl     a
     ld      l,a
     ld      h,0
 
-    ld      a,(iy+_SUBY)       ; div by 8 to get character line then mul by 600
+    ld      a,(iy+_SUBY)        ; div by 8 to get character line then mul by 600
     srl     a
     srl     a
     srl     a
@@ -104,7 +47,7 @@ _subrender:
     ld      de,D_BUFFER
     add     hl,de
 
-    ld      (iy+_SCRADL),l     ; sub's address in the display memory
+    ld      (iy+_SCRADL),l      ; sub's address in the display memory
     ld      (iy+_SCRADH),h
 
     ; find the character codes that appear under the sub in its new position
@@ -423,13 +366,119 @@ _testcollision:
     ret
 
 
-    .align 16
-charcache:
-    .fill   48
-
 
 explooff:
     .word   0,601,600,2,1,602
     .word   0,601,600,2,1,602
 exploptr:
     .word   0
+
+    .align 16
+charcache:
+    .fill   48
+
+
+
+
+
+
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+; Move the sub using the user controls.
+;
+
+playermovesub:
+    push    iy
+    pop     hl
+    ld      de,_SUBY
+    add     hl,de
+
+    ld      a,(up)          ; min y = 6
+    and     1
+    jr      z,_checkdown
+    ld      a,(hl)
+    cp      7
+    jr      c,_checkdown
+    cp      0
+    jr      z,_checkdown
+    dec     (hl)
+
+    cp      7               ; play the sub surfacing sound if we hit line 6
+    ld      a,SFX_SUBSURFACE
+    call    z,AFXPLAY
+
+_checkdown:
+    ld      a,(down)        ; max y = $48
+    and     1
+    jr      z,_checkleft
+    ld      a,(hl)
+    cp      $48
+    jr      nc,_checkleft
+    inc     (hl)
+
+_checkleft:
+    push    iy
+    pop     hl
+    ld      de,_SUBX
+    add     hl,de
+
+    ld      a,(left)        ; min x = 0
+    and     1
+    jr      z,_checkright
+    ld      a,(hl)
+    and     a
+    jr      z,_checkright
+    dec     (hl)
+
+_checkright:
+    ld      a,(right)       ; max x = 160
+    and     1
+    jr      z,_checkfire
+    ld      a,(hl)
+    cp      $a0
+    jr      nc,_checkfire
+    inc     (hl)
+
+_checkfire:
+    ld      a,(fire)
+    cp      1
+    ret     nz
+
+    ld      a,(bulletCount)
+    or      a
+    ret     nz
+
+    ld      bc,obullet
+    call    getobject
+    call    initobject
+    call    insertobject_beforethis
+
+    ldi                         ; copy pixel x & y
+    ldi
+    ret
+
+
+
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+; Move the sub after killing the boss using remote control.
+;
+
+bossexit:
+    ld      a,(iy+_SUBY)
+    cp      5*8
+    jr      z,_testx
+    jr      c,_godown
+    dec     a
+    dec     a                   ; cheaper than a JR
+_godown:
+    inc     a
+    ld      (iy+_SUBY),a
+    ret
+
+_testx:
+    ld      a,(iy+_SUBX)
+    inc     a
+    ret     z
+    ld      (iy+_SUBX),a
+    ret

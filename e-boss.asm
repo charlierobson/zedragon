@@ -208,7 +208,7 @@ _loop:
     ld      a,$ff
     ld      (collision),a                   ; turn off shooters, quite gameloop
 
-    ld      (iy+OUSER+3),4
+    ld      (iy+OUSER+3),3
 
 _bigbangreset:
     ld      (iy+OUSER+2),30
@@ -259,6 +259,9 @@ _bigbangloop:
     inc     hl
     dec     (iy+OUSER+2)
     jr      nz,_bigbangloop
+
+    ld      hl,bossexit                 ; install the sub remote controller
+    ld      (submvfunc),hl
 
     dec     (iy+OUSER+3)
     jr      nz,_bigbangreset
