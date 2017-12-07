@@ -13,14 +13,6 @@ ITERS = 8
 FFLOP = 9
 ;10/11
 COLL = 12
-shootemupperhaps:
-    ld      l,(iy+OUSER)        ; x
-    ld      h,(iy+OUSER+1)
-    ld      de,(scrollpos)
-    sbc     hl,de
-    ld      a,l
-    cp      10
-    DIEC
 
 shootemup:
     ld      l,(iy+OUSER)        ; x
@@ -104,6 +96,8 @@ _soy2:
     ld      a,(collision)               ; die if sub died
     or      (iy+OUSER+COLL)
     DIENZ
+    call    cIfIneffective
+    DIEC
     call    cIfOffscreenLeft
     DIEC
 

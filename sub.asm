@@ -34,15 +34,17 @@ _drawsub:
     ld      l,a
     ld      h,0
 
+    ld      de,(scrollpos)
+    add     hl,de
+
+    ld      (subcharx),hl       ; expose this for the enemies
+
     ld      a,(iy+_SUBY)        ; div by 8 to get character line then mul by 600
     srl     a
     srl     a
     srl     a
     call    mulby600            ; de = a * 600
     add     hl,de               ; character offset relative to visible window
-
-    ld      de,(scrollpos)
-    add     hl,de
 
     ld      de,D_BUFFER
     add     hl,de

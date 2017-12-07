@@ -21,12 +21,12 @@ NME_BOSSDOOR = $70
 _considertable:
     .word   considerstal, stalfall
     .word   considermine, minearise
-    .word   considernull, 0                         ; never consider static mines
-    .word   considerdepth, depthchargeGenerator
-    .word   considershooter, shootemupperhaps
-    .word   considerlaser, laseremup
-    .word   considerboss, bosskey
-    .word   considerboss, boss
+    .word   considernever, 0                         ; never consider static mines
+    .word   considerifeffective, depthchargeGenerator
+    .word   considerifeffective, shootemup
+    .word   considerifeffective, laseremup
+    .word   consideralways, bosskey
+    .word   consideralways, boss
 
 
 enemyinitiator:
@@ -121,12 +121,34 @@ _starterator:
 ; consideration functions - return with carry set to go with
 ; this object.
 ;
-considerdepth:          ; always start
-considershooter:
-considerlaser:
-considerboss:
+
+considerifeffective:
+    push    hl
+    ld      hl,(subcharx)
+    and     a
+    sbc     hl,de                   ; ifsub x < enemy x, C will be set 
+    pop     hl
+    jr      nc,considernever
+
+    push    hl
+    push    de
+    ld      hl,(subcharx)
+    ld      de,8
+    add     hl,de
+    and     a
+    sbc     hl,de                   ; if enemy is further right than 8 chars, C will be set 
+    pop     de
+    pop     hl
+    jr      c,considernever
+
+    ; fall in
+
+consideralways:
     scf
-considernull:           ; never starts
+    ret
+
+considernever:
+    and     a
     ret
 
 
@@ -153,6 +175,25 @@ cIfOffscreenLeft:
     ld      l,(iy+OUSER+0)
     ld      h,(iy+OUSER+1)
     ld      de,(scrollpos)
+    and     a
+    sbc     hl,de
+    ret
+
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+; Return with carry set if x is to the left of the sub by
+; more than 8 characters
+;
+cIfIneffective:
+    ld      hl,(subcharx)
+    ld      de,8
+    and     a
+    sbc     hl,de
+
+    ld      e,(iy+OUSER+0)
+    ld      d,(iy+OUSER+1)
+
+    ex      de,hl
     and     a
     sbc     hl,de
     ret

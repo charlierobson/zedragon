@@ -92,6 +92,9 @@ collision:
 gamemode:
     .byte   1           ; 0 = explorer, 1 = normal
 
+subcharx:
+    .word   0
+
 bulletHitX:
     .word   0
 bulletHitY:

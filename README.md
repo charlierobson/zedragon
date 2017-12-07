@@ -22,11 +22,10 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~sub moves off after boss death~~
 * ~~zxpand detection~~
 * instructions
-* tackle slowdown
-  * stop enemies after ship has passed
 
 ### IN PROGRESS
-* twin bullets
+* tackle slowdown
+  * stop enemies after ship has passed
 
 ### ONGOING
 * map cleanup

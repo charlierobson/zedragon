@@ -16,6 +16,8 @@ _loop:
     ld      a,(collision)                   ; die if sub died
     or      a
     DIENZ
+    call    cIfIneffective
+    DIEC
     call    cIfOffscreenLeft
     DIEC
 
@@ -28,7 +30,6 @@ _loop:
     call    getobject
     call    initobject
     call    insertobject_afterthis
-
     ldi
     ldi
     ldi
