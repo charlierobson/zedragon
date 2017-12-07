@@ -12,7 +12,7 @@ attract:
 
     ld      hl,titlescreen
     ld      de,D_BUFFER
-    call    LZ48_decrunch
+    call    decrunch
 
     ld      hl,scrollpos                ; ensure scroll is at 0 by waiting a cycle
     ld      (hl),0

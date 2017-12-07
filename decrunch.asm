@@ -1,6 +1,6 @@
 ; http://www.cpcwiki.eu/forum/programming/lz48-cruncherdecruncher/
 
-LZ48_decrunch:
+decrunch:
     ldi
     ld      b,0
 

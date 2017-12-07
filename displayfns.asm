@@ -10,7 +10,7 @@
 initcharsets:
     ld      hl,charsetlz
     ld      de,UDG
-    call    LZ48_decrunch
+    call    decrunch
 
     ; copy game character set up high
 

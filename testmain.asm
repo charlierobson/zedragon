@@ -46,7 +46,7 @@ testmain:
 _testreset:
     ld      hl,titlescreen
     ld      de,D_MIRROR
-    call    LZ48_decrunch
+    call    decrunch
 
     ld      hl,D_MIRROR
     ld      de,D_BUFFER
