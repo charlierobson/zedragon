@@ -44,7 +44,7 @@ obullet:
     ld      (iy+_PIXY),a
 
     ld      a,(iy+_PIXX)
-    add     a,12
+    add     a,10
 
     ld      hl,bulletCount
     inc     (hl)
