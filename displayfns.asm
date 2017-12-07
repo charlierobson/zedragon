@@ -233,8 +233,10 @@ scroll:
 
 
 displayocount:
-    ld      a,(ocount)
     ld      de,TOP_LINE
+    ld      a,(ocount)
+    call    hexout
+    ld      a,(ocountmax)
     call    hexout
     ret
 

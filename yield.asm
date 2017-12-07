@@ -59,11 +59,17 @@ resumenext:
 	add		hl,bc
 	ld		(PSTORE),hl
 
-	; keep count of the number of objects which have YIELDed
+	; keep count of the number of objects which have YIELDed,
+	; and the maximum encountered so far
 	;
 	ld		hl,ocount
 	inc		(hl)
-
+	ld		a,(hl)
+	inc		hl
+	cp		(hl)
+	jr		c,{+}
+	ld		(hl),a
++:
 	; now resume executing at the object's saved address
 	;
 	ld		l,(IY+OPC)

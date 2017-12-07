@@ -13,6 +13,10 @@ gamemain:
     call    displayhi
     call    enablegamesound
 
+    xor     a
+    ld      (ocount),a
+    ld      (ocountmax),a
+
     ld      a,r                     ; seed the rng
     ld      (rng+1),a
 
@@ -74,6 +78,7 @@ _gameloop:
     call    zonecheck
 
 _notscrolled:
+    ;call    displayocount
     xor     a
     ld      (ocount),a
     YIELD
@@ -107,6 +112,7 @@ _notscrolled:
 _interlifedelay:
     xor     a
     ld      (ocount),a
+    ;call    displayocount
     YIELD
 
     inc     (iy+_COUNTER)

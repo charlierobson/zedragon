@@ -153,6 +153,9 @@ considernever:
 
 
 considermine:
+    ld      a,(ocount)
+    cp      10
+    ret     nc          ; 10 or more objects active
     push    bc
     call    rng
     pop     bc

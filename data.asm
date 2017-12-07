@@ -116,6 +116,8 @@ bulletCount:
 
 ocount:
     .byte   0
+ocountmax:
+    .byte   0
 
 airupdatecounter:
     .byte   0

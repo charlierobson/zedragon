@@ -91,7 +91,7 @@ _aliveloop:
 
     ld      (iy+OUSER),$80
 
--:  ;call    displayocount
+-:  call    displayocount
     xor     a
     ld      (ocount),a
     YIELD

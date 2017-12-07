@@ -25,7 +25,8 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 
 ### IN PROGRESS
 * tackle slowdown
-  * stop enemies after ship has passed
+  * ~~stop enemies after ship has passed~~
+  * cap number of enemies by disallowing mines when more than X objects active
 
 ### ONGOING
 * map cleanup
