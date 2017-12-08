@@ -20,7 +20,8 @@ subpix      = $3700
 enemyidx    = $37c0
 titlescreen = $3a18
 mul600tab   = $3c00
-;0x3ecL (1004) bytes remaining
+txtres      = $3c14
+;0x2ccL (716) bytes remaining
 
 FREELIST    = $8000
 D_MIRROR    = $808a
@@ -45,6 +46,9 @@ pssubssz    = $ - pssubs
 
 tsx:         .incbin  "titlescrn.binlz"
 tsxsz:      = $ - tsx
+
+txtresx:     .incbin "txtres.bin"
+txtresxsz:     = $ - txtresx
 
 m600tabx:    .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
 m600tabxsz =  $ - m600tabx

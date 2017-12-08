@@ -24,6 +24,11 @@ initmovedata:
     ld      bc,m600tabxsz
     ldir
 
+    ld      hl,txtresx
+    ld      de,txtres
+    ld      bc,txtresxsz
+    ldir
+
     ret
 
 

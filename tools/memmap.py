@@ -46,6 +46,10 @@ end = start + 20
 print("mul600tab = $" + format(start, 'x'));
 
 start = end
+end = start + 32*9
+print("txtres = $" + format(start, 'x'));
+
+start = end
 remaining = 0x4000 - start
 print(hex(remaining) + " (" + str(remaining) + ") bytes remaining")
 
