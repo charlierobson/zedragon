@@ -18,10 +18,6 @@ _SCRPOSH = OUSER+11
 _WORLDXL = OUSER+12
 _WORLDXH = OUSER+13
 
-    .align  16
-bchar:
-    .fill   16
-
 _tempnmecolpos:
     .word   0
 _tempbltx:
@@ -34,6 +30,10 @@ allocbrender:
     ld      de,bchar
     ld      a,$b6
     ret
+
+    .align  16
+bchar:
+    .fill   16
 
 
 obullet:
