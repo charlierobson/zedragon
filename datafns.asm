@@ -19,6 +19,11 @@ initmovedata:
     ld      bc,tsxsz
     ldir
 
+    ld      hl,m600tabx
+    ld      de,mul600tab
+    ld      bc,m600tabxsz
+    ldir
+
     ret
 
 

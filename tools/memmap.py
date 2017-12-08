@@ -41,6 +41,10 @@ end = start + tsstat.st_size
 #print(hex(start) + " - " + hex(end) + " : enemyidx")
 print("titlescreen = $" + format(start, 'x'));
 
+start = roundup(end)
+end = start + 20
+print("mul600tab = $" + format(start, 'x'));
+
 start = end
 remaining = 0x4000 - start
 print(hex(remaining) + " (" + str(remaining) + ") bytes remaining")

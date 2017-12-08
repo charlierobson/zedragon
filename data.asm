@@ -168,11 +168,3 @@ flagframe:
 	.byte		0
 flaganimation:
 	.byte		$1e,$de, $1e,$dc, $1c,$dc, $1c,$de
-
-    .align 256
-
-; this needs to be wholly within a 256 byte page too
-;
-mul600tab:
-    .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
-; MOVE THIS TO $8000
