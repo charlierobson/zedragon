@@ -266,7 +266,80 @@ _bigbangloop:
     dec     (iy+OUSER+3)
     jr      nz,_bigbangreset
 
+    ; 2 second delay
+
+    ld      (iy+OUSER+3),100
+
+-:  YIELD
+    dec     (iy+OUSER+3)
+    jr      nz,{-}
+
+    ; congratulate player
+
+    call    getobject
+    ld      bc,teletyper
+    call    initobject
+    call    insertobject_afterthis
+    ex      de,hl
+    ld      (hl),_congrattext & 255
+    inc     hl
+    ld      (hl),_congrattext / 256
+
     DIE
+
+
+teletyper:
+    call    cls
+
+    ld      hl,ttfont
+    ld      de,UDG
+    ld      hl,$200
+   ; ldir
+
+    ld      hl,0
+    ld      (scrollpos),hl
+
+    ld      hl,D_BUFFER
+    ld      (iy+OUSER+0),l
+    ld      (iy+OUSER+1),h
+
+_ttloop:
+    ld      (iy+OUSER+2),5
+    ld      l,(iy+OUSER+0)
+    ld      h,(iy+OUSER+1)
+    ld      (hl),1
+
+-:
+    YIELD
+    dec     (iy+OUSER+2)
+    jr      nz,{-}
+
+    ld      (iy+OUSER+2),5
+    ld      l,(iy+OUSER+0)
+    ld      h,(iy+OUSER+1)
+    ld      (hl),0
+
+-:
+    YIELD
+    dec     (iy+OUSER+2)
+    jr      nz,{-}
+
+    jr      _ttloop
+
+    .asciimap $00, $FF, {*}
+            ;--------========--------========
+_congrattext:
+    .asc    "    Congratulations Captain!~"
+    .asc    "~"
+    .asc    "The biggest threat to our planet~"
+    .asc    "is defeated. We are safe again.~"
+    .asc    "~"
+    .asc    "You will receive the highest~"
+    .asc    "honour our country can give...~"
+    .asc    "~"
+    .asc    "          ANOTHER GO!!^"
+            ;--------========--------========
+    
 
 _explosequence:
     .byte   $94,$56,$54,$98,$97,$81,$74,$93

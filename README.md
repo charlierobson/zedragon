@@ -21,10 +21,12 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~"laser" sounds~~
 * ~~sub moves off after boss death~~
 * ~~zxpand detection~~
-* instructions
 * ~~tackle slowdown~~
   * ~~stop enemies after ship has passed~~
   * ~~cap number of enemies by disallowing mines when more than X objects active~~
+* instructions
+* congrats / teletyper?
+* move on to restart
 
 ### IN PROGRESS
 

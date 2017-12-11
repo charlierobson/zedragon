@@ -30,7 +30,7 @@ titlecredidx:
     ;.asc    " TITLE TUNE: REAR ADMIRAL MOGGY "
     ;.asc    "   STC MUSIC PLAYER: ANDY REA   "
     ;.asc    "   AYFX DRIVER:  ALEX SEMENOV   "
-    ;.asc    "ORIGINAL CODE/GFX:  RUSS WETMORE"
+    ;.asc    "   ORIGINAL GFX: RUSS WETMORE   "
     ;.asc    "      P R E S S    F I R E      "
 
 titletune:
