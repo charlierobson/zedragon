@@ -34,11 +34,6 @@ _attractloop:
 	ld		bc,gamemain
     ld      a,(fire)
     cp      1
-    jr      z,_gamestart
-
-    ld      bc,teletypercongrat ;testmain
-    ld      a,(feature)
-    cp      1
     jr      nz,_attractloop
     
 _gamestart:

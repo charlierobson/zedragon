@@ -153,22 +153,6 @@ animatecharacters:
 
     ; every 16 frames
 
-    ld      hl,flaganimation
-    ld      a,(FRAMES)
-    rra
-    rra
-    rra
-    rra
-    and     %00000011
-    add     a,a
-    add     a,l
-    ld      l,a
-    ld      a,(hl)
-    ld      (UDG+$198),a         ; ship rear end, $33
-    inc     hl
-    ld      a,(hl)
-    ld      (UDG+$199),a
-
     ld      a,(UDG+$181)        ; shooter, $30
     xor     $66 ^ $7e
     ld      (UDG+$181),a
@@ -198,6 +182,21 @@ testevery8:
     ret     nz
 
     ; every 8 frames
+
+    ld      hl,flaganimation
+    ld      a,(FRAMES)
+    rra
+    rra
+    rra
+    and     %00000011
+    add     a,a
+    add     a,l
+    ld      l,a
+    ld      a,(hl)
+    ld      (UDG+$198),a         ; ship rear end, $33
+    inc     hl
+    ld      a,(hl)
+    ld      (UDG+$199),a
 
     ld      hl,shooterframe
     ld      c,5                     ; 6 frames, 0..5 inclusive

@@ -26,7 +26,8 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
   * ~~cap number of enemies by disallowing mines when more than X objects active~~
 * ~~congrats / teletyper?~~
 * ~~move on to restart~~
-* game over screen
+* ~~game over screen~~
+* pause
 
 ### IN PROGRESS
 

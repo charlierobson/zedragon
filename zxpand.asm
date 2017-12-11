@@ -8,11 +8,19 @@ detectzxp:
     ld      bc,$e007
     ld      a,$55
     out     (c),a
+    nop
+    nop
+    nop
+    nop
     in      a,(c)
     cp      $0f
     ret     nz
     ld      a,$aa
     out     (c),a
+    nop
+    nop
+    nop
+    nop
     in      a,(c)
     cp      $f0
     ret

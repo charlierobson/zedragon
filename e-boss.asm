@@ -10,7 +10,7 @@ _COUNT = OUSER+6
 _DOORL = OUSER+7
 _DOORH = OUSER+8
 
-BOSSHITS = 1
+BOSSHITS = 3
 
 bosskey:
     ld      l,(iy+OUSER+0)          ; hl = x
