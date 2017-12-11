@@ -10,6 +10,9 @@ _hiscore:
 resetscore:
     ld      hl,0
     ld      (_score),hl
+    ret
+
+showscoreline:
     ld      hl,scoreline
     ld      de,TOP_LINE
     ld      bc,32

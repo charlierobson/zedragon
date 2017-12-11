@@ -34,6 +34,11 @@ initmovedata:
     ld      bc,hercfontxsz
     ldir
 
+    ld      hl,congrattextx
+    ld      de,congrattext
+    ld      bc,congrattextxsz
+    ldir
+
     ret
 
 

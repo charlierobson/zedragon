@@ -22,7 +22,8 @@ titlescreen = $3a18
 mul600tab   = $3c00
 txtres      = $3c14
 ttfont      = $3d34
-;0x14bL (331) bytes remaining
+congrattext = $3eb8
+;0xa8 (168) bytes remaining
 
 FREELIST    = $8000
 D_MIRROR    = $808a
@@ -56,6 +57,24 @@ hercfontxsz:   = $ - hercfontx
 
 m600tabx:    .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
 m600tabxsz =  $ - m600tabx
+
+    .asciimap 0, 255, {*}-'@'
+    .asciimap ' ', ' ', 0
+    .asciimap '.', '.', $1e
+    .asciimap '!', '!', $3c
+
+congrattextx:
+    .asc    "    Congratulations Captain!~"
+    .asc    "~"
+    .asc    "The biggest threat to our planet~"
+    .asc    "is defeated. We are safe again.~"
+    .asc    "~"
+    .asc    "You will receive the highest~"
+    .asc    "honour our country can give...~"
+    .asc    "~"
+    .asc    "      ...ANOTHER MISSION!!~}"
+            ;--------========--------========
+congrattextxsz = $ - congrattextx
 
     ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)
@@ -116,7 +135,6 @@ starthere:
     ; here's the main loop, the root
 
 fnmain:
-    call    animatecharacters
     call    readinput
 
     ld      hl,(scrollpos)

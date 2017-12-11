@@ -24,9 +24,9 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~tackle slowdown~~
   * ~~stop enemies after ship has passed~~
   * ~~cap number of enemies by disallowing mines when more than X objects active~~
-* instructions
-* congrats / teletyper?
-* move on to restart
+* ~~congrats / teletyper?~~
+* ~~move on to restart~~
+* game over screen
 
 ### IN PROGRESS
 
@@ -51,5 +51,4 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * other udg boards
 * chroma
 * game over music
-* game over screen
 * ship control, for tight spot maneuvering

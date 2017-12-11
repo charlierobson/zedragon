@@ -3,6 +3,8 @@
 attract:
     call    cls
 
+    YIELD
+
     call    installmaincharset          ; (re)install the main character set
 
     ld      hl,scrollpos
@@ -27,12 +29,14 @@ _attractloop:
 
     YIELD
 
+    call    animatecharacters
+
 	ld		bc,gamemain
     ld      a,(fire)
     cp      1
     jr      z,_gamestart
 
-    ld      bc,testmain
+    ld      bc,teletypercongrat ;testmain
     ld      a,(feature)
     cp      1
     jr      nz,_attractloop
@@ -40,7 +44,9 @@ _attractloop:
 _gamestart:
     push    bc
     call    silencesound
+    call    resetscore
     pop     bc
+
 	call	getobject
 	call	initobject
 	call	insertobject_afterhead

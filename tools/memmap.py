@@ -55,6 +55,10 @@ end = start + hercstat.st_size
 print("hercfont = $" + format(start, 'x'));
 
 start = end
+end = start + 160
+print("congrattext = $" + format(start, 'x'));
+
+start = end
 remaining = 0x4000 - start
 print(hex(remaining) + " (" + str(remaining) + ") bytes remaining")
 

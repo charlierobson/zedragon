@@ -8,7 +8,11 @@ _COUNTER = OUSER+3
 
 gamemain:
     call    cls
-    call    resetscore
+
+    YIELD
+
+    call    installmaincharset          ; (re)install the main character set    
+    call    showscoreline
     call    displayscore
     call    displayhi
     call    enablegamesound
@@ -35,6 +39,9 @@ gamemain:
 
     ld      a,(laserframe)          ; can't remember why but reasons
     ld      (laserframe+1),a
+
+    ld      hl,playermovesub        ; install the sub remote controller
+    ld      (submvfunc),hl
 
 _resetafterdeath:
     xor     a                       ; reset collision flag that gets set when sub dies
@@ -83,6 +90,7 @@ _notscrolled:
     ld      (ocount),a
     YIELD
 
+    call    animatecharacters
     call    displayscore
     call    checkhi
     call    c,displayhi
@@ -115,6 +123,8 @@ _interlifedelay:
     ;call    displayocount
     YIELD
 
+    call    animatecharacters
+
     inc     (iy+_COUNTER)
     jr      nz,_interlifedelay
 
@@ -130,7 +140,7 @@ _nomoreo:
     call    silencesound
 
 	call	getobject
-	ld		bc,attract
+	ld		bc,teletypergameover
 	call	initobject
 	call	insertobject_afterhead
 
