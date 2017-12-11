@@ -10,6 +10,8 @@ _COUNT = OUSER+6
 _DOORL = OUSER+7
 _DOORH = OUSER+8
 
+BOSSHITS = 1
+
 bosskey:
     ld      l,(iy+OUSER+0)          ; hl = x
     ld      h,(iy+OUSER+1)
@@ -52,7 +54,7 @@ _close1:
     jr      z,_close0
 
 _reset:
-    ld      (iy+_HEALTH),3
+    ld      (iy+_HEALTH),BOSSHITS
 
 _loop:
     YIELD
@@ -178,7 +180,7 @@ boss:
     ld      (iy+OUSER+1),h
     ld      (iy+OUSER+2),0
 
-    ld      (iy+OUSER+3),3          ; boss hit count
+    ld      (iy+OUSER+3),BOSSHITS          ; boss hit count
 
 _loop:
     YIELD
@@ -277,66 +279,12 @@ _bigbangloop:
     ; congratulate player
 
     call    getobject
-    ld      bc,teletyper
+    ld      bc,teletypercongrat
     call    initobject
     call    insertobject_afterthis
-    ex      de,hl
-    ld      (hl),_congrattext & 255
-    inc     hl
-    ld      (hl),_congrattext / 256
 
     DIE
 
-
-teletyper:
-    call    cls
-
-    ld      hl,ttfont
-    ld      de,UDG
-    call    decrunch
-
-    ld      hl,0
-    ld      (scrollpos),hl
-
-    ld      hl,D_BUFFER
-    ld      (iy+OUSER+0),l
-    ld      (iy+OUSER+1),h
-
-_ttloop:
-    ld      (iy+OUSER+2),5
-    ld      l,(iy+OUSER+0)
-    ld      h,(iy+OUSER+1)
-    ld      (hl),1
-
--:
-    YIELD
-    dec     (iy+OUSER+2)
-    jr      nz,{-}
-
-    ld      (iy+OUSER+2),5
-    ld      l,(iy+OUSER+0)
-    ld      h,(iy+OUSER+1)
-    ld      (hl),0
-
--:
-    YIELD
-    dec     (iy+OUSER+2)
-    jr      nz,{-}
-
-    jr      _ttloop
-
-            ;--------========--------========
-_congrattext:
-    .asc    "    Congratulations Captain!~"
-    .asc    "~"
-    .asc    "The biggest threat to our planet~"
-    .asc    "is defeated. We are safe again.~"
-    .asc    "~"
-    .asc    "You will receive the highest~"
-    .asc    "honour our country can give_~"
-    .asc    "~"
-    .asc    "         _ANOTHER GO!!^"
-            ;--------========--------========
 
 _explosequence:
     .byte   $94,$56,$54,$98,$97,$81,$74,$93

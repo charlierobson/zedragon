@@ -157,6 +157,7 @@ fnmain:
 #include "scorefns.asm"
 #include "datafns.asm"
 #include "displayfns.asm"
+#include "teletyper.asm"
 #include "soundfns.asm"
 #include "mapfns.asm"
 #include "stcplay.asm"
