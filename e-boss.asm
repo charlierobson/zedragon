@@ -293,8 +293,7 @@ teletyper:
 
     ld      hl,ttfont
     ld      de,UDG
-    ld      hl,$200
-   ; ldir
+    call    decrunch
 
     ld      hl,0
     ld      (scrollpos),hl
@@ -326,7 +325,6 @@ _ttloop:
 
     jr      _ttloop
 
-    .asciimap $00, $FF, {*}
             ;--------========--------========
 _congrattext:
     .asc    "    Congratulations Captain!~"
@@ -335,11 +333,10 @@ _congrattext:
     .asc    "is defeated. We are safe again.~"
     .asc    "~"
     .asc    "You will receive the highest~"
-    .asc    "honour our country can give...~"
+    .asc    "honour our country can give_~"
     .asc    "~"
-    .asc    "          ANOTHER GO!!^"
+    .asc    "         _ANOTHER GO!!^"
             ;--------========--------========
-    
 
 _explosequence:
     .byte   $94,$56,$54,$98,$97,$81,$74,$93

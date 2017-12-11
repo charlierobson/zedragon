@@ -29,6 +29,11 @@ initmovedata:
     ld      bc,txtresxsz
     ldir
 
+    ld      hl,hercfontx
+    ld      de,ttfont
+    ld      bc,hercfontxsz
+    ldir
+
     ret
 
 

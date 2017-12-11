@@ -1,32 +1,27 @@
     .module DISPLAYFNS
 
-	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	;
-    ; Depack udg into its home at 8K.
+    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
-    ; Copy the first 128 chars up to higher memory, inverting the
-    ; non-inverted half as we go. This  makes the sub rendering easier.
+    ; Depack udg into a back-up store in high mem. Invert the
+    ; first 512 bytes so all characters are inverted, which is
+    ; how we need them fot the micro-bitmap work - sub/bullet.
     ;
-initcharsets:
-    ld      hl,charsetlz
+initcharset:
+    ld      hl,charsetx         ; depack all 3 pages of UDG to ensure charset 3 is available
     ld      de,UDG
     call    decrunch
 
-    ; copy game character set up high
-
-    ld      hl,UDG
+    ld      hl,UDG              ; preserve first 2 pages of charsets in high mem
     ld      de,CHARSETS
+    push    de                  ; stash pointer to chars in high mem that we will invert
     ld      bc,1024
     ldir
 
-    ; bc is 0 from the ldir, ready for djnz
-    ; call the inverter to do 256 bytes...
-    ;
-    ld     hl,CHARSETS
-    call   _inverness
-    ;
-    ; ...then drop straight back into it to do the next 256
-    ;
+    pop     hl
+    call   _inverness           ; invert first 256 bytes of 512
+
+    ; then fall back in to do the rest
+
 _inverness:
     ld      a,(hl)
     xor     $ff
@@ -35,6 +30,22 @@ _inverness:
     djnz    _inverness
     ret
 
+
+    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ;
+    ; Copy the backup character set data from high memory into
+    ; place for the character generator to access. (Un)invert the
+    ; characters we inverted in the first place.
+    ;
+installmaincharset:
+    ld      hl,CHARSETS
+    ld      de,UDG
+    push    de                  ; stash pointer to chars in UDG area that we will (un)invert
+    ld      bc,1024
+    ldir
+    pop     hl
+    call    _inverness          ; (un)invert the first 256 bytes
+    jp      _inverness          ; then the remaining
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	;

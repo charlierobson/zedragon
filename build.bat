@@ -4,6 +4,7 @@
 @lz48 -i titlescrn.bin -o titlescrn.binlz
 @lz48 -i charset.bin -o charset.binlz
 @lz48 -i map.bin -o map.binlz
+@lz48 -i hercules.bin -o hercules.binlz
 
 brass zedragon.asm zedragon.p -s -l listing.html
 

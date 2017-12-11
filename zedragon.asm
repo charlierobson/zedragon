@@ -21,7 +21,8 @@ enemyidx    = $37c0
 titlescreen = $3a18
 mul600tab   = $3c00
 txtres      = $3c14
-;0x2ccL (716) bytes remaining
+ttfont      = $3d34
+;0x14bL (331) bytes remaining
 
 FREELIST    = $8000
 D_MIRROR    = $808a
@@ -32,13 +33,13 @@ DRAWLIST_1  = $9e00
 maplz:       .incbin "map.binlz"
 maplzsz  =    $-maplz
 
-charsetlz:	 .incbin "charset.binlz"
-charsetlzsz = $ - charsetlz
+charsetx:    .incbin "charset.binlz"
+charsetxsz  = $ - charsetx
 
-enemydatx:	 .incbin "enemydat.bin"
+enemydatx:   .incbin "enemydat.bin"
 enemydatxsz = $ - enemydatx
 
-enemyidxx:	 .incbin "enemyidx.bin"
+enemyidxx:   .incbin "enemyidx.bin"
 enemyidxxsz = $ - enemyidxx
 
 pssubs:      .incbin "prescrolledsubs.bin"
@@ -49,6 +50,9 @@ tsxsz:      = $ - tsx
 
 txtresx:     .incbin "txtres.bin"
 txtresxsz:     = $ - txtresx
+
+hercfontx:   .incbin "hercules.binlz"
+hercfontxsz:   = $ - hercfontx
 
 m600tabx:    .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
 m600tabxsz =  $ - m600tabx
@@ -79,7 +83,8 @@ starthere:
     call    initmap
     call    initmovedata
     call    initostore
-    call    initcharsets
+    call    initcharset
+
     call    setupdisplay
 
 	out     ($fe),a

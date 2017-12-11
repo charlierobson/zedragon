@@ -3,6 +3,8 @@
 attract:
     call    cls
 
+    call    installmaincharset          ; (re)install the main character set
+
     ld      hl,scrollpos
     ld      (hl),32
     YIELD
