@@ -1,15 +1,8 @@
     .module SCORE
 
-_score:
-    .word   0
-
-_hiscore:
-    .word   $0200
-
-
 resetscore:
     ld      hl,0
-    ld      (_score),hl
+    ld      (score),hl
     ret
 
 showscoreline:
@@ -21,19 +14,19 @@ showscoreline:
 
 
 checkhi:
-    ld      hl,(_hiscore)
-    ld      de,(_score)
+    ld      hl,(hiscore)
+    ld      de,(score)
     and     a
     sbc     hl,de               ; results in carry set when score > hiscore
     ret     nc
     ex      de,hl
-    ld      (_hiscore),hl       ; update hiscore, return with C set
+    ld      (hiscore),hl       ; update hiscore, return with C set
     ret
 
 
 
 addscore:
-    ld      hl,(_score)
+    ld      hl,(score)
     ld      d,h
     ld      a,l
     add     a,c
@@ -43,19 +36,25 @@ addscore:
     adc     a,b
     daa
     ld      h,a
-    ld      (_score),hl
+    ld      (score),hl
     sub     d
     cp      $10
     ret     c
 
-;    ld      hl,lives
-;    inc     (hl)
+    ld      hl,lives
+    ld      a,(hl)
+    cp      9
+    ret     z
+    inc     (hl)
+    call    showlives
+    ld      a,SFX_EXTRASUB
+    call    AFXPLAY
     ret
 
 
 displayscore:
     ld      de,TOP_LINE+6
-    ld      hl,(_score)
+    ld      hl,(score)
     ld      a,h
     call    _bcd_a
 
@@ -83,7 +82,7 @@ show_char:
 
 displayhi:
     ld      de,TOP_LINE+16
-    ld      hl,(_hiscore)
+    ld      hl,(hiscore)
     ld      a,h
     call    _bcd_a
 

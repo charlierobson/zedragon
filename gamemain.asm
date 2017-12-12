@@ -1,6 +1,5 @@
     .module GAMEMAIN
 
-_LIVES = OUSER
 _RSPL = OUSER+1
 _RSPH = OUSER+2
 _COUNTER = OUSER+3
@@ -34,8 +33,8 @@ gamemain:
     ld      (zone),a
 
     ld      a,4                     ; set initial lives
-    ld      (iy+_LIVES),a
-    call    _showlives
+    ld      (lives),a
+    call    showlives
 
     ld      a,(laserframe)          ; can't remember why but reasons
     ld      (laserframe+1),a
@@ -114,10 +113,10 @@ _notscrolled:
     ; sub's dead
     ld      a,(gamemode)
     ld      l,a
-    ld      a,(iy+_LIVES)
+    ld      a,(lives)
     sub     l
-    ld      (iy+_LIVES),a
-    call    _showlives
+    ld      (lives),a
+    call    showlives
 
     ld      (iy+_COUNTER),100        ; counts up until roll-over: 150ish = ~3 sec
 
@@ -137,7 +136,7 @@ _nomoreo:
     cp      2
     jr      nz,_nomoreo
 
-    ld      a,(iy+_LIVES)           ; if no more subs are available then it's game over
+    ld      a,(lives)           ; if no more subs are available then it's game over
     and     a
     jp      nz,_resetafterdeath
 
@@ -146,14 +145,17 @@ _nomoreo:
 
 _dienow:
     xor     a
-    ld      (pauseposs),a           ; pausing now not possibe
+    ld      (pauseposs),a           ; pausing now not possible
+
+    call    writehi
+
     DIE
 
 
-_showlives:
+showlives:
     ld      a,(gamemode)
     and     a
-    ld      a,(iy+_LIVES)
+    ld      a,(lives)
     jr      nz,{+}
 
     ld      a,14 - 16
@@ -175,13 +177,8 @@ featurecheck:
     ld      a,(gamemode)
     xor     1
     ld      (gamemode),a
-    call    _showlives
+    call    showlives
     ret
-
-;    ld      a,(UDG+3)
- ;   xor     $8
-  ;  ld      (UDG+3),a
-   ; ret
 
 
 

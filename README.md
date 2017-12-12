@@ -29,6 +29,8 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~game over screen~~
 * ~~only allow skipping zones to ones visited~~
 * ~~pause~~
+* ~~hiscore / max zone saving~~
+* extra lives
 
 ### IN PROGRESS
 
@@ -48,7 +50,6 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~sub exploding on line 9 crashes the game~~
 
 ### NICE TO HAVE
-* hiscore / max zone saving
 * control customisation
 * other udg boards
 * chroma

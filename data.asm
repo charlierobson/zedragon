@@ -85,6 +85,9 @@ scrollpos:
 scrollflags:
     .byte   0
 
+zxpandenabled:
+    .byte   0
+
 gameframe:
     .word   0
 
@@ -129,11 +132,21 @@ airupdatecounter:
 airlevel:
     .byte   0
 
+lives:
+    .byte   0
 
+score:
+    .word   0
 zone:
-    .byte   0
-maxzone:                ; maximum zone the player is allowed to skip to
-    .byte   0
+    .byte   0       ; current zone
+
+; --- ordering here is for eeprom persistence, don't alter
+hiscore:
+    .word   $0175
+maxzone:
+    .byte   0       ; maximum zone the player is allowed to skip to
+; --- ordering here is for eeprom persistence, don't alter
+
 
     ; Restart scroll and sub positions
 dofs:
