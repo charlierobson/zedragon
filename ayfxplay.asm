@@ -46,6 +46,7 @@ SFX_TORPED0 = 18
 SFX_TORPED1 = 19
 SFX_TORPED2 = 20
 SFX_TORPED3 = 21
+SFX_TT = 22
 
 ; channel descriptors, 4 bytes per channel:
 ; +0 (2) current address (the channel is free if the high byte =$00)

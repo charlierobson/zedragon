@@ -27,7 +27,8 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~congrats / teletyper?~~
 * ~~move on to restart~~
 * ~~game over screen~~
-* pause
+* ~~only allow skipping zones to ones visited~~
+* ~~pause~~
 
 ### IN PROGRESS
 
@@ -47,9 +48,10 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~sub exploding on line 9 crashes the game~~
 
 ### NICE TO HAVE
-* hiscore saving
+* hiscore / max zone saving
 * control customisation
 * other udg boards
 * chroma
+* sound on/off
 * game over music
 * ship control, for tight spot maneuvering

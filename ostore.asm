@@ -13,8 +13,8 @@
 	;
 	NSTRUCTS	.equ	$20
 
-	PSTORE		.equ	PRTBUF+0		; pointer to private data store
-	NEXTFREE	.equ	PRTBUF+2		; pointer to memory location holding address of next free object
+	PSTORE		.word	0		; pointer to private data store
+	NEXTFREE	.word	0		; pointer to memory location holding address of next free object
 
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

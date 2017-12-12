@@ -43,6 +43,9 @@ gamemain:
     ld      hl,playermovesub        ; install the sub remote controller
     ld      (submvfunc),hl
 
+    ld      a,$ff
+    ld      (pauseposs),a           ; pausing is possible
+
 _resetafterdeath:
     xor     a                       ; reset collision flag that gets set when sub dies
     ld      (collision),a
@@ -103,7 +106,8 @@ _notscrolled:
 
     ld      a,(collision)       ; loop until the sub has collided with something or beaten the boss
     cp      $ff
-    DIEZ
+    jp      z,_dienow
+
     cp      0
     jp      z,_gameloop
 
@@ -137,14 +141,15 @@ _nomoreo:
     and     a
     jp      nz,_resetafterdeath
 
-    call    silencesound
+    call    getobject
+    ld      bc,teletypergameover
+    call    initobject
+    call    insertobject_afterhead
 
-	call	getobject
-	ld		bc,teletypergameover
-	call	initobject
-	call	insertobject_afterhead
-
-	DIE
+_dienow:
+    xor     a
+    ld      (pauseposs),a           ; pausing now not possibe
+    DIE
 
 
 
@@ -189,7 +194,8 @@ _advancecheck:
     ret     nz
 
     ld      a,(zone)
-    cp      6
+    ld      hl,maxzone
+    cp      (hl)
     ret     z
 
     ld      a,SFX_ZONEREACH     ; let player know
@@ -229,9 +235,17 @@ zonecheck:
     ld      (iy+_RSPH),h
 
 _showzone:
-    ld      hl,zone
+    ld      hl,zone             ; increment zone number
     inc     (hl)
-    call    displayzone
+
+    ld      a,(maxzone)         ; if zone > maxzone then bump maxzone
+    cp      (hl)
+    jr      nc,{+}
+
+    inc     a
+    ld      (maxzone),a
+
++:  call    displayzone
 
     ld      a,SFX_ZONEREACH     ; let player know
     jp      AFXPLAY

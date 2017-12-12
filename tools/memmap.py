@@ -6,6 +6,7 @@ def roundup(lower):
 mapstat = os.stat('map.binlz')
 tsstat = os.stat('titlescrn.binlz')
 hercstat = os.stat('hercules.binlz')
+txtresstat = os.stat('txtres.bin')
 
 start = 0x2000
 end = start + 0x600
@@ -47,12 +48,12 @@ end = start + 20
 print("mul600tab = $" + format(start, 'x'));
 
 start = end
-end = start + 32*9
+end = start + txtresstat.st_size
 print("txtres = $" + format(start, 'x'));
 
 start = end
 end = start + hercstat.st_size
-print("hercfont = $" + format(start, 'x'));
+print("ttfont = $" + format(start, 'x'));
 
 start = end
 end = start + 160

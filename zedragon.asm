@@ -11,19 +11,18 @@
     .export
 
 D_BUFFER = $
-
-UDG         = $2000
-PUREMAP     = $2600
-OSTORE      = $2e00
-enemydat    = $3600
-subpix      = $3700
-enemyidx    = $37c0
+UDG = $2000
+PUREMAP = $2600
+OSTORE = $2e00
+enemydat = $3600
+subpix = $3700
+enemyidx = $37c0
 titlescreen = $3a18
-mul600tab   = $3c00
-txtres      = $3c14
-ttfont      = $3d34
-congrattext = $3eb8
-;0xa8 (168) bytes remaining
+mul600tab = $3c00
+txtres = $3c14
+ttfont = $3d54
+congrattext = $3ed8
+;0x88L (136) bytes remaining
 
 FREELIST    = $8000
 D_MIRROR    = $808a
@@ -136,6 +135,12 @@ starthere:
 
 fnmain:
     call    readinput
+    ld      a,(pauseposs)
+    ld      b,a
+    ld      a,(pause)
+    and     b
+    cp      1
+    call    z,_pause
 
     ld      hl,(scrollpos)
     ld      (BUFF_OFFSET),hl
@@ -160,6 +165,32 @@ fnmain:
     YIELD
 
     jp      fnmain
+
+
+_pause:
+    ld      hl,BOTTOM_LINE
+    push    hl
+    ld      de,PRTBUF
+    ld      bc,32
+    ldir
+    ld      hl,txtres+9*32
+    pop     de
+    ld      bc,32
+    ldir
+
+_ploop:
+    call    waitvsync
+    call    readinput
+    ld      a,(pause)
+    cp      1
+    jr      nz,_ploop
+
+    ld      hl,PRTBUF
+    ld      de,BOTTOM_LINE
+    ld      bc,32
+    ldir
+
+    ret
 
 
 #include "ostore.asm"

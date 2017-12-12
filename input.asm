@@ -40,6 +40,7 @@ jsreadfn = $+1
     call    updateinputstate ;
     call    updateinputstate
     call    updateinputstate
+    call    updateinputstate
 
     ; fall into here for last input - quit
 

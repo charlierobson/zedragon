@@ -66,6 +66,7 @@ inputstates:
     .byte	%00001000,7,%00000001,0        ; fire    (SP)
     .byte	%11111111,3,%00000001,0        ; advance (1)
     .byte	%11111111,4,%00000001,0        ; feature (0)
+    .byte	%11111111,5,%00000001,0        ; pause   (P)
 
 ; calculate actual input impulse addresses
 up      = inputstates + 3
@@ -75,6 +76,7 @@ right   = inputstates + 15
 fire    = inputstates + 19
 advance = inputstates + 23
 feature = inputstates + 27
+pause   = inputstates + 31
 
 scrolltick:
 	.byte	0
@@ -85,6 +87,9 @@ scrollflags:
 
 gameframe:
     .word   0
+
+pauseposs:
+    .byte   0
 
 collision:
     .byte   0
@@ -126,6 +131,8 @@ airlevel:
 
 
 zone:
+    .byte   0
+maxzone:                ; maximum zone the player is allowed to skip to
     .byte   0
 
     ; Restart scroll and sub positions

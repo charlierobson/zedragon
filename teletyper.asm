@@ -10,7 +10,7 @@ _AFTERL = OUSER+6
 _AFTERH = OUSER+7
 _TIMER = OUSER+8
 
-TTRATE = 3
+TTRATE = 2
 
 failtext:
     .asc    "         MISSION FAILED}"
@@ -89,7 +89,11 @@ _ttloop:
     inc     hl
     ld      (iy+_SCRPL),l
     ld      (iy+_SCRPH),h
+    and     a
+    jr      z,_ttloop
 
+    ld      a,SFX_TT
+    call    AFXPLAY
     jr      _ttloop
 
 _done:
