@@ -27,9 +27,7 @@ _loop:
     ld      (iy+OUSER+6),$28
 
     ld      bc,depthcharge
-    call    getobject
-    call    initobject
-    call    insertobject_afterthis
+    call    objectafterthis
     ldi
     ldi
     ldi

@@ -100,9 +100,7 @@ _yep:
 _starterator:
     ld      bc,0
 
-    call    getobject
-    call    initobject
-    call    insertobject_afterthis      ; exits with hl-> data area
+    call    objectafterthis             ; returns with hl-> data area
 
     ex      de,hl
     pop     de                          ; retrieve X

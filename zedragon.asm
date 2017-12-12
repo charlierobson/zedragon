@@ -123,10 +123,8 @@ starthere:
 
     ; seed the whole shebanga with the attract mode process
     ;
-    call    getobject
     ld      bc,attract
-    call    initobject
-	call	insertobject_afterhead
+    call    objectafterhead
 
     xor     a
     ld      (ocount),a

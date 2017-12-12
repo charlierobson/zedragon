@@ -336,3 +336,15 @@ _svPintonew
 
 	pop		de					; recover target pointer
 	ret
+
+
+
+objectafterhead:
+    call    getobject
+    call    initobject
+    jp      insertobject_afterhead
+
+objectafterthis:
+    call    getobject
+    call    initobject
+    jp      insertobject_afterthis

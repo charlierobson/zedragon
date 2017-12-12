@@ -101,10 +101,8 @@ _subddeathtest:
     ldi
     ldi
 
-    call    getobject
     ld      bc,bossdoor
-    call    initobject
-    call    insertobject_afterthis
+    call    objectafterthis
 
     jr      _reset
 
@@ -278,10 +276,8 @@ _bigbangloop:
 
     ; congratulate player
 
-    call    getobject
     ld      bc,teletypercongrat
-    call    initobject
-    call    insertobject_afterthis
+    call    objectafterthis
 
     DIE
 

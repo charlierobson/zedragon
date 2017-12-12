@@ -141,16 +141,13 @@ _nomoreo:
     and     a
     jp      nz,_resetafterdeath
 
-    call    getobject
     ld      bc,teletypergameover
-    call    initobject
-    call    insertobject_afterhead
+    call    objectafterhead
 
 _dienow:
     xor     a
     ld      (pauseposs),a           ; pausing now not possibe
     DIE
-
 
 
 _showlives:

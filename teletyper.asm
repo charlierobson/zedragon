@@ -128,9 +128,7 @@ _done:
 
 	ld		c,(iy+_AFTERL)
 	ld		b,(iy+_AFTERH)
-	call	getobject
-	call	initobject
-	call	insertobject_afterhead
+	call	objectafterhead
 
     DIE
 

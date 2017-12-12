@@ -329,9 +329,7 @@ _subsubexplo:
     push    hl
 
     ld      bc,explosion
-    call    getobject
-    call    initobject
-    call    insertobject_afterthis
+    call    objectafterthis
 
     ex      de,hl
     pop     de

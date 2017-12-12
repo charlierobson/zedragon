@@ -42,7 +42,5 @@ _gamestart:
     call    resetscore
     pop     bc
 
-	call	getobject
-	call	initobject
-	call	insertobject_afterhead
+	call	objectafterhead
 	DIE
