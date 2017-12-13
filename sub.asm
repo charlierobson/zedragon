@@ -388,7 +388,15 @@ charcache:
 ;
 
 playermovesub:
-    push    iy
+    ld      a,(fire)        ; is fire held? if not, carry on as normal
+    cp      $ff
+    jr      nz,{+}
+
+    ld      a,(FRAMES)      ; if fire is held, only allow movement every other frame
+    and     1
+    jr      z,_checkfire
+
++:  push    iy
     pop     hl
     ld      de,_SUBY
     add     hl,de
@@ -401,6 +409,7 @@ playermovesub:
     jr      c,_checkdown
     cp      0
     jr      z,_checkdown
+
     dec     (hl)
 
     cp      7               ; play the sub surfacing sound if we hit line 6
@@ -414,6 +423,7 @@ _checkdown:
     ld      a,(hl)
     cp      $48
     jr      nc,_checkleft
+
     inc     (hl)
 
 _checkleft:
@@ -428,6 +438,7 @@ _checkleft:
     ld      a,(hl)
     and     a
     jr      z,_checkright
+
     dec     (hl)
 
 _checkright:
@@ -437,6 +448,7 @@ _checkright:
     ld      a,(hl)
     cp      $a0
     jr      nc,_checkfire
+
     inc     (hl)
 
 _checkfire:

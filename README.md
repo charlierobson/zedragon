@@ -30,6 +30,7 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~only allow skipping zones to ones visited~~
 * ~~pause~~
 * ~~hiscore / max zone saving~~
+* ~~ship control, for tight spot maneuvering~~
 * extra lives
 
 ### IN PROGRESS
@@ -48,6 +49,7 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~enemies can fall below line 10~~
 * ~~torpedo passes through mine sometimes~~
 * ~~sub exploding on line 9 crashes the game~~
+* controls get stuck sometimes
 
 ### NICE TO HAVE
 * control customisation
@@ -55,4 +57,3 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * chroma
 * sound on/off
 * game over music
-* ship control, for tight spot maneuvering
