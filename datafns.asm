@@ -39,6 +39,11 @@ initmovedata:
     ld      bc,congrattextxsz
     ldir
 
+    ld      hl,inputstatesx
+    ld      de,inputstates
+    ld      bc,inputstatesxsz
+    ldir
+
     ret
 
 

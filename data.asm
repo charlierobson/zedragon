@@ -34,49 +34,10 @@ titlecredidx:
     ;.asc    "      P R E S S    F I R E      "
 
 titletune:
-	.incbin	"title.stc"
+    .incbin	"title.stc"
 
 sfx:
-	.incbin	"zedragon.afb"
-
-LAST_J:
-	.byte	0
-
-; -----  4  3  2  1  0
-;
-; $FE -  V, C, X, Z, SH   0
-; $FD -  G, F, D, S, A    1
-; $FB -  T, R, E, W, Q    2
-; $F7 -  5, 4, 3, 2, 1    3
-; $EF -  6, 7, 8, 9, 0    4
-; $DF -  Y, U, I, O, P    5
-; $BF -  H, J, K, L, NL   6
-; $7F -  B, N, M, ., SP   7
-;
-; joystick bit, or $ff/%11111111 for no joy
-; key row offset 0-7,
-; key mask, or $ff/%11111111 for no key
-; trigger impulse
-
-inputstates:
-    .byte	%10000000,2,%00000001,0        ; up      (Q)
-    .byte	%01000000,1,%00000001,0        ; down    (A)
-    .byte	%00100000,7,%00001000,0        ; left    (N)
-    .byte	%00010000,7,%00000100,0        ; right   (M)
-    .byte	%00001000,7,%00000001,0        ; fire    (SP)
-    .byte	%11111111,3,%00000001,0        ; advance (1)
-    .byte	%11111111,4,%00000001,0        ; feature (0)
-    .byte	%11111111,5,%00000001,0        ; pause   (P)
-
-; calculate actual input impulse addresses
-up      = inputstates + 3
-down    = inputstates + 7
-left    = inputstates + 11
-right   = inputstates + 15
-fire    = inputstates + 19
-advance = inputstates + 23
-feature = inputstates + 27
-pause   = inputstates + 31
+    .incbin	"zedragon.afb"
 
 scrolltick:
 	.byte	0

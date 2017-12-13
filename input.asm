@@ -3,6 +3,35 @@
     .module INPUT
 ;
 
+
+; -----  4  3  2  1  0
+;
+; $FE -  V, C, X, Z, SH   0
+; $FD -  G, F, D, S, A    1
+; $FB -  T, R, E, W, Q    2
+; $F7 -  5, 4, 3, 2, 1    3
+; $EF -  6, 7, 8, 9, 0    4
+; $DF -  Y, U, I, O, P    5
+; $BF -  H, J, K, L, NL   6
+; $7F -  B, N, M, ., SP   7
+;
+; joystick bit, or $ff/%11111111 for no joy
+; key row offset 0-7,
+; key mask, or $ff/%11111111 for no key
+; trigger impulse
+
+
+; calculate actual input impulse addresses
+up      = inputstates + 3
+down    = inputstates + 7
+left    = inputstates + 11
+right   = inputstates + 15
+fire    = inputstates + 19
+advance = inputstates + 23
+feature = inputstates + 27
+pause   = inputstates + 31
+
+
     .align  8
 _kbin:
     .fill   8

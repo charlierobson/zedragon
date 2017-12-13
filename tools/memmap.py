@@ -1,7 +1,13 @@
 import os
 
-def roundup(lower):
+def x(value):
+    return format(value, 'x')
+
+def roundup100(lower):
     return (lower + 255) & 0xff00
+
+def roundup10(lower):
+    return ((lower + 15) / 16) * 16
 
 mapstat = os.stat('map.binlz')
 tsstat = os.stat('titlescrn.binlz')
@@ -10,82 +16,77 @@ txtresstat = os.stat('txtres.bin')
 
 start = 0x2000
 end = start + 0x600
-#print(hex(start) + " - " + hex(end) + " : udg")
-print("UDG = $" + format(start, 'x'));
+print("UDG = $" + x(start))
 
-start = end
-end = int(roundup(start + mapstat.st_size))
-#print(hex(start) + " - " + hex(end) + " : pure map")
-print("PUREMAP = $" + format(start, 'x'));
-
-start = end
-end = start + 64*32
-#print(hex(start) + " - " + hex(end) + " : ostore (32 objects)")
-print("OSTORE = $" + format(start, 'x'));
-
-start = end
+start = roundup10(end)
 end = start + 256
-#print(hex(start) + " - " + hex(end) + " : enemydat")
-print("enemydat = $" + format(start, 'x'));
+print("enemydat = $" + x(start))
 
-start = end
-end = start + 3*8*8
-#print(hex(start) + " - " + hex(end) + " : prescrolledsubs")
-print("subpix = $" + format(start, 'x'));
+start = roundup10(end)
+end = start + 64*32
+print("OSTORE = $" + x(start))
 
-start = end
+start = roundup10(end)
+end = start + (3*8*8)
+print("subpix = $" + x(start))
+
+start = roundup10(end)
+end = start + mapstat.st_size
+print("PUREMAP = $" + x(start))
+
+start = roundup10(end)
 end = start + 600
-#print(hex(start) + " - " + hex(end) + " : enemyidx")
-print("enemyidx = $" + format(start, 'x'));
+print("enemyidx = $" + x(start))
 
-start = end
-end = start + tsstat.st_size
-#print(hex(start) + " - " + hex(end) + " : enemyidx")
-print("titlescreen = $" + format(start, 'x'));
-
-start = roundup(end)
+start = roundup10(end)
 end = start + 20
-print("mul600tab = $" + format(start, 'x'));
+print("mul600tab = $" + x(start))
 
-start = end
+start = roundup10(end)
+end = start + tsstat.st_size
+print("titlescreen = $" + x(start))
+
+start = roundup10(end)
 end = start + txtresstat.st_size
-print("txtres = $" + format(start, 'x'));
+print("txtres = $" + x(start))
 
-start = end
+start = roundup10(end)
 end = start + hercstat.st_size
-print("ttfont = $" + format(start, 'x'));
+print("ttfont = $" + x(start))
 
-start = end
-end = start + 160
-print("congrattext = $" + format(start, 'x'));
+start = roundup10(end)
+end = start + 190
+print("congrattext = $" + x(start))
 
-start = end
+start = roundup10(end)
 remaining = 0x4000 - start
-print(hex(remaining) + " (" + str(remaining) + ") bytes remaining")
+print("; spare @ $" + x(remaining) + " " + str(remaining) + " bytes remaining")
+print
 
 #----------------------------------
 
+
 start = 0x8000
-end = start + 0x8a
-#print(hex(start) + " - " + hex(end) + " : mirror map")
-print("FREELIST = $" + format(start, 'x'));
+end = start + 48
+print("inputsid = $" + x(start))
+print("inputstates = $" + x(start + 4))
 
 start = end
+end = start + 64
+print("FREELIST = $" + x(start))
+
+start = 0x808a
 end = start + 6000
-#print(hex(start) + " - " + hex(end) + " : mirror map")
-print("D_MIRROR = $" + format(start, 'x'));
+print("D_MIRROR = $" + x(start))
 
-start = roundup(end)
+start = roundup100(end)
 end = start + 1024
-#print(hex(start) + " - " + hex(end) + " : charsets")
-print("CHARSETS = $" + format(start, 'x'));
+print("CHARSETS = $" + x(start))
 
-start = roundup(end)
+start = roundup100(end)
 end = start + 512
-#print(hex(start) + " - " + hex(end) + " : charsets")
-print("DRAWLIST_0 = $" + format(start, 'x'));
+print("DRAWLIST_0 = $" + x(start))
 
-start = roundup(end)
+start = roundup100(end)
 end = start + 512
-#print(hex(start) + " - " + hex(end) + " : charsets")
-print("DRAWLIST_1 = $" + format(start, 'x'));
+print("DRAWLIST_1 = $" + x(start))
