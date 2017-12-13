@@ -12,13 +12,9 @@ _TIMER = OUSER+8
 
 TTRATE = 2
 
-failtext:
-    .asc    "         MISSION FAILED}"
-            ;--------========--------========
-
 teletypergameover:
-    ld      (iy+_DATAL),failtext & 255
-    ld      (iy+_DATAH),failtext / 256
+    ld      (iy+_DATAL),failedtext & 255
+    ld      (iy+_DATAH),failedtext / 256
 	ld		(iy+_AFTERL),attract & 255
 	ld		(iy+_AFTERH),attract / 256
 
@@ -112,7 +108,7 @@ _done:
 
     dec     (iy+_TIMER)
 
-    ld      hl,titlecreds+192+1
+    ld      hl,pressfiretext+1
     bit     6,(iy+_TIMER)
     jr      nz,{+}
 

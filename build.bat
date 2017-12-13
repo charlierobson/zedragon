@@ -6,6 +6,8 @@
 @lz48 -i map.bin -o map.binlz
 @lz48 -i hercules.bin -o hercules.binlz
 
+brass txtres.asm txtres.bin
+
 @python tools/memmap.py > memmap.asm
 
 brass zedragon.asm zedragon.p -s -l listing.html

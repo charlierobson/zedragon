@@ -33,32 +33,14 @@ pssubssz    = $ - pssubs
 tsx:         .incbin  "titlescrn.binlz"
 tsxsz:      = $ - tsx
 
-txtresx:     .incbin "txtres.bin"
-txtresxsz:     = $ - txtresx
-
 hercfontx:   .incbin "hercules.binlz"
 hercfontxsz:   = $ - hercfontx
 
+txtresx:     .incbin "txtres.bin"
+txtresxsz:     = $ - txtresx
+
 m600tabx:    .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
 m600tabxsz =  $ - m600tabx
-
-    .asciimap 0, 255, {*}-'@'
-    .asciimap ' ', ' ', 0
-    .asciimap '.', '.', $1e
-    .asciimap '!', '!', $3c
-
-congrattextx:
-    .asc    "    Congratulations Captain!~"
-    .asc    "~"
-    .asc    "The biggest threat to our planet~"
-    .asc    "is defeated. We are safe again.~"
-    .asc    "~"
-    .asc    "You will receive the highest~"
-    .asc    "honour our country can give...~"
-    .asc    "~"
-    .asc    "      ...ANOTHER MISSION!!~}"
-            ;--------========--------========
-congrattextxsz = $ - congrattextx
 
 inputstatesx:
     .byte	%10000000,2,%00000001,0        ; up      (Q)
@@ -70,7 +52,6 @@ inputstatesx:
     .byte	%11111111,4,%00000001,0        ; feature (0)
     .byte	%11111111,5,%00000001,0        ; pause   (P)
 inputstatesxsz = $ - inputstatesx
-
 
     ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)

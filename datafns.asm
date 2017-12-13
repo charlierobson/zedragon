@@ -34,11 +34,6 @@ initmovedata:
     ld      bc,hercfontxsz
     ldir
 
-    ld      hl,congrattextx
-    ld      de,congrattext
-    ld      bc,congrattextxsz
-    ldir
-
     ld      hl,inputstatesx
     ld      de,inputstates
     ld      bc,inputstatesxsz

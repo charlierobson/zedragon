@@ -11,28 +11,16 @@
     CH_BULLET       = $ae
     CH_WATER        = $af
 
-    .asciimap ' ', '_', {*}-' '
+scoreline = txtres + $00
+airline = txtres + $20
+titlecreds = txtres + $40
+pressfiretext = txtres + $100
+pausedtext = txtres + $120
+failedtext = txtres + $140
+congrattext = txtres + $160
 
-scoreline = txtres
-    ;.asc    "SCORE:00000  HI:00000  Z:1  ^_:4"
-             ;--------========--------========
-
-airline = txtres + 32
-    ;.asc    "AIR: -------------------------- "
-             ;--------========--------========
-
-titlecreds = txtres + 64
 titlecredidx:
     .byte   0
-
-    ;        --------========--------========
-    ;.asc    "     PROGRAMMING: SIRMORRIS     "
-    ;.asc    "CUSTOM DISPLAY ROUTINE: ANDY REA"
-    ;.asc    " TITLE TUNE: REAR ADMIRAL MOGGY "
-    ;.asc    "   STC MUSIC PLAYER: ANDY REA   "
-    ;.asc    "   AYFX DRIVER:  ALEX SEMENOV   "
-    ;.asc    "   ORIGINAL GFX: RUSS WETMORE   "
-    ;.asc    "      P R E S S    F I R E      "
 
 titletune:
     .incbin	"title.stc"
