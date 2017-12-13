@@ -2,6 +2,7 @@
     CH_BOSSKEY      = $3F
     CH_MINEBASE     = $80
     CH_MINE         = $87
+    CH_MINEBLANK    = $86
     CH_STALACBASE   = $88
     CH_SHOOTBASE    = $90
     CH_CHAIN        = $96

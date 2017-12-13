@@ -95,10 +95,16 @@ _update:
     set     7,h
     res     6,h
     ld      a,(hl)              ; are we about to hit some thing?
-    pop     hl
     and     a
-    ld      a,0                 ; doesn't alter flags
+    ld      b,a
+    pop     hl
+    ld      a,0                 ; doesn't alter z flag
     jr      z,_loop             ; nothing above us, so continue
+
+    ld      a,b
+
+    cp      CH_MINEBLANK        ; mine trail?
+    jr      z,_loop
 
     cp      $30                 ; some solid thing above?
     jr      nc,_loop

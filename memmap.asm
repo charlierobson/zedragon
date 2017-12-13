@@ -3,13 +3,13 @@ enemydat = $2600
 OSTORE = $2700
 subpix = $2f00
 PUREMAP = $2fc0
-enemyidx = $3750
-mul600tab = $39b0
-titlescreen = $39d0
-txtres = $3b40
-ttfont = $3c80
-congrattext = $3e10
-; spare @ $130 304 bytes remaining
+enemyidx = $3760
+mul600tab = $39c0
+titlescreen = $39e0
+txtres = $3b50
+ttfont = $3c90
+congrattext = $3e20
+; spare @ $120 288 bytes remaining
 
 inputsid = $8000
 inputstates = $8004

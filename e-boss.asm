@@ -26,6 +26,9 @@ bosskey:
     ld      (iy+OUSER+1),h
     ld      (iy+OUSER+2),16         ; resdy for copying to explosion, short one please
 
+    ld      bc,bossmine
+    call    objectafterthis
+
     ld      hl,579+D_BUFFER+600
 
 _close0:
@@ -107,6 +110,60 @@ _subddeathtest:
     jr      _reset
 
 
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+    .module BOSSMINER
+;
+
+_CXL = OUSER+0
+_CXH = OUSER+1
+_CY = OUSER+2
+_TIMER = OUSER+3
+
+bossmine:
+    ld      (iy+_CXL),582 & 255
+    ld      (iy+_CXH),582 / 256
+    ld      (iy+_CY), 9
+
+    ld      (iy+_TIMER),250
+
+_waitloop:
+    YIELD
+    YIELD
+    ld      a,(collision)
+    and     a
+    DIENZ
+    dec     (iy+_TIMER)
+    jr      nz,_waitloop
+
+_appearloop:
+    YIELD
+    ld      a,(collision)
+    and     a
+    DIENZ
+    ld      a,(iy+_TIMER)
+    sra     a
+    sra     a
+    sra     a
+    and     $fe
+    add     a,$81
+    ld      (D_BUFFER+582+(9*600)),a
+
+    inc     (iy+_TIMER)
+    ld      a,(iy+_TIMER)
+    cp      64
+    jr      nz,_appearloop
+
+    ld      bc,minearise
+    call    objectafterthis
+    ldi
+    ldi
+    ldi
+
+    YIELD
+
+    jr      bossmine
+
 
 ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ;
@@ -122,7 +179,7 @@ bossdoor:
 
     ld      a,$1f
     call    _setchr
-    ld      (iy+OUSER+0),9
+    ld      (iy+OUSER+0),20
 
 _loop00:
     YIELD
@@ -131,7 +188,7 @@ _loop00:
 
     ld      a,$29
     call    _setchr
-    ld      (iy+OUSER+0),50
+    ld      (iy+OUSER+0),60
 
 _loop01:
     YIELD
@@ -140,7 +197,7 @@ _loop01:
 
     ld      a,$1f
     call    _setchr
-    ld      (iy+OUSER+0),9
+    ld      (iy+OUSER+0),12
 
 _loop02:
     YIELD
