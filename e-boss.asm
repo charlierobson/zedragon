@@ -274,6 +274,10 @@ _loop:
     sbc     hl,de
     jr      nz,_loop
 
+    ld      bc,5
+    call    addscore
+    call    displayscore
+
     call    startexplosion
     ldi
     ldi
@@ -351,6 +355,10 @@ _bigbangloop:
     ld      (iy+OUSER+3),100
 
 -:  YIELD
+    ld      bc,1
+    call    addscore
+    call    displayscore
+
     dec     (iy+OUSER+3)
     jr      nz,{-}
 
