@@ -115,7 +115,7 @@ resetcredits:
 updatecredits:
     ld      a,(titlecredidx)
     inc     a
-    cp      12              ; reset counter every complete cycle
+    cp      14              ; reset counter every complete cycle
     jr      nz,{+}
 
     xor     a
@@ -125,7 +125,7 @@ updatecredits:
     bit     0,a             ; if bit 1 is set show one of the two repeated items 
     jr      z,{+}
 
-    ld      a,6*2
+    ld      a,7*2
 
 +:  and     $fe
     sla     a

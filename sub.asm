@@ -402,7 +402,11 @@ playermovesub:
     add     hl,de
 
     ld      a,(up)          ; min y = 6
-    and     1
+    bit     0,a
+    jr      z,_checkdown
+    cp      3
+    jr      z,_checkdown
+    cp      7
     jr      z,_checkdown
     ld      a,(hl)
     cp      7
@@ -418,7 +422,11 @@ playermovesub:
 
 _checkdown:
     ld      a,(down)        ; max y = $48
-    and     1
+    bit     0,a
+    jr      z,_checkleft
+    cp      3
+    jr      z,_checkleft
+    cp      7
     jr      z,_checkleft
     ld      a,(hl)
     cp      $48

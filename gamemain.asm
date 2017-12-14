@@ -124,6 +124,7 @@ _interlifedelay:
     xor     a
     ld      (ocount),a
     ;call    displayocount
+    call    scroll
     YIELD
 
     call    animatecharacters

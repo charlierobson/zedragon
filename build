@@ -5,6 +5,8 @@ tools/lz48 -i charset.bin -o charset.binlz
 tools/lz48 -i hercules.bin -o hercules.binlz
 tools/lz48 -i titlescrn.bin -o titlescrn.binlz
 
+brass txtres.asm txtres.bin
+
 brass zedragon.asm zedragon.p -s -l listing.html
 
 cp zedragon.p ./ZXpand_SD_Card/menu.p

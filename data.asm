@@ -14,10 +14,11 @@
 scoreline = txtres + $00
 airline = txtres + $20
 titlecreds = txtres + $40
-pressfiretext = txtres + $100
-pausedtext = txtres + $120
-failedtext = txtres + $140
-congrattext = txtres + $160
+zxpdistxt =  txtresx + $110 ; hit the source before copy
+pressfiretext = txtres + $120
+pausedtext = txtres + $140
+failedtext = txtres + $160
+congrattext = txtres + $180
 
 titlecredidx:
     .byte   0

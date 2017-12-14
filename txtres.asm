@@ -16,12 +16,14 @@
     .asc    "   STC MUSIC PLAYER: ANDY REA   "
     .asc    "   AYFX DRIVER:  ALEX SEMENOV   "
     .asc    "    ATARI GFX:  RUSS WETMORE    "
+;zxpdistxt =  txtres + $110
+    .asc    "        ZXPAND: DISABLED        "
 
-;pressfire =  txtres + $100
+;pressfire =  txtres + $120
     .asc    "      P R E S S    F I R E      "
     ;        --------========--------========
 
-;pausedtext = txtres + $120
+;pausedtext = txtres + $140
     .asc    "             PAUSED             "
     ;        --------========--------========
 
@@ -30,11 +32,11 @@
     .asciimap '.', '.', $1e
     .asciimap '!', '!', $3c
 
-;failedtext =  txtres + $140
+;failedtext =  txtres + $160
     .asc    "         MISSION FAILED}        "
     ;        --------========--------========
 
-;congrattext = txtres + $160
+;congrattext = txtres + $180
     ;        --------========--------========
     .asc    "    Congratulations Captain!~"
     .asc    "~"

@@ -15,6 +15,7 @@ detectzxp:
     in      a,(c)
     cp      $0f
     ret     nz
+
     ld      a,$aa
     out     (c),a
     nop
@@ -33,6 +34,13 @@ detectzxp:
 enablezxpandfeatures:
     ld      a,1
     ld      (zxpandenabled),a
+
+    ld      hl,zxpdistxt
+    ld      (hl),0
+    inc     hl
+    ld      (hl),'E'-' '
+    inc     hl
+    ld      (hl),'N'-' '
 
     ld      bc,$e007            ; go low, ram at 8-40k
     ld      a,$b2
