@@ -37,14 +37,19 @@ addscore:
     daa
     ld      h,a
     ld      (score),hl
-    sub     d
-    cp      $10
+
+    sub     d               ; d is high byte of score, 0HHLL0
+    cp      1               ; did score just flip the 1000s digit?
     ret     c
 
-    ld      hl,lives
+    bit     0,h             ; return if odd number of 1000s
+    ret     nz
+
+    ld      hl,lives        ; yielding a bonus sub every 2000 pints
     ld      a,(hl)
     cp      9
     ret     z
+
     inc     (hl)
     call    showlives
     ld      a,SFX_EXTRASUB

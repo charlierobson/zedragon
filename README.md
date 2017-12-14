@@ -31,7 +31,7 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~pause~~
 * ~~hiscore / max zone saving~~
 * ~~ship control, for tight spot maneuvering~~
-* extra lives
+* ~~extra lives~~
 
 ### IN PROGRESS
 
@@ -50,6 +50,7 @@ Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 * ~~torpedo passes through mine sometimes~~
 * ~~sub exploding on line 9 crashes the game~~
 * controls get stuck sometimes
+  * not sure if this is a ZXpand issue, nature of input fns is that they *will* clear if left alone...
 
 ### NICE TO HAVE
 * control customisation
