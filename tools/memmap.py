@@ -22,12 +22,12 @@ end = start + 0x600
 print("UDG = $" + x(start))
 
 start = roundup10(end)
-end = start + 256
-print("enemydat = $" + x(start))
-
-start = roundup10(end)
 end = start + 64*32
 print("OSTORE = $" + x(start))
+
+start = roundup10(end)
+end = start + 256
+print("enemydat = $" + x(start))
 
 start = roundup10(end)
 end = start + (3*8*8)

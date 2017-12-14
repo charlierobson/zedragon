@@ -2,19 +2,6 @@
 
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ;
-    ; Copy the compressed map data to lower memory, where it will
-    ; be used to reset the display and mirror maps each level.
-    ;
-initmap:
-    ld      hl,maplz
-    ld      de,PUREMAP
-    ld      bc,maplzsz
-    ldir
-    ret
-
-
-    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    ;
     ; Deompress the map into the mirror display file above 16k,
     ; and then memcpy that into the display file.
     ;

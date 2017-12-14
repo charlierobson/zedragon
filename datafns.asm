@@ -1,52 +1,12 @@
 initmovedata:
-    ld      hl,enemydatx
-    ld      de,enemydat
-    ld      bc,enemydatxsz
-    ldir
-
-    ld      hl,enemyidxx
-    ld      de,enemyidx
-    ld      bc,enemyidxxsz
-    ldir
-
-    ld      hl,pssubs
-    ld      de,subpix
-    ld      bc,pssubssz
-    ldir
-
-    ld      hl,tsx
-    ld      de,titlescreen
-    ld      bc,tsxsz
-    ldir
-
-    ld      hl,m600tabx
-    ld      de,mul600tab
-    ld      bc,m600tabxsz
-    ldir
-
-    ld      hl,txtresx
-    ld      de,txtres
-    ld      bc,txtresxsz
-    ldir
-
-    ld      hl,hercfontx
-    ld      de,ttfont
-    ld      bc,hercfontxsz
+    ld      hl,datax
+    ld      de,$2e00
+    ld      bc,$4000-$2e00
     ldir
 
     ld      hl,inputstatesx
-    ld      de,inputstates
+    ld      de,inputsid
     ld      bc,inputstatesxsz
-    ldir
-
-    ld      hl,considertablex
-    ld      de,considertable
-    ld      bc,considertablexsz
-    ldir
-
-    ld      hl,dofsx
-    ld      de,dofs
-    ld      bc,dofsxsz
     ldir
 
     ret

@@ -5,6 +5,9 @@ tools/lz48 -i charset.bin -o charset.binlz
 tools/lz48 -i hercules.bin -o hercules.binlz
 tools/lz48 -i titlescrn.bin -o titlescrn.binlz
 tools/lz48 -i title.stc -o title.stclz
+
+brass datawad.asm -s datawad.bin
+
 python tools/memmap.py > memmap.asm
 brass txtres.asm txtres.bin
 

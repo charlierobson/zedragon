@@ -1,6 +1,6 @@
 UDG = $2000
-enemydat = $2600
-OSTORE = $2700
+OSTORE = $2600
+enemydat = $2e00
 subpix = $2f00
 PUREMAP = $2fc0
 enemyidx = $3760

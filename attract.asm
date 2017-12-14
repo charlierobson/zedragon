@@ -11,14 +11,14 @@ attract:
     ld      (hl),32
     YIELD
 
-    ld      hl,titletunex
+    ld      hl,titletunelz
     ld      de,D_MIRROR
     call    decrunch
 
     call    resetcredits
     call    enabletitlesound
 
-    ld      hl,titlescreen
+    ld      hl,titlescrn
     ld      de,D_BUFFER
     call    decrunch
 
