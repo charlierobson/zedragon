@@ -24,7 +24,9 @@ subfunction:
 submvfunc = $+1
     call    playermovesub       ; listen to controls by default, can be changed though
 
-    ; calculate address of sub in the map, relative to the current scroll position
+    ld      a,(iy+_SUBX)        ; pixel -> char conversion
+    cp      $ff
+    DIEZ
 
 _drawsub:
     ld      a,(iy+_SUBX)        ; pixel -> char conversion
