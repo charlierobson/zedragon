@@ -8,9 +8,6 @@ tools/lz48 -i title.stc -o title.stclz
 
 brass datawad.asm -s datawad.bin
 
-python tools/memmap.py > memmap.asm
-brass txtres.asm txtres.bin
-
 brass zedragon.asm zedragon.p -s -l listing.html
 
 cp zedragon.p ./ZXpand_SD_Card/menu.p

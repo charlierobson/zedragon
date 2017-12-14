@@ -1,4 +1,4 @@
-; Output by Brass 1.0.5.3 at 14/12/2017 16:49:45
+; Output by Brass 1.0.5.3 at 14/12/2017 16:53:19
 ; Source file: datawad.asm
 
 UDG	.equ	$2000	; [datawad.asm:5]

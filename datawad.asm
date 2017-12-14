@@ -1,5 +1,5 @@
 ;    .exportmode LabelFile
-    .exportmode Assembler
+    .exportmode Assembly
     .export
 
 UDG = $2000
