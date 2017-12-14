@@ -5,10 +5,9 @@
 @lz48 -i charset.bin -o charset.binlz
 @lz48 -i map.bin -o map.binlz
 @lz48 -i hercules.bin -o hercules.binlz
+@lz48 -i title.stc -o title.stclz
 
-brass txtres.asm txtres.bin
-
-@python tools/memmap.py > memmap.asm
+brass datawad.asm -s datawad.bin
 
 brass zedragon.asm zedragon.p -s -l listing.html
 
