@@ -14,20 +14,6 @@ NME_LASER    = $50
 NME_BOSSKEY  = $60
 NME_BOSSDOOR = $70
 
-; TODO - make x,y to screenpos function to share amongst objects
-;        make function that creates & initialises object
-
-    .align  64
-_considertable:
-    .word   considerstal, stalfall
-    .word   considermine, minearise
-    .word   considernever, 0                         ; never consider static mines
-    .word   considerifeffective, depthchargeGenerator
-    .word   considerifeffective, shootemup
-    .word   considerifeffective, laseremup
-    .word   consideralways, bosskey
-    .word   consideralways, boss
-
 
 enemyinitiator:
     ld      de,(scrollpos)      ; find the first enemy on screen
@@ -67,7 +53,7 @@ _possibly:
 
     push    hl
 
-    ld      hl,_considertable   ; index into consideration table
+    ld      hl,considertable   ; index into consideration table
     or      l
     ld      l,a
 

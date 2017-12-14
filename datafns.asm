@@ -39,6 +39,16 @@ initmovedata:
     ld      bc,inputstatesxsz
     ldir
 
+    ld      hl,considertablex
+    ld      de,considertable
+    ld      bc,considertablexsz
+    ldir
+
+    ld      hl,dofsx
+    ld      de,dofs
+    ld      bc,dofsxsz
+    ldir
+
     ret
 
 

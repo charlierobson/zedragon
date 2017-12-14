@@ -53,6 +53,42 @@ inputstatesx:
     .byte	%11111111,5,%00000001,0        ; pause   (P)
 inputstatesxsz = $ - inputstatesx
 
+considertablex:
+    .word   considerstal, stalfall
+    .word   considermine, minearise
+    .word   considernever, 0                         ; never consider static mines
+    .word   considerifeffective, depthchargeGenerator
+    .word   considerifeffective, shootemup
+    .word   considerifeffective, laseremup
+    .word   consideralways, bosskey
+    .word   consideralways, boss
+considertablexsz = $ - considertablex
+
+dofsx:
+    .word   $0000
+	.byte	0,6
+
+    .word   $004a
+	.byte	72,6
+
+    .word   $00aa
+	.byte	64,16
+
+    .word   $010b
+	.byte	72,16
+
+    .word   $0181
+	.byte	56,6
+
+    .word   $01d8
+	.byte	56,8
+
+    .word   $021a
+	.byte	80,6
+
+    .word   $ffff
+dofsxsz = $ - dofsx
+
     ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)
     RET

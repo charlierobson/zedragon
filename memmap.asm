@@ -7,9 +7,10 @@ enemyidx = $3760
 mul600tab = $39c0
 titlescreen = $39e0
 txtres = $3b50
-ttfont = $3d70
-congrattext = $3f00
-; spare @ $40 64 bytes remaining
+ttfont = $3d90
+considertable = $3f40
+dofs = $3f80
+; spare @ $60 96 bytes remaining
 
 inputsid = $8000
 inputstates = $8004

@@ -11,6 +11,10 @@ attract:
     ld      (hl),32
     YIELD
 
+    ld      hl,titletunex
+    ld      de,D_MIRROR
+    call    decrunch
+
     call    resetcredits
     call    enabletitlesound
 

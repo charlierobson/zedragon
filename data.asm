@@ -23,8 +23,8 @@ congrattext = txtres + $180
 titlecredidx:
     .byte   0
 
-titletune:
-    .incbin	"title.stc"
+titletunex:
+    .incbin	"title.stclz"
 
 sfx:
     .incbin	"zedragon.afb"
@@ -97,32 +97,6 @@ hiscore:
 maxzone:
     .byte   0       ; maximum zone the player is allowed to skip to
 ; --- ordering here is for eeprom persistence, don't alter
-
-
-    ; Restart scroll and sub positions
-dofs:
-    .word   $0000
-	.byte	0,6
-
-    .word   $004a
-	.byte	72,6
-
-    .word   $00aa
-	.byte	64,16
-
-    .word   $010b
-	.byte	72,16
-
-    .word   $0181
-	.byte	56,6
-
-    .word   $01d8
-	.byte	56,8
-dofs7:
-    .word   $021a
-	.byte	80,6
-
-    .word   $ffff
 
 
 shooterframe:

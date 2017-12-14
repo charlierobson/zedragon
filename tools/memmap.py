@@ -9,6 +9,9 @@ def roundup100(lower):
 def roundup10(lower):
     return ((lower + 15) / 16) * 16
 
+def roundup40(lower):
+    return ((lower + 63) / 64) * 64
+
 mapstat = os.stat('map.binlz')
 tsstat = os.stat('titlescrn.binlz')
 hercstat = os.stat('hercules.binlz')
@@ -54,9 +57,13 @@ start = roundup10(end)
 end = start + hercstat.st_size
 print("ttfont = $" + x(start))
 
+start = roundup40(end)
+end = start + 64
+print("considertable = $" + x(start))
+
 start = roundup10(end)
-end = start + 190
-print("congrattext = $" + x(start))
+end = start + 32
+print("dofs = $" + x(start))
 
 start = roundup10(end)
 remaining = 0x4000 - start

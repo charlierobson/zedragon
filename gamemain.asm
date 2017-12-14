@@ -191,7 +191,7 @@ _advancecheck:
     ld      a,(zone)
     ld      hl,maxzone
     cp      (hl)
-    ret     z
+  ;  ret     z
 
     ld      a,SFX_ZONEREACH     ; let player know
     call    AFXPLAY

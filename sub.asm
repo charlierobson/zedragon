@@ -230,7 +230,7 @@ colidx2 = $+6
     inc     hl
 
     ld      a,(iy+_SUBY)
-    cp      $47
+    cp      $48
     jr      nc,_nosecondline
 
     push    hl
@@ -289,10 +289,14 @@ chkidx2 = $+5
     inc     e
     djnz    _checkcoll
 
-    ld      a,(collision)
+    ; no collision - asphyxiation?
+
+    ld      a,(collision)           ; set z flag ahead of call to updateair
     and     a
-    ld      a,(iy+_SUBY)
+
+    ld      a,(iy+_SUBY)            ; only update air if sub not dead/celebrating boss defeat
     call    z,updateair
+
     ld      a,(airlevel)
     or      a
     jp      nz,subfunction
@@ -362,7 +366,10 @@ _testcollision:
     ld      a,c
     and     a
     ret     z
-    cp      $a0         ; no collision with chars $a0 or greater
+
+    ld      a,(collision)   ; (causes no collisions when boss just died)
+    or      c
+    cp      $a0             ; no collision with chars $a0 or greater
     ret
 
 

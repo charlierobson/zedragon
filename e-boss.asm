@@ -36,6 +36,9 @@ _close0:
     ld      (iy+_DOORL),l
     ld      (iy+_DOORH),h
 
+    ld      a,SFX_WALL
+    call    AFXPLAY
+
 _close1:
     YIELD
     dec     (iy+_COUNT)
@@ -130,6 +133,7 @@ bossmine:
 _waitloop:
     YIELD
     YIELD
+    YIELD
     ld      a,(collision)
     and     a
     DIENZ
@@ -183,21 +187,30 @@ bossdoor:
 
 _loop00:
     YIELD
+    ld      a,(bosshitted)
+    and     a
+    jr      nz,_closenow
+
     dec     (iy+OUSER+0)
     jr      nz,_loop00
 
     ld      a,$29
     call    _setchr
-    ld      (iy+OUSER+0),60
+    ld      (iy+OUSER+0),75
 
 _loop01:
     YIELD
+    ld      a,(bosshitted)
+    and     a
+    jr      nz,_closenow
+
     dec     (iy+OUSER+0)
     jr      nz,_loop01
 
+_closenow:
     ld      a,$1f
     call    _setchr
-    ld      (iy+OUSER+0),12
+    ld      (iy+OUSER+0),20
 
 _loop02:
     YIELD
@@ -211,6 +224,9 @@ _close2:
     ld      hl,bda
     dec     (hl)
 
+    xor     a
+    ld      (bosshitted),a
+
     DIE
 
 
@@ -222,7 +238,8 @@ _setchr:
     ld      (de),a
     ret
 
-
+bosshitted:
+    .byte   0
 
 ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ;
@@ -236,6 +253,9 @@ boss:
     ld      (iy+OUSER+2),0
 
     ld      (iy+OUSER+3),BOSSHITS          ; boss hit count
+
+    xor     a
+    ld      (bosshitted),a
 
 _loop:
     YIELD
@@ -258,6 +278,9 @@ _loop:
     ldi
     ldi
     ldi
+
+    ld      hl,bosshitted
+    inc     (hl)
 
     dec     (iy+OUSER+3)
     jr      nz,_loop
