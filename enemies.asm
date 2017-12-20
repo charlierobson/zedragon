@@ -186,6 +186,21 @@ cIfIneffective:
     ret
 
 
+;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+;
+; Return with carry set if x is to the left of the sub
+;
+cIfIneffectiveHard:
+    ld      hl,(subcharx)
+    ld      e,(iy+OUSER+0)
+    ld      d,(iy+OUSER+1)
+
+    ex      de,hl
+    and     a
+    sbc     hl,de
+    ret
+
+
     .include "e-stalactite.asm"
     .include "e-mine.asm"
     .include "e-shooter.asm"
