@@ -66,10 +66,11 @@ BOTTOM_LINE:
 starthere:
     out     ($fd),a
 
+    call    initmovedata
+
     call    detectzxp
     call    z,enablezxpandfeatures
 
-    call    initmovedata
     call    initostore
     call    initcharset
 
