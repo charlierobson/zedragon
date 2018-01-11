@@ -8,20 +8,20 @@ detectzxp:
     ld      bc,$e007
     ld      a,$55
     out     (c),a
-    nop
-    nop
-    nop
-    nop
+    ex      (sp),hl
+    ex      (sp),hl
+    ex      (sp),hl
+    ex      (sp),hl
     in      a,(c)
     cp      $0f
     ret     nz
 
     ld      a,$aa
     out     (c),a
-    nop
-    nop
-    nop
-    nop
+    ex      (sp),hl
+    ex      (sp),hl
+    ex      (sp),hl
+    ex      (sp),hl
     in      a,(c)
     cp      $f0
     ret
@@ -35,7 +35,7 @@ enablezxpandfeatures:
     ld      a,1
     ld      (zxpandenabled),a
 
-    ld      hl,zxpdistxt
+    ld      hl,zxpdistxt+16
     ld      (hl),0
     inc     hl
     ld      (hl),'E'-' '
