@@ -1,15 +1,32 @@
 # zedragon
-ZX81 conversion of Russ Wetmore's classic atari game Sea Dragon
+Conversion of Russ Wetmore's classic Atari game Sea Dragon for the Sinclair ZX81 suitably equipped with 32K RAM, AY/YM sound and UDG.§
 
-## Additional Hardware Requirements
+---
+## How to play
+
+Avoid contact with enemies or the environment. Don't run out of air. Surface regularly to refill your tanks.
+
+ZXpand joystick or the following keys move your sub:
+
+|Key|Direction|
+|----|----|
+| Q | Up |
+| A | Down |
+| N | Left |
+| M | Right |
+
+Space fires. Hold fire while moving to slow the sub's movement for tight spots.
+
+---
+### Additional Hardware Requirements
 
 RAM at 8-40K : Chroma / ZXPand / ZXpand+
-UDG : UDG-For-ZXpand / CHR$128 mod
+UDG : UDG-For-ZXpand / CHR$128 mod (128 character mode)
 
 Joystick : Kempston / Chroma / ZXpand+ / ZXpand-AY
 Sound : ZonX / Mr.X / ZXpand+ / ZXpand-AY
 
-
+---
 ### TODO
 * ~~lasers~~
 * ~~stalactites~~
