@@ -200,7 +200,6 @@ cIfIneffectiveHard:
     sbc     hl,de
     ret
 
-
     .include "e-stalactite.asm"
     .include "e-mine.asm"
     .include "e-shooter.asm"
