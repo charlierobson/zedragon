@@ -16,7 +16,7 @@ _loop:
     ld      a,(collision)                   ; die if sub died
     or      a
     DIENZ
-    call    cIfIneffective
+    call    cIfIneffectiveHard
     DIEC
     call    cIfOffscreenLeft
     DIEC
