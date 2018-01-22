@@ -5,4 +5,7 @@
 *.sym
 *.exe
 *.inc
+*.bin
+*.???lz
+
 ZXpand_SD_Card
