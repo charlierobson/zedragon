@@ -29,6 +29,9 @@ shootemup:
     ld      (iy+OUSER+COLL),0             ; collision cache
     ld      (iy+OUSER+FFLOP),0
 
+    call    cIfIneffectiveHard
+    DIEC
+
     ; search the shooter space to find the required length
     ld      de,601
     set     7,h
@@ -96,7 +99,7 @@ _soy2:
     ld      a,(collision)               ; die if sub died
     or      (iy+OUSER+COLL)
     DIENZ
-    call    cIfIneffective
+    call    cIfIneffectiveHard
     DIEC
     call    cIfOffscreenLeft
     DIEC

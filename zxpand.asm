@@ -10,16 +10,12 @@ detectzxp:
     out     (c),a
     ex      (sp),hl
     ex      (sp),hl
-    ex      (sp),hl
-    ex      (sp),hl
     in      a,(c)
     cp      $0f
     ret     nz
 
     ld      a,$aa
     out     (c),a
-    ex      (sp),hl
-    ex      (sp),hl
     ex      (sp),hl
     ex      (sp),hl
     in      a,(c)
