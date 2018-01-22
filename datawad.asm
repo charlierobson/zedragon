@@ -94,8 +94,8 @@ dofs:
     .word   $004a
 	.byte	72,6
 
-    .word   $00aa
-	.byte	64,16
+    .word   $00b1
+	.byte	40,6
 
     .word   $010b
 	.byte	72,16

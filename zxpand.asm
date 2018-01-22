@@ -55,7 +55,12 @@ enablezxpandfeatures:
 
 
 _readspandstick:
-    call    $1ffe               ; get the joystick bits
+    ld      bc,$e007
+    ld      a,$a0
+    out     (c),a
+    ex      (sp),hl
+    ex      (sp),hl
+    in      a,(c)
     or      %00000111           ; we need some 1 bits for 'no joy' test
     ret
 
