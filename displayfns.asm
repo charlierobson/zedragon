@@ -72,8 +72,8 @@ cls:
     ld      bc,6000
     call    fillmem
 
-    ld      (scrollpos),bc          ; bc is 0 at thispoint
-    ld      (BUFF_OFFSET),bc
+    ld      hl,D_BUFFER
+    ld      (MapStart),hl
 
     ld      hl,TOP_LINE
     ld      bc,32

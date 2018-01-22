@@ -1,5 +1,3 @@
-    BUFFER_WIDTH    .equ 600
-    NUMBER_OF_ROWS  .equ 10
 
 setupdisplay:
 	CALL	cls
@@ -308,73 +306,8 @@ VID_COMPLETE:
 ;AS LONG AS WHATEVER YOU DO WILL BE COMPLETE WITHIN
 ;THE LOWER MARGIN BEFORE vSYNC OCCURS
 
-	EX		AF,AF'
-	OUT		($FE),A
+	jp		vysnctask
 
-	PUSH	IY				;STC (and AYFX) PLAYER USES IY
-GO_PLAYER = $+1
-	LD		A,0
-	AND		A
-SOUNDFN = $+1
-	CALL	nz,0
-	POP		IY
-
-	ld		hl,laserframe
-	xor		a
-	inc		(hl)
-	jp		m,{+}
-
-	ld		l,(hl)
-	ld		h,1
-	ld		a,(hl)
-	and		$08
-
-+:	xor		$ff
-
-	ld		hl,UDG+$2b8			; character $97 - laser  we want a shimmering laser effect
-	ld		de,CHARSETS+$2b8
-
-	ld		(hl),a
-	ld		(de),a
-	inc		hl
-	inc		de
-	ld		(hl),a
-	ld		(de),a
-	inc		hl
-	inc		de
-	ld		(hl),a
-	ld		(de),a
-	inc		hl
-	inc		de
-	ld		(hl),a
-	ld		(de),a
-	inc		hl
-	inc		de
-	ld		(hl),a
-	ld		(de),a
-	inc		hl
-	inc		de
-	ld		(hl),a
-	ld		(de),a
-	inc		hl
-	inc		de
-	ld		(hl),a
-	ld		(de),a
-	inc		hl
-	inc		de
-	ld		(hl),a
-	ld		(de),a
-
-	POP		HL
-	POP		DE
-	POP		BC
-	POP		AF
-	;AT THIS PIONT ALL REGISTERS RESTORED AS THEY WERE BEFORE 
-	;VIDEO GENERATION TOOK PLACE
-	RET
-
-laserframe:
-	.word	0
 
 VID_STACK:
 	.word	NXT_ROW

@@ -8,6 +8,9 @@
 #include "include/sysvars.asm"
 #include "include/zxline0.asm"
 
+BUFFER_WIDTH    .equ 600
+NUMBER_OF_ROWS  .equ 10
+
 .define ADD_DE_A add a,e \ ld e,a \ adc a,d \ sub e \ ld d,a
 .define ADD_HL_A add a,l \ ld l,a \ adc a,h \ sub l \ ld h,a
 
@@ -59,7 +62,9 @@ BOTTOM_LINE:
 	.fill 32,0
 	RET
 
-#include "readisplay.asm"
+;#include "readisplay.asm"
+#include "trolldisplay.asm"
+#include "vsynctask.asm"
 #include "yield.asm"
 
 ; ------------------------------------------------------------
@@ -112,7 +117,9 @@ fnmain:
     call    z,_pause
 
     ld      hl,(scrollpos)
-    ld      (BUFF_OFFSET),hl
+    ld      de,D_BUFFER
+    add     hl,de
+    ld      (MapStart),hl
     call    waitvsync
 
     call    updatescreen
