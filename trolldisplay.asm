@@ -8,7 +8,16 @@ setupdisplay:
 restoredisplay:
     ret
 
-MAP_WIDTH = BUFFER_WIDTH
+
+
+waitvsync:
+	ld	hl,FrameCounter
+	ld	a,(hl)
+-:	cp	(hl)
+	jr	z,{-}
+	ret
+
+
 
 
 ; ----------------
@@ -22,24 +31,24 @@ ScrollXFine = $ + 1
 	and	6			; 7
 	sla	a			; 8
 	add	a,_DELAY0 & 255	; 7
-	ld	(_DelayTable),a 	; 13
+	ld	(_DelayTable0),a 	; 13
 	xor	a			; 4
-_DelayTable = $ + 1
+_DelayTable0 = $ + 1
 	jp	_DELAY0 		; 10
     .align 16
 _DELAY0:
 	and	(hl)			; 7
-	jp	_AFTER_DELAY		; 10
-_DELAY1:
+	jp	_AFTER_DELAY0		; 10
+;;_DELAY1:
 	dec	hl			; 6
-	jp	_AFTER_DELAY		; 10
-_DELAY2:
+	jp	_AFTER_DELAY0		; 10
+;;_DELAY2:
 	ret	c			; 5
-	jp	_AFTER_DELAY		; 10
-_DELAY3:
+	jp	_AFTER_DELAY0		; 10
+;;_DELAY3:
 	nop				; 4
-	jp	_AFTER_DELAY		; 10
-_AFTER_DELAY:
+	jp	_AFTER_DELAY0		; 10
+_AFTER_DELAY0:
 ; waste time
 	ret	c			; 5
 	dec	hl			; 6
@@ -168,13 +177,13 @@ _DelayTable1 = $ + 1
 _DELAY01:
 	nop				; 4
 	jp	_AFTER_DELAY1		; 10
-_DELAY11:
+;;_DELAY11:
 	ret	c			; 5
 	jp	_AFTER_DELAY1		; 10
-_DELAY21:
+;;_DELAY21:
 	dec	hl			; 6
 	jp	_AFTER_DELAY1		; 10
-_DELAY31:
+;;_DELAY31:
 	and	(hl)			; 7
 	jp	_AFTER_DELAY1		; 10
 _AFTER_DELAY1:
@@ -312,7 +321,7 @@ MAP_WIDTH = 600
 MAP_HEIGHT = 10
 
 DISPLAY_WIDTH = 32
-DISPLAY_HEIGHT_RASTERS = 96
+DISPLAY_HEIGHT_RASTERS = 80
 DISPLAY_HEIGHT = DISPLAY_HEIGHT_RASTERS / 8
 
 TOTAL_RASTERS	= 312			; PAL=312, NTSC=262

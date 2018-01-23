@@ -47,18 +47,7 @@ installmaincharset:
     call    _inverness          ; (un)invert the first 256 bytes
     jp      _inverness          ; then the remaining
 
-	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	;
-    ; Kill time until we notice the FRAMES variable change
-    ;
-    ; A display has just been produced, and now we can continue.
-    ;
-waitvsync:
-    ld      hl,FRAMES
-    ld      a,(hl)
--:  cp      (hl)
-    jr      z,{-}
-    ret
+
 
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -69,11 +58,9 @@ cls:
     xor     a
 
     ld      hl,D_BUFFER
+    ld      (MapStart),hl
     ld      bc,6000
     call    fillmem
-
-    ld      hl,D_BUFFER
-    ld      (MapStart),hl
 
     ld      hl,TOP_LINE
     ld      bc,32

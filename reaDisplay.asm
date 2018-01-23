@@ -1,6 +1,5 @@
 
 setupdisplay:
-	CALL	cls
 	LD		HL,($400C)
 	LD		(REAL_D_FILE),HL
 

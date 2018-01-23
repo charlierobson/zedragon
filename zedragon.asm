@@ -49,7 +49,6 @@ inputstatesx:
     .byte	%11111111,5,%00000001,0        ; pause   (P)
 inputstatesxsz = $ - inputstatesx
 
-    ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)
     RET
 
@@ -79,6 +78,7 @@ starthere:
     call    initostore
     call    initcharset
 
+    call	cls
     call    setupdisplay
 
 	out     ($fe),a
