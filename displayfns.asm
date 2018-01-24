@@ -205,9 +205,28 @@ scroll:
     bit     0,(hl)                  ; scrollflag.0 = 1 when scrolling enabled
     ret     z
 
-    ld      hl,scrolltick           ; return if it's not time to scroll
-    ld      c,23
-    call    updatecounter
+;    ld      hl,scrolltick           ; return if it's not time to scroll
+;    ld      c,23
+;    call    updatecounter
+;    ret     nz
+
+    ld      a,(scrolltick)
+    inc     a
+    ld      (scrolltick),a
+    srl     a
+    srl     a
+    srl     a
+    and     7
+    ld      hl,finescroll
+    cp      (hl)
+    ret     z
+
+    ld      (hl),a
+
+    ld      hl,scrollflags
+    set     7,(hl)                  ; scrollflag.7 = 1 when scrolled
+
+    and     a
     ret     nz
 
     ld      hl,(scrollpos)
@@ -224,8 +243,6 @@ scroll:
 
     inc     hl
     ld      (scrollpos),hl
-    ld      hl,scrollflags
-    set     7,(hl)                  ; scrollflag.7 = 1 when scrolled
     ret
 
 

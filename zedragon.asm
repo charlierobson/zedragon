@@ -120,6 +120,8 @@ fnmain:
     ld      de,D_BUFFER
     add     hl,de
     ld      (MapStart),hl
+    ld      a,(finescroll)
+    ld      (ScrollXFine),a
     call    waitvsync
 
     call    updatescreen

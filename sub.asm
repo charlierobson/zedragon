@@ -13,8 +13,6 @@ _COLLTAB = OUSER+6
 _EXPLOCT = OUSER+6      ; overloads follow
 _WAIT = OUSER+7
 
-;;#include "testfns.asm"
-
 ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ;
 ; The submarine object.
@@ -29,7 +27,12 @@ submvfunc = $+1
     DIEZ
 
 _drawsub:
+    ld      a,(finescroll)
+    and     6 ; 2 pixel scroll
+    ld      c,a
+
     ld      a,(iy+_SUBX)        ; pixel -> char conversion
+    add     a,c
     srl     a
     srl     a
     srl     a
@@ -113,7 +116,12 @@ _drawsub:
     ;
     ; choose which set of 3 pre-scrolled sub tiles to use.
 
+    ld      a,(finescroll)
+    and     6 ; 2 pixel scroll
+    ld      c,a
+
     ld      a,(iy+_SUBX)        ; pixel offset 0..7
+    add     a,c
     and     7
     ld      c,a
     add     a,a

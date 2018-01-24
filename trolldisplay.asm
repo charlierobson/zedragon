@@ -110,7 +110,7 @@ AFTER_LINE0:
 ; draw 1 raster of 32 chars
 	jp	(hl)			; 4 + (32 * 4) + 10 = 142 (65 left)
 
-; ----------------
+; ------ ----------
 AFTER_LINE1_6:
 ; dec line counter
 	dec	b			; 4
@@ -219,6 +219,8 @@ _AFTER_DELAY1:
 ; draw the text
 	jp	STATUS_TEXT + $8000	; 10
 STATUS_LINES_DONE:
+	ld		a,$21					;7 game font
+	ld		i,a						;9
 ; restore shadow registers
 	exx
 	pop	hl			; 10
@@ -233,7 +235,7 @@ STATUS_LINES_DONE:
 ; NMI on
 	out	($fe),a 		; 11
 ; return to application
-	jp      vysnctask
+	ret
 
 ; ----------------
 GENERATE_VSYNC:
@@ -339,5 +341,6 @@ Keys1		.byte	$ff
 
 STATUS_TEXT:
 	;dbzx	'X>>>ScrollFine  ,     SpriteFine  , <<<X'
-    .asc '0123456789012345678901234567890123456789'
+    ;.asc '0123456789012345678901234567890123456789'
+	.fill	40,$80
 	jp	AFTER_STATUS_LINE
