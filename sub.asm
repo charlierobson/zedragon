@@ -321,7 +321,7 @@ _subdead:
 
     ld      (iy+_EXPLOCT),6
     ld      hl,explooff
-    ld      a,(FRAMES)
+    ld      a,(FrameCounter)
     and     6
     add     a,l
     ld      l,a
@@ -409,7 +409,7 @@ playermovesub:
     cp      $ff
     jr      nz,{+}
 
-    ld      a,(FRAMES)      ; if fire is held, only allow movement every other frame
+    ld      a,(FrameCounter)      ; if fire is held, only allow movement every other frame
     and     1
     jr      z,_checkfire
 

@@ -127,14 +127,14 @@ updatecredits:
     sub     l
     ld      h,a
 
-    ld      de,BOTTOM_LINE
+    ld      de,BOTTOM_LINE+4
     ld      bc,32
     ldir
     ret
 
 
 animatecharacters:
-    ld      a,(FRAMES)
+    ld      a,(FrameCounter)
     and     15
     jr      nz,testevery8
 
@@ -171,7 +171,7 @@ testevery8:
     ; every 8 frames
 
     ld      hl,flaganimation
-    ld      a,(FRAMES)
+    ld      a,(FrameCounter)
     rra
     rra
     rra

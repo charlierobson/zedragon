@@ -27,7 +27,7 @@ attract:
     YIELD
 
 _attractloop:
-    ld      a,(FRAMES)
+    ld      a,(FrameCounter)
     and     127
     call    z,updatecredits
 

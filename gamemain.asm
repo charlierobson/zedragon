@@ -99,7 +99,7 @@ _notscrolled:
 
     call    enemyinitiator
 
-    ld      a,(FRAMES)          ; play ping sfx (id = 0) every so often
+    ld      a,(FrameCounter)          ; play ping sfx (id = 0) every so often
     and     127
     call    z,AFXPLAY2
 

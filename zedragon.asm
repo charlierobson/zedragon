@@ -52,15 +52,6 @@ inputstatesxsz = $ - inputstatesx
     .fill 6000-($-D_BUFFER)
     RET
 
-TOP_LINE:
-	.fill 32,0
-	RET
-
-	.align	32	; to assist in air display calculations
-BOTTOM_LINE:
-	.fill 32,0
-	RET
-
 ;#include "readisplay.asm"
 #include "trolldisplay.asm"
 #include "vsynctask.asm"
