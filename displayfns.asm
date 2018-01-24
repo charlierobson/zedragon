@@ -63,11 +63,11 @@ cls:
     call    fillmem
 
     ld      hl,TOP_LINE
-    ld      bc,32
+    ld      bc,40
     call    fillmem
 
     ld      hl,BOTTOM_LINE
-    ld      bc,32
+    ld      bc,40
     ;
     ; falls in to ...
 
@@ -84,53 +84,6 @@ fillmem:
     ldir
     ret
 
-
-    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    ;
-    ; Start displaying the credits at the 0th item.
-    ;
-resetcredits:
-    xor     a
-    jr      {+}
-
-
-    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    ;
-    ; Cycle through the credits, showing 'press fire' every other
-    ; time. The new credit goes in the bottom line of the display.
-    ;
-updatecredits:
-    ld      a,(titlecredidx)
-    inc     a
-    cp      14              ; reset counter every complete cycle
-    jr      nz,{+}
-
-    xor     a
-
-+:  ld      (titlecredidx),a
-
-    bit     0,a             ; if bit 1 is set show one of the two repeated items 
-    jr      z,{+}
-
-    ld      a,7*2
-
-+:  and     $fe
-    sla     a
-    sla     a
-    sla     a
-    sla     a
-    ld      hl,titlecreds
-
-    add     a,l             ; add A to HL
-    ld      l,a
-    adc     a,h
-    sub     l
-    ld      h,a
-
-    ld      de,BOTTOM_LINE+4
-    ld      bc,32
-    ldir
-    ret
 
 
 animatecharacters:
@@ -204,11 +157,6 @@ scroll:
 
     bit     0,(hl)                  ; scrollflag.0 = 1 when scrolling enabled
     ret     z
-
-;    ld      hl,scrolltick           ; return if it's not time to scroll
-;    ld      c,23
-;    call    updatecounter
-;    ret     nz
 
     ld      a,(scrolltick)
     inc     a

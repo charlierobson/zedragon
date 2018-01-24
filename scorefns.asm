@@ -7,7 +7,7 @@ resetscore:
 
 showscoreline:
     ld      hl,scoreline
-    ld      de,TOP_LINE
+    ld      de,TOP_LINE+4
     ld      bc,32
     ldir
     ret
@@ -58,7 +58,7 @@ addscore:
 
 
 displayscore:
-    ld      de,TOP_LINE+6
+    ld      de,TOP_LINE+6+4
     ld      hl,(score)
     ld      a,h
     call    _bcd_a
@@ -86,7 +86,7 @@ show_char:
 
 
 displayhi:
-    ld      de,TOP_LINE+16
+    ld      de,TOP_LINE+16+4
     ld      hl,(hiscore)
     ld      a,h
     call    _bcd_a
@@ -96,7 +96,7 @@ displayhi:
 
 
 displayzone:
-    ld      de,TOP_LINE+25
+    ld      de,TOP_LINE+25+4
     ld      a,(zone)
     add     a,17
     ld      (de),a

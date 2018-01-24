@@ -162,7 +162,7 @@ showlives:
     ld      a,14 - 16
 
 +:  add     a,16
-    ld      (TOP_LINE+31),a
+    ld      (TOP_LINE+31+4),a
     ret
 
 
