@@ -9,6 +9,8 @@ attract:
 
     ld      hl,scrollpos
     ld      (hl),32
+    xor     a
+    ld      (ScrollXFine),a
     YIELD
 
     ld      hl,titletunelz
@@ -94,7 +96,7 @@ updatecredits:
     sub     l
     ld      h,a
 
-    ld      de,BOTTOM_LINE+4
+    ld      de,BOTTOM_LINE+5
     ld      bc,32
     ldir
 
