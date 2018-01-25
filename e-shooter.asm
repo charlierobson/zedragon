@@ -15,6 +15,9 @@ FFLOP = 9
 COLL = 12
 
 shootemup:
+    call    cIfIneffectiveHard
+    DIEC
+
     ld      l,(iy+OUSER)        ; x
     ld      h,(iy+OUSER+1)
     ld      a,(iy+OUSER+2)      ; y
@@ -28,9 +31,6 @@ shootemup:
     ld      (iy+OUSER+OLEN),0              ; shooter length
     ld      (iy+OUSER+COLL),0             ; collision cache
     ld      (iy+OUSER+FFLOP),0
-
-    call    cIfIneffectiveHard
-    DIEC
 
     ; search the shooter space to find the required length
     ld      de,601
