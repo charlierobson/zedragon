@@ -40,14 +40,14 @@ airline:
     .align 16
 titlecreds
     ;        --------========--------========
-    .asc    "     PROGRAMMING: SIRMORRIS     "
-    .asc    "CUSTOM DISPLAY ROUTINE: ANDY REA"
+    .asc    "  GAME PROGRAMMING: SIRMORRIS   "
+    .asc    "DISPLAY ROUTINE:  ADAM KLOTBLIXT"
     .asc    " TITLE TUNE: REAR ADMIRAL MOGGY "
     .asc    "   STC MUSIC PLAYER: ANDY REA   "
     .asc    "   AYFX DRIVER:  ALEX SEMENOV   "
-    .asc    "    ATARI GFX:  RUSS WETMORE    "
+    .asc    "MASSIVE THANKS TO:  RUSS WETMORE"
 zxpdistxt:
-    .asc    "        ZXPAND: DISABLED        "
+    .asc    "        ZXPAND: DISABLED    V2.0"
 
     .align 16
 pressfiretext:
@@ -74,12 +74,12 @@ congrattext:
     ;        --------========--------========
     .asc    "    Congratulations Captain!~"
     .asc    "~"
-;    .asc    "The biggest threat to our planet~"
-;    .asc    "is defeated. We are safe again.~"
-;    .asc    "~"
-;    .asc    "You will receive the highest~"
-;    .asc    "honour our country can give...~"
-;    .asc    "~"
+    .asc    "The biggest threat to our planet~"
+    .asc    "is defeated. We are safe again.~"
+    .asc    "~"
+    .asc    "You will receive the highest~"
+    .asc    "honour our country can give...~"
+    .asc    "~"
     .asc    "      ...ANOTHER MISSION!!~}"
     ;        --------========--------========
 
