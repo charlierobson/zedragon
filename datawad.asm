@@ -20,9 +20,6 @@ PUREMAP:    .incbin "map.binlz"
 enemyidx:   .incbin "enemyidx.bin"
 
     .align 16
-mul600tab:  .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
-
-    .align 16
 titlescrn:  .incbin  "titlescrn.binlz"
 
     .align 16
@@ -77,12 +74,12 @@ congrattext:
     ;        --------========--------========
     .asc    "    Congratulations Captain!~"
     .asc    "~"
-    .asc    "The biggest threat to our planet~"
-    .asc    "is defeated. We are safe again.~"
-    .asc    "~"
-    .asc    "You will receive the highest~"
-    .asc    "honour our country can give...~"
-    .asc    "~"
+;    .asc    "The biggest threat to our planet~"
+;    .asc    "is defeated. We are safe again.~"
+;    .asc    "~"
+;    .asc    "You will receive the highest~"
+;    .asc    "honour our country can give...~"
+;    .asc    "~"
     .asc    "      ...ANOTHER MISSION!!~}"
     ;        --------========--------========
 
@@ -110,6 +107,9 @@ dofs:
 	.byte	80,6
 
     .word   $ffff
+
+    .align 16
+mul600tab:  .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
 
     .align  64
 considertable:

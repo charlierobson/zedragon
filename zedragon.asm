@@ -52,7 +52,6 @@ inputstatesxsz = $ - inputstatesx
     .fill 6000-($-D_BUFFER)
     RET
 
-;#include "readisplay.asm"
 #include "trolldisplay.asm"
 #include "vsynctask.asm"
 #include "yield.asm"
@@ -76,7 +75,7 @@ starthere:
 
 	; create the head of the linked object list: the 'main' object.
 	; this waits for vsync, then proceeds along to the next object in the chain,
-	; eventually returning to itself ad nauseum
+	; eventually returning to itself ad nauseumls -
 	;
 	; the head object is a special case - it can't be inserted into the chain -
 	; we must set up the next pointer manually
