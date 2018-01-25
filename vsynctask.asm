@@ -1,7 +1,4 @@
 vysnctask:
-	ex		af,AF'
-	out		($fe),a
-
 	push	iy				;stc (and ayfx) player uses iy
 GO_PLAYER = $+1
 	ld		a,0
@@ -55,13 +52,6 @@ SOUNDFN = $+1
 	inc		de
 	ld		(hl),a
 	ld		(de),a
-
-	POP		HL
-	POP		DE
-	POP		BC
-	POP		AF
-	;AT THIS PIONT ALL REGISTERS RESTORED AS THEY WERE BEFORE 
-	;VIDEO GENERATION TOOK PLACE
 	RET
 
 laserframe:

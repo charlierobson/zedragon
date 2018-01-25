@@ -163,7 +163,6 @@ scroll:
     ld      (scrolltick),a
     srl     a
     srl     a
-    srl     a
     and     7
     ld      hl,finescroll
     cp      (hl)

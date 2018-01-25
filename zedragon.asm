@@ -107,13 +107,14 @@ fnmain:
     cp      1
     call    z,_pause
 
+    call    waitvsync
+
     ld      hl,(scrollpos)
     ld      de,D_BUFFER
     add     hl,de
     ld      (MapStart),hl
     ld      a,(finescroll)
     ld      (ScrollXFine),a
-    call    waitvsync
 
     call    updatescreen
 
