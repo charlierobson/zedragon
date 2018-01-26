@@ -350,8 +350,6 @@ BOTTOM_MARGIN	= TOTAL_MARGIN - TOP_MARGIN
 
 StackSave	.word	0
 FrameCounter	.byte	0
-Keys0		.byte	$ff
-Keys1		.byte	$ff
 
 TOP_LINE:
 STATUS_TEXT0:
