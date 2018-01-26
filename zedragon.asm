@@ -38,7 +38,7 @@ considertablex:
     .word   consideralways, boss
 
 inputstatesx:
-    .byte   $1d,$de,$fa,0                     ; INUTDATA tag = defa(ult)
+    .byte   $1d,$de,$fa,0                     ; INPUTDATA tag = ID-DEFA(ult)
     .byte	%10000000,2,%00000001,0        ; up      (Q)
     .byte	%01000000,1,%00000001,0        ; down    (A)
     .byte	%00100000,7,%00001000,0        ; left    (N)
