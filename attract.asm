@@ -31,6 +31,13 @@ _attractloop:
     and     127
     call    z,updatecredits
 
+    ld      a,(up)
+    cp      1
+    call    z,screenup
+    ld      a,(down)
+    cp      1
+    call    z,screendown
+
     YIELD
 
     call    animatecharacters
@@ -50,6 +57,21 @@ _gamestart:
 	DIE
 
 
+screenup:
+    ld      a,(VCentre)
+    cp      $3d
+    ret     z
+    dec     a
+    ld      (VCentre),a
+    ret
+
+screendown:
+    ld      a,(VCentre)
+    cp      $66
+    ret     z
+    inc     a
+    ld      (VCentre),a
+    ret
 
 
     ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
