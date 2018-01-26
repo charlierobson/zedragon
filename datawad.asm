@@ -20,9 +20,6 @@ PUREMAP:    .incbin "map.binlz"
 enemyidx:   .incbin "enemyidx.bin"
 
     .align 16
-mul600tab:  .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
-
-    .align 16
 titlescrn:  .incbin  "titlescrn.binlz"
 
     .align 16
@@ -43,14 +40,14 @@ airline:
     .align 16
 titlecreds
     ;        --------========--------========
-    .asc    "     PROGRAMMING: SIRMORRIS     "
-    .asc    "CUSTOM DISPLAY ROUTINE: ANDY REA"
+    .asc    "  GAME PROGRAMMING: SIRMORRIS   "
+    .asc    "DISPLAY ROUTINE:  ADAM KLOTBLIXT"
     .asc    " TITLE TUNE: REAR ADMIRAL MOGGY "
     .asc    "   STC MUSIC PLAYER: ANDY REA   "
     .asc    "   AYFX DRIVER:  ALEX SEMENOV   "
-    .asc    "    ATARI GFX:  RUSS WETMORE    "
+    .asc    "MASSIVE THANKS TO:  RUSS WETMORE"
 zxpdistxt:
-    .asc    "        ZXPAND: DISABLED        "
+    .asc    "        ZXPAND: DISABLED    V2.0"
 
     .align 16
 pressfiretext:
@@ -110,6 +107,9 @@ dofs:
 	.byte	80,6
 
     .word   $ffff
+
+    .align 16
+mul600tab:  .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
 
     .align  64
 considertable:

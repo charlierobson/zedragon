@@ -38,7 +38,7 @@ considertablex:
     .word   consideralways, boss
 
 inputstatesx:
-    .byte   $1d,$de,$fa,0                     ; INUTDATA tag = defa(ult)
+    .byte   $1d,$de,$fa,0                     ; INPUTDATA tag = ID-DEFA(ult)
     .byte	%10000000,2,%00000001,0        ; up      (Q)
     .byte	%01000000,1,%00000001,0        ; down    (A)
     .byte	%00100000,7,%00001000,0        ; left    (N)
@@ -52,7 +52,6 @@ inputstatesxsz = $ - inputstatesx
     .fill 6000-($-D_BUFFER)
     RET
 
-;#include "readisplay.asm"
 #include "trolldisplay.asm"
 #include "vsynctask.asm"
 #include "yield.asm"
@@ -76,7 +75,7 @@ starthere:
 
 	; create the head of the linked object list: the 'main' object.
 	; this waits for vsync, then proceeds along to the next object in the chain,
-	; eventually returning to itself ad nauseum
+	; eventually returning to itself ad nauseumls -
 	;
 	; the head object is a special case - it can't be inserted into the chain -
 	; we must set up the next pointer manually
