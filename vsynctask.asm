@@ -7,6 +7,8 @@ SOUNDFN = $+1
 	call	nz,0
 	pop		iy
 
+	ret
+
 	ld		hl,laserframe
 	xor		a
 	inc		(hl)

@@ -232,7 +232,9 @@ VCentreBot = $+1
 ; draw the text
 	jp	STATUS_TEXT1 + $8000	; 10
 STATUS_TEXT1_DONE:
-	;call	vsynctask
+; NMI on
+	out	($fe),a 		; 11
+	call	vsynctask
 ; restore shadow registers
 	exx
 	pop	hl			; 10
@@ -244,8 +246,6 @@ STATUS_TEXT1_DONE:
 	pop	de			; 10
 	pop	bc			; 10
 	pop	af			; 10
-; NMI on
-	out	($fe),a 		; 11
 ; return to application
 	ret				; 10
 ; jp vsynctask ; crashes :(
@@ -254,16 +254,44 @@ STATUS_TEXT1_DONE:
 GENERATE_VSYNC:
 ; VSync start
 	in	a,($fe) 		; 11
-; read some keys
-	ld	bc,$effe		; 10 read keys 0-6
-	in	a,(c)			; 12
-	ld	(Keys0),a		; 13
-	ld	bc,$f7fe		; 10read keys 1-5
-	in	a,(c)			; 12
-	ld	(Keys1),a		; 13
-; waste time, 4 rasters worth of VSync
-	ld	b,57			; 7
+
+;; read some keys
+;	ld	bc,$effe		; 10 read keys 0-6
+;	in	a,(c)			; 12
+;	ld	(Keys0),a		; 13
+;	ld	bc,$f7fe		; 10read keys 1-5
+;	in	a,(c)			; 12
+;	ld	(Keys1),a		; 13
+; = 70
+;
+;; waste time, 4 rasters worth of VSync
+;	ld	b,57			; 7
+;	djnz	$			; 13/8
+; = 756
+;
+; total T = 70 + 756 = 826
+
+    ld      de,INPUT._kbin  ; 10
+    ld      bc,$fefe        ; 10
+	; = 20
+    .repeat 8
+        in      a,(c)       ; 12
+        rlc     b           ; 8
+        ld      (de),a      ; 7
+        inc     de          ; 6  = 33
+    .loop
+	; = 8 * 33 = 264
+
+	;waste time
+	ld		b,40		; 7
 	djnz	$			; 13/8
+	; = (40*13)+8+7 = 535
+
+	; for timing only
+	ld	a,TOP_MARGIN		; 7
+
+; total T = 535 + 264 + 20  + 7 = 826
+
 ; prepare for top margin
 VCentreTop = $+1
 	ld	a,TOP_MARGIN		; 7

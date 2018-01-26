@@ -48,17 +48,6 @@ jsreadfn = $+1
     call    _nullstick
     ld      (_lastJ),a
 
-    ld      de,_kbin            ; read the keyboard, building a table at (de)
-    ld      c,$fe
-    ld      b,8
-
--:  ld      a,c                 ; read each of the 8 half rows
-    in      a,($fe)
-    ld      (de),a
-    rlc     c
-    inc     de
-    djnz    {-}
-
     ; point at first input state block
     ;
     ld      hl,inputstates
