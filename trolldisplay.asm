@@ -246,6 +246,7 @@ STATUS_TEXT1_DONE:
 	out	($fe),a 		; 11
 ; return to application
 	ret				; 10
+; jp vsynctask ; crashes :(
 
 ; ----------------
 GENERATE_VSYNC:
