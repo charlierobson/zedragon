@@ -56,18 +56,18 @@ installmaincharset:
     ;
 cls:
     xor     a
-
+    ld      (ScrollXFine),a
     ld      hl,D_BUFFER
     ld      (MapStart),hl
     ld      bc,6000
     call    fillmem
 
     ld      hl,TOP_LINE
-    ld      bc,40
+    ld      bc,32
     call    fillmem
 
     ld      hl,BOTTOM_LINE
-    ld      bc,40
+    ld      bc,32
     ;
     ; falls in to ...
 
@@ -202,19 +202,6 @@ displayocount:
     ret
 
 
-displaylastk:
-    ld      de,TOP_LINE+23
-    ld      a,(LAST_K+1)
-    call    hexout
-    ld      a,(LAST_K)
-    call    hexout
-    ld      de,TOP_LINE+28
-    ld      a,(LAST_K+1)
-    xor     $ff
-    call    hexout
-    ld      a,(LAST_K)
-    xor     $ff
-
 hexout:
     push    af
     rrca
@@ -230,22 +217,6 @@ hexout:
 +:  add     a,$10
     ld      (de),a
     inc     de
-    ret
-
-
-binaryout:
-    ld      b,8
-    ld      c,$80
-
--:  ld      a,l
-    and     c
-    ld      a,16
-    jr      z,{+}
-    inc     a
-+:  ld      (de),a
-    inc     de
-    rrc     c
-    djnz    {-}
     ret
 
 

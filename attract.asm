@@ -123,7 +123,7 @@ updatecredits:
     sub     l
     ld      h,a
 
-    ld      de,BOTTOM_LINE+5
+    ld      de,BOTTOM_LINE
     ld      bc,32
     ldir
 
