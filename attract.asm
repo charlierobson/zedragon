@@ -58,19 +58,24 @@ _gamestart:
 
 
 screenup:
-    ld      a,(VCentre)
+    ld      a,(VCentreTop)
     cp      $3d
     ret     z
     dec     a
-    ld      (VCentre),a
-    ret
+    jr      setmargin
 
 screendown:
-    ld      a,(VCentre)
+    ld      a,(VCentreTop)
     cp      $66
     ret     z
     inc     a
-    ld      (VCentre),a
+
+setmargin:
+    ld      (VCentreTop),a
+    ld      b,a
+    ld      a,TOTAL_MARGIN
+    sub     b
+    ld      (VCentreBot),a
     ret
 
 

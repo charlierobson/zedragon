@@ -1,6 +1,4 @@
 vsynctask:
-	ret
-
 	push	iy				;stc (and ayfx) player uses iy
 GO_PLAYER = $+1
 	ld		a,0

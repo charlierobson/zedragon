@@ -218,6 +218,7 @@ AFTER_DELAY2:
 	ld	hl,FrameCounter 	; 10
 	inc	(hl)			; 11
 ; prepare for bottom margin and VSYNC
+VCentreBot = $+1
 	ld	a,BOTTOM_MARGIN 	; 7
 	neg				; 8
 	inc	a			; 4
@@ -231,6 +232,7 @@ AFTER_DELAY2:
 ; draw the text
 	jp	STATUS_TEXT1 + $8000	; 10
 STATUS_TEXT1_DONE:
+	;call	vsynctask
 ; restore shadow registers
 	exx
 	pop	hl			; 10
@@ -263,7 +265,7 @@ GENERATE_VSYNC:
 	ld	b,57			; 7
 	djnz	$			; 13/8
 ; prepare for top margin
-VCentre = $+1
+VCentreTop = $+1
 	ld	a,TOP_MARGIN		; 7
 	neg				; 8
 	inc	a			; 4
@@ -314,7 +316,7 @@ VSYNC_RASTERS	= 4
 VISIBLE_RASTERS = DISPLAY_HEIGHT_RASTERS + 8 + 8
 WASTED_RASTERS	= 5
 TOTAL_MARGIN	= TOTAL_RASTERS - VISIBLE_RASTERS - VSYNC_RASTERS - WASTED_RASTERS
-TOP_MARGIN	= ( TOTAL_MARGIN / 2 ) - 24
+TOP_MARGIN	= (TOTAL_MARGIN / 2) - 16
 BOTTOM_MARGIN	= TOTAL_MARGIN - TOP_MARGIN
 
 
