@@ -246,6 +246,7 @@ STATUS_TEXT1_DONE:
 	out	($fe),a 		; 11
 ; return to application
 	ret				; 10
+; jp vsynctask ; crashes :(
 
 ; ----------------
 GENERATE_VSYNC:
@@ -262,6 +263,7 @@ GENERATE_VSYNC:
 	ld	b,57			; 7
 	djnz	$			; 13/8
 ; prepare for top margin
+VCentre = $+1
 	ld	a,TOP_MARGIN		; 7
 	neg				; 8
 	inc	a			; 4
@@ -312,7 +314,7 @@ VSYNC_RASTERS	= 4
 VISIBLE_RASTERS = DISPLAY_HEIGHT_RASTERS + 8 + 8
 WASTED_RASTERS	= 5
 TOTAL_MARGIN	= TOTAL_RASTERS - VISIBLE_RASTERS - VSYNC_RASTERS - WASTED_RASTERS
-TOP_MARGIN	= TOTAL_MARGIN / 2
+TOP_MARGIN	= ( TOTAL_MARGIN / 2 ) - 24
 BOTTOM_MARGIN	= TOTAL_MARGIN - TOP_MARGIN
 
 

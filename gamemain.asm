@@ -82,11 +82,9 @@ _gameloop:
     call    scroll
     ld      a,(scrollflags)
     rlca
-    jr      nc,_notscrolled     ; haven't scrolled the bg, so we don't need to update any pointers
 
-    call    zonecheck
+    call    c,zonecheck             ; coarse scroll has occurred - check zone
 
-_notscrolled:
     ;call    displayocount
     xor     a
     ld      (ocount),a
