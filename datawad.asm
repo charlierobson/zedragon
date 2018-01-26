@@ -1,4 +1,3 @@
-;    .exportmode LabelFile
     .exportmode Assembly
     .export
 
@@ -41,13 +40,13 @@ airline:
 titlecreds
     ;        --------========--------========
     .asc    "  GAME PROGRAMMING: SIRMORRIS   "
-    .asc    "DISPLAY ROUTINE:  ADAM KLOTBLIXT"
-    .asc    " TITLE TUNE: REAR ADMIRAL MOGGY "
+    .asc    "DISPLAY ROUTINE: REA / KLOTBLIXT"
+    .asc    " TITLE TUNE: REAR ADMIRER MOGGY "
     .asc    "   STC MUSIC PLAYER: ANDY REA   "
     .asc    "   AYFX DRIVER:  ALEX SEMENOV   "
     .asc    "MASSIVE THANKS TO:  RUSS WETMORE"
 zxpdistxt:
-    .asc    "        ZXPAND: DISABLED    V2.0"
+    .asc    "        ZXPAND: DISABLED        "
 
     .align 16
 pressfiretext:
