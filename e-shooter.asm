@@ -15,9 +15,6 @@ FFLOP = 9
 COLL = 12
 
 shootemup:
-    call    cIfIneffectiveHard
-    DIEC
-
     ld      l,(iy+OUSER)        ; x
     ld      h,(iy+OUSER+1)
     ld      a,(iy+OUSER+2)      ; y

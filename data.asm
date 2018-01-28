@@ -78,7 +78,6 @@ airlevel:
 
 lives:
     .byte   0
-
 score:
     .word   0
 zone:

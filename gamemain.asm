@@ -79,6 +79,8 @@ _gameloop:
     inc     hl
     ld      (gameframe),hl
 
+    call    LASER._makeSound
+
     call    scroll
     ld      a,(scrollflags)
     rlca
