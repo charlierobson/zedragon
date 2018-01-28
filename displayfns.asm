@@ -152,6 +152,12 @@ testevery8:
 
 
 scroll:
+    ld      hl,(scrollpos)
+    ld      de,600-32
+    and     a
+    sbc     hl,de
+    ret     z
+
     ld      hl,scrollflags
     res     7,(hl)                  ; scrollflag.7 = 1 when scrolled
 
@@ -164,32 +170,21 @@ scroll:
     srl     a
     srl     a
     and     7
+
     ld      hl,finescroll
     cp      (hl)
     ret     z
 
     ld      (hl),a
 
-    ld      hl,scrollflags
-    set     7,(hl)                  ; scrollflag.7 = 1 when scrolled
-
-    and     a
+    and     a                       ; return if not at next char boundary
     ret     nz
 
-    ld      hl,(scrollpos)
+    ld      hl,scrollflags
+    set     7,(hl)                  ; scrollflag.7 = 1 when scrolled a character
 
-    ld      a,l                     ; check if we've hit the end. don't scroll if so
-    cp      (600-32) & 255
-    jr      nz,{+}
-
-    ld      a,h
-    cp      (600-32) / 256
-    ret     z
-
-+:  ; do actual scroll
-
-    inc     hl
-    ld      (scrollpos),hl
+    ld      hl,scrollpos
+    inc     (hl)
     ret
 
 
