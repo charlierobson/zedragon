@@ -22,7 +22,7 @@ updateair:
 
     ; increase air
 
-    ld      c,4                 ; increase air every 5 cycles
+    ld      c,6                 ; increase air faster then it decreases
     call    updatecounter
     ret     nz                  ; not time to modify air value yet
 
@@ -35,7 +35,7 @@ updateair:
     jr      _display
 
 _decrease
-    ld      c,11                 ; decrease air every few game cycles
+    ld      c,13                ; decrease air more slowly than it increases
     call    updatecounter
     ret     nz                  ; not time to modify air value yet
 
