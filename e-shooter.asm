@@ -96,7 +96,7 @@ _soy2:
     ld      a,(collision)               ; die if sub died
     or      (iy+OUSER+COLL)
     DIENZ
-    call    cIfIneffectiveHard
+    call    cIfIneffective
     DIEC
     call    cIfOffscreenLeft
     DIEC
