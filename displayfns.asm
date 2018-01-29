@@ -183,8 +183,9 @@ scroll:
     ld      hl,scrollflags
     set     7,(hl)                  ; scrollflag.7 = 1 when scrolled a character
 
-    ld      hl,scrollpos
-    inc     (hl)
+    ld      hl,(scrollpos)
+    inc     hl
+    ld      (scrollpos),hl
     ret
 
 
