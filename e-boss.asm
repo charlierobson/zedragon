@@ -290,7 +290,7 @@ _loop:
     jr      nz,_loop
 
     ld      a,$ff
-    ld      (collision),a                   ; turn off shooters, quite gameloop
+    ld      (collision),a                   ; turn off shooters, quit gameloop
 
     ld      (iy+OUSER+3),3
 
