@@ -137,7 +137,7 @@ fnmain:
 
 
 _pause:
-    ld      hl,BOTTOM_LINE
+    ld      hl,BOTTOM_LINE+4
     push    hl
     ld      de,PRTBUF
     ld      bc,32
@@ -155,7 +155,7 @@ _ploop:
     jr      nz,_ploop
 
     ld      hl,PRTBUF
-    ld      de,BOTTOM_LINE
+    ld      de,BOTTOM_LINE+4
     ld      bc,32
     ldir
 

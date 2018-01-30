@@ -50,6 +50,7 @@ _resetafterdeath:
     ld      (collision),a
 
     call    refreshmap
+
     call    resetair
     call    resetenemies
 
@@ -152,18 +153,6 @@ _dienow:
 
     DIE
 
-
-showlives:
-    ld      a,(gamemode)
-    and     a
-    ld      a,(lives)
-    jr      nz,{+}
-
-    ld      a,14 - 16
-
-+:  add     a,16
-    ld      (TOP_LINE+31),a
-    ret
 
 
 

@@ -2,6 +2,7 @@ import de.bezier.guido.*;
 
 
 String mapName = "map.bin";
+//String mapName = "titlescrn.bin";
 
 int mode;
 byte[] map;

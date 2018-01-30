@@ -43,8 +43,8 @@ DRAW_MAP:
 ; prepare to draw 8 lines of status text
 	ld	b,8			; 7
 ; draw the text
-	jp	STATUS_TEXT0 + $8000	; 10
-STATUS_TEXT0_DONE:
+	jp	TOP_LINE + $8000	; 10
+TOP_LINE_DONE:
 ; waste time
 	ld	b,12			; 7
 	djnz	$			; 13/8
@@ -155,26 +155,26 @@ AFTER_LINE7:
 	jp	(hl)			; 4 + (32 * 4) + 10 = 142 (65 left)
 
 ; ----------------
-AFTER_STATUS_TEXT0:
+AFTER_TOP_LINE:
 ; dec line counter
 	dec	b			; 4
-	jp	z,STATUS_TEXT0_DONE	; 10/10 previous line was last
+	jp	z,TOP_LINE_DONE	; 10/10 previous line was last
 ; waste time
 	ld	a,0			; 7
 	inc	de			; 6
 ; draw 1 raster of 40 chars
-	jp	STATUS_TEXT0 + $8000	; 10
+	jp	TOP_LINE + $8000	; 10
 
 ; ----------------
-AFTER_STATUS_TEXT1:
+AFTER_BOTTOM_LINE:
 ; dec line counter
 	dec	b			; 4
-	jp	z,STATUS_TEXT1_DONE	; 10/10 previous line was last
+	jp	z,BOTTOM_LINE_DONE	; 10/10 previous line was last
 ; waste time
 	ld	a,0			; 7
 	inc	de			; 6
 ; draw 1 raster of 40 chars
-	jp	STATUS_TEXT1 + $8000	; 10
+	jp	BOTTOM_LINE + $8000	; 10
 
 ; ----------------
 DRAW_MAP_DONE:
@@ -230,8 +230,8 @@ VCentreBot = $+1
 ; prepare to draw 8 lines of status text
 	ld	b,8			; 7
 ; draw the text
-	jp	STATUS_TEXT1 + $8000	; 10
-STATUS_TEXT1_DONE:
+	jp	BOTTOM_LINE + $8000	; 10
+BOTTOM_LINE_DONE:
 ; NMI on
 	out	($fe),a 		; 11
 	call	vsynctask
@@ -351,13 +351,10 @@ BOTTOM_MARGIN	= TOTAL_MARGIN - TOP_MARGIN
 StackSave	.word	0
 FrameCounter	.byte	0
 
-STATUS_TEXT0:
+TOP_LINE:
 	.fill	40,0
-	jp	AFTER_STATUS_TEXT0
+	jp	AFTER_TOP_LINE
 
-STATUS_TEXT1:
+BOTTOM_LINE:
 	.fill	40,0
-	jp	AFTER_STATUS_TEXT1
-
-TOP_LINE = STATUS_TEXT0+4
-BOTTOM_LINE = STATUS_TEXT1+4
+	jp	AFTER_BOTTOM_LINE

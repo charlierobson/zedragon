@@ -9,7 +9,7 @@ resetair:
     ld      (airlevel),a
     ld      hl,airline
     ld      de,BOTTOM_LINE
-    ld      bc,32
+    ld      bc,40
     ldir
     ret
 
@@ -64,7 +64,7 @@ _decrease
 _display:
     push    af
 
-    ld      hl,BOTTOM_LINE+5
+    ld      hl,BOTTOM_LINE+5+4
     srl     a
     srl     a
     srl     a

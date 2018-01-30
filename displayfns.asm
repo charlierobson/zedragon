@@ -63,11 +63,11 @@ cls:
     call    fillmem
 
     ld      hl,TOP_LINE
-    ld      bc,32
+    ld      bc,40
     call    fillmem
 
     ld      hl,BOTTOM_LINE
-    ld      bc,32
+    ld      bc,40
     ;
     ; falls in to ...
 
@@ -196,6 +196,8 @@ displayocount:
     ld      a,(ocountmax)
     call    hexout
     ret
+
+
 
 
 hexout:

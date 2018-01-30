@@ -5,10 +5,11 @@ resetscore:
     ld      (score),hl
     ret
 
+
 showscoreline:
     ld      hl,scoreline
     ld      de,TOP_LINE
-    ld      bc,32
+    ld      bc,40
     ldir
     ret
 
@@ -58,7 +59,7 @@ addscore:
 
 
 displayscore:
-    ld      de,TOP_LINE+6
+    ld      de,TOP_LINE+SCOREP
     ld      hl,(score)
     ld      a,h
     call    _bcd_a
@@ -86,7 +87,7 @@ show_char:
 
 
 displayhi:
-    ld      de,TOP_LINE+16
+    ld      de,TOP_LINE+HIP
     ld      hl,(hiscore)
     ld      a,h
     call    _bcd_a
@@ -96,9 +97,22 @@ displayhi:
 
 
 displayzone:
-    ld      de,TOP_LINE+25
+    ld      de,TOP_LINE+ZONEP
     ld      a,(zone)
     add     a,17
     ld      (de),a
     ret
 
+
+
+showlives:
+    ld      a,(gamemode)
+    and     a
+    ld      a,(lives)
+    jr      nz,{+}
+
+    ld      a,14 - 16
+
++:  add     a,16
+    ld      (TOP_LINE+LIVESP),a
+    ret
