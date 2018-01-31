@@ -219,6 +219,8 @@ void mouseDragged()
   int delta = lastMouseX - mouseX;
   lastMouseX = mouseX;
 
+  println(delta, scrollpos);
+
   fineScroll += delta;
   scrollpos = fineScroll / 16;
 

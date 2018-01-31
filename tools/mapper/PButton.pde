@@ -43,6 +43,7 @@ public class MMButton extends ActiveElement
   void mousePressed () 
   {
     scrollpos += mapMod;
+    fineScroll = scrollpos * 16;
     if (scrollpos < 0) scrollpos = 0;
     if (scrollpos > 600 - xtiles) scrollpos = 600 - xtiles;
   }
