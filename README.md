@@ -1,6 +1,8 @@
 # zedragon
 Conversion of Russ Wetmore's classic Atari game Sea Dragon for the Sinclair ZX81 suitably equipped with 32K RAM, AY/YM sound and UDG.§
 
+---
+
 ## How to play
 
 Avoid contact with enemies or the environment. Don't run out of air. Surface regularly to refill your tanks.

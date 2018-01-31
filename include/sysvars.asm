@@ -32,7 +32,7 @@ FLAGX:		.byte	0
 STRLEN:		.word	0
 T_ADDR:		.word	$0C8D
 SEED:		.word	0
-FRAMES:		.word	$FFFF
+xFRAMES:		.word	$FFFF
 COORDS:		.byte	0,0
 PR_CC:		.byte	$BC
 S_POSN:		.byte	33,24

@@ -13,8 +13,6 @@ _COLLTAB = OUSER+6
 _EXPLOCT = OUSER+6      ; overloads follow
 _WAIT = OUSER+7
 
-;;#include "testfns.asm"
-
 ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ;
 ; The submarine object.
@@ -29,7 +27,12 @@ submvfunc = $+1
     DIEZ
 
 _drawsub:
+    ld      a,(finescroll)
+    and     6 ; 2 pixel scroll
+    ld      c,a
+
     ld      a,(iy+_SUBX)        ; pixel -> char conversion
+    add     a,c
     srl     a
     srl     a
     srl     a
@@ -113,7 +116,12 @@ _drawsub:
     ;
     ; choose which set of 3 pre-scrolled sub tiles to use.
 
+    ld      a,(finescroll)
+    and     6 ; 2 pixel scroll
+    ld      c,a
+
     ld      a,(iy+_SUBX)        ; pixel offset 0..7
+    add     a,c
     and     7
     ld      c,a
     add     a,a
@@ -283,7 +291,7 @@ chkidx2 = $+5
     ld      a,(iy+0)                ; pixel collision data
     and     a                       ; clears carry
     call    nz,_testcollision        ; test the collision
-    jr      c,_subdead
+    jr      c,_subdead             ; COMMENT THIS FOR INVINCIBILITY
 
     inc     d
     inc     d
@@ -313,7 +321,7 @@ _subdead:
 
     ld      (iy+_EXPLOCT),6
     ld      hl,explooff
-    ld      a,(FRAMES)
+    ld      a,(FrameCounter)
     and     6
     add     a,l
     ld      l,a
@@ -401,7 +409,7 @@ playermovesub:
     cp      $ff
     jr      nz,{+}
 
-    ld      a,(FRAMES)      ; if fire is held, only allow movement every other frame
+    ld      a,(FrameCounter)      ; if fire is held, only allow movement every other frame
     and     1
     jr      z,_checkfire
 

@@ -24,6 +24,8 @@ scrolltick:
 	.byte	0
 scrollpos:
     .word   0
+finescroll:
+    .byte   0
 scrollflags:
     .byte   0
 
@@ -76,7 +78,6 @@ airlevel:
 
 lives:
     .byte   0
-
 score:
     .word   0
 zone:

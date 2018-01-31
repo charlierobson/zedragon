@@ -314,14 +314,14 @@ getenemy:
 
 _dispcolls:
     ld      a,(iy+_LCHAR)
-    ld      de,TOP_LINE+4
+    ld      de,TOP_LINE
     call    hexout
     ld      a,(iy+_LCOLB)
-    ld      de,TOP_LINE+7
+    ld      de,TOP_LINE+3
     call    hexout
     ld      a,(iy+_RCHAR)
-    ld      de,TOP_LINE+10
+    ld      de,TOP_LINE+6
     call    hexout
     ld      a,(iy+_RCOLB)
-    ld      de,TOP_LINE+13
+    ld      de,TOP_LINE+9
     jp      hexout

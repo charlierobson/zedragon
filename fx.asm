@@ -11,7 +11,7 @@ _COUNTER = OUSER+2
 ;
 
 explosound:
-    ld      a,(FRAMES)
+    ld      a,(FrameCounter)
     and     3
     add     a,SFX_EXPLODE0
     jp      AFXPLAY

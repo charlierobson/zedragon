@@ -1,4 +1,3 @@
-;    .exportmode LabelFile
     .exportmode Assembly
     .export
 
@@ -20,9 +19,6 @@ PUREMAP:    .incbin "map.binlz"
 enemyidx:   .incbin "enemyidx.bin"
 
     .align 16
-mul600tab:  .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
-
-    .align 16
 titlescrn:  .incbin  "titlescrn.binlz"
 
     .align 16
@@ -32,23 +28,27 @@ ttfont:     .incbin "hercules.binlz"
 
     .align 16
 scoreline:
-    .asc    "SCORE:00000  HI:00000  Z:1  ^_:4"
-    ;        --------========--------========
+    .asc    "  SCORE 00000  HI 00000   ZONE 1  ^_ 4  "
+    ;        --------========--------========--------
+SCOREP = 8
+HIP = 18
+ZONEP = 31
+LIVESP = 37
 
     .align 16
 airline:
-    .asc    "AIR: -------------------------- "
-    ;        --------========--------========
+    .asc    "    AIR: --------------------------     "
+    ;        --------========--------========--------
 
     .align 16
 titlecreds
     ;        --------========--------========
-    .asc    "     PROGRAMMING: SIRMORRIS     "
-    .asc    "CUSTOM DISPLAY ROUTINE: ANDY REA"
-    .asc    " TITLE TUNE: REAR ADMIRAL MOGGY "
+    .asc    "  GAME PROGRAMMING: SIRMORRIS   "
+    .asc    "DISPLAY ROUTINE: REA / KLOTBLIXT"
+    .asc    " TITLE TUNE: REAR ADMIRER MOGGY "
     .asc    "   STC MUSIC PLAYER: ANDY REA   "
     .asc    "   AYFX DRIVER:  ALEX SEMENOV   "
-    .asc    "    ATARI GFX:  RUSS WETMORE    "
+    .asc    "MASSIVE THANKS TO:  RUSS WETMORE"
 zxpdistxt:
     .asc    "        ZXPAND: DISABLED        "
 
@@ -85,6 +85,9 @@ congrattext:
     .asc    "~"
     .asc    "      ...ANOTHER MISSION!!~}"
     ;        --------========--------========
+
+    .align 16
+mul600tab:  .word   0,600,1200,1800,2400,3000,3600,4200,4800,5400
 
     .align 16
 dofs:

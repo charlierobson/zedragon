@@ -8,6 +8,9 @@
 #include "include/sysvars.asm"
 #include "include/zxline0.asm"
 
+BUFFER_WIDTH    .equ 600
+NUMBER_OF_ROWS  .equ 10
+
 .define ADD_DE_A add a,e \ ld e,a \ adc a,d \ sub e \ ld d,a
 .define ADD_HL_A add a,l \ ld l,a \ adc a,h \ sub l \ ld h,a
 
@@ -35,7 +38,7 @@ considertablex:
     .word   consideralways, boss
 
 inputstatesx:
-    .byte   $1d,$de,$fa,0                     ; INUTDATA tag = defa(ult)
+    .byte   $1d,$de,$fa,0                     ; INPUTDATA tag = ID-DEFA(ult)
     .byte	%10000000,2,%00000001,0        ; up      (Q)
     .byte	%01000000,1,%00000001,0        ; down    (A)
     .byte	%00100000,7,%00001000,0        ; left    (N)
@@ -46,20 +49,11 @@ inputstatesx:
     .byte	%11111111,5,%00000001,0        ; pause   (P)
 inputstatesxsz = $ - inputstatesx
 
-    ; here lies D_BUFFER
     .fill 6000-($-D_BUFFER)
     RET
 
-TOP_LINE:
-	.fill 32,0
-	RET
-
-	.align	32	; to assist in air display calculations
-BOTTOM_LINE:
-	.fill 32,0
-	RET
-
-#include "readisplay.asm"
+#include "trolldisplay.asm"
+#include "vsynctask.asm"
 #include "yield.asm"
 
 ; ------------------------------------------------------------
@@ -74,13 +68,14 @@ starthere:
     call    initostore
     call    initcharset
 
+    call	cls
     call    setupdisplay
 
 	out     ($fe),a
 
 	; create the head of the linked object list: the 'main' object.
 	; this waits for vsync, then proceeds along to the next object in the chain,
-	; eventually returning to itself ad nauseum
+	; eventually returning to itself ad nauseumls -
 	;
 	; the head object is a special case - it can't be inserted into the chain -
 	; we must set up the next pointer manually
@@ -111,9 +106,14 @@ fnmain:
     cp      1
     call    z,_pause
 
-    ld      hl,(scrollpos)
-    ld      (BUFF_OFFSET),hl
     call    waitvsync
+
+    ld      hl,(scrollpos)
+    ld      de,D_BUFFER
+    add     hl,de
+    ld      (MapStart),hl
+    ld      a,(finescroll)
+    ld      (ScrollXFine),a
 
     call    updatescreen
 
@@ -137,7 +137,7 @@ fnmain:
 
 
 _pause:
-    ld      hl,BOTTOM_LINE
+    ld      hl,BOTTOM_LINE+4
     push    hl
     ld      de,PRTBUF
     ld      bc,32
@@ -155,7 +155,7 @@ _ploop:
     jr      nz,_ploop
 
     ld      hl,PRTBUF
-    ld      de,BOTTOM_LINE
+    ld      de,BOTTOM_LINE+4
     ld      bc,32
     ldir
 

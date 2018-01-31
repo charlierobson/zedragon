@@ -50,6 +50,7 @@ _resetafterdeath:
     ld      (collision),a
 
     call    refreshmap
+
     call    resetair
     call    resetenemies
 
@@ -79,14 +80,14 @@ _gameloop:
     inc     hl
     ld      (gameframe),hl
 
+    call    LASER._makeSound
+
     call    scroll
     ld      a,(scrollflags)
     rlca
-    jr      nc,_notscrolled     ; haven't scrolled the bg, so we don't need to update any pointers
 
-    call    zonecheck
+    call    c,zonecheck             ; coarse scroll has occurred - check zone
 
-_notscrolled:
     ;call    displayocount
     xor     a
     ld      (ocount),a
@@ -99,7 +100,7 @@ _notscrolled:
 
     call    enemyinitiator
 
-    ld      a,(FRAMES)          ; play ping sfx (id = 0) every so often
+    ld      a,(FrameCounter)          ; play ping sfx (id = 0) every so often
     and     127
     call    z,AFXPLAY2
 
@@ -152,18 +153,6 @@ _dienow:
 
     DIE
 
-
-showlives:
-    ld      a,(gamemode)
-    and     a
-    ld      a,(lives)
-    jr      nz,{+}
-
-    ld      a,14 - 16
-
-+:  add     a,16
-    ld      (TOP_LINE+31),a
-    ret
 
 
 

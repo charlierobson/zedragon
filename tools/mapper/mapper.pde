@@ -2,6 +2,7 @@ import de.bezier.guido.*;
 
 
 String mapName = "map.bin";
+//String mapName = "titlescrn.bin";
 
 int mode;
 byte[] map;
@@ -217,6 +218,8 @@ void mouseDragged()
 {
   int delta = lastMouseX - mouseX;
   lastMouseX = mouseX;
+
+  println(delta, scrollpos);
 
   fineScroll += delta;
   scrollpos = fineScroll / 16;

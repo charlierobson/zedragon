@@ -112,9 +112,9 @@ _done:
     bit     6,(iy+_TIMER)
     jr      nz,{+}
 
-    ld      hl,BOTTOM_LINE
+    ld      hl,BOTTOM_LINE+4
 
-+:  ld      de,BOTTOM_LINE+1
++:  ld      de,BOTTOM_LINE+1+4
     ld      bc,31
     ldir
 

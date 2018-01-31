@@ -47,18 +47,7 @@ installmaincharset:
     call    _inverness          ; (un)invert the first 256 bytes
     jp      _inverness          ; then the remaining
 
-	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	;
-    ; Kill time until we notice the FRAMES variable change
-    ;
-    ; A display has just been produced, and now we can continue.
-    ;
-waitvsync:
-    ld      hl,FRAMES
-    ld      a,(hl)
--:  cp      (hl)
-    jr      z,{-}
-    ret
+
 
 
 	;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -67,20 +56,18 @@ waitvsync:
     ;
 cls:
     xor     a
-
+    ld      (ScrollXFine),a
     ld      hl,D_BUFFER
+    ld      (MapStart),hl
     ld      bc,6000
     call    fillmem
 
-    ld      (scrollpos),bc          ; bc is 0 at thispoint
-    ld      (BUFF_OFFSET),bc
-
     ld      hl,TOP_LINE
-    ld      bc,32
+    ld      bc,40
     call    fillmem
 
     ld      hl,BOTTOM_LINE
-    ld      bc,32
+    ld      bc,40
     ;
     ; falls in to ...
 
@@ -98,56 +85,9 @@ fillmem:
     ret
 
 
-    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    ;
-    ; Start displaying the credits at the 0th item.
-    ;
-resetcredits:
-    xor     a
-    jr      {+}
-
-
-    ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    ;
-    ; Cycle through the credits, showing 'press fire' every other
-    ; time. The new credit goes in the bottom line of the display.
-    ;
-updatecredits:
-    ld      a,(titlecredidx)
-    inc     a
-    cp      14              ; reset counter every complete cycle
-    jr      nz,{+}
-
-    xor     a
-
-+:  ld      (titlecredidx),a
-
-    bit     0,a             ; if bit 1 is set show one of the two repeated items 
-    jr      z,{+}
-
-    ld      a,7*2
-
-+:  and     $fe
-    sla     a
-    sla     a
-    sla     a
-    sla     a
-    ld      hl,titlecreds
-
-    add     a,l             ; add A to HL
-    ld      l,a
-    adc     a,h
-    sub     l
-    ld      h,a
-
-    ld      de,BOTTOM_LINE
-    ld      bc,32
-    ldir
-    ret
-
 
 animatecharacters:
-    ld      a,(FRAMES)
+    ld      a,(FrameCounter)
     and     15
     jr      nz,testevery8
 
@@ -184,7 +124,7 @@ testevery8:
     ; every 8 frames
 
     ld      hl,flaganimation
-    ld      a,(FRAMES)
+    ld      a,(FrameCounter)
     rra
     rra
     rra
@@ -212,33 +152,40 @@ testevery8:
 
 
 scroll:
+    ld      hl,(scrollpos)
+    ld      de,600-32
+    and     a
+    sbc     hl,de
+    ret     z
+
     ld      hl,scrollflags
     res     7,(hl)                  ; scrollflag.7 = 1 when scrolled
 
     bit     0,(hl)                  ; scrollflag.0 = 1 when scrolling enabled
     ret     z
 
-    ld      hl,scrolltick           ; return if it's not time to scroll
-    ld      c,23
-    call    updatecounter
-    ret     nz
+    ld      a,(scrolltick)
+    inc     a
+    ld      (scrolltick),a
+    srl     a
+    srl     a
+    and     7
 
-    ld      hl,(scrollpos)
-
-    ld      a,l                     ; check if we've hit the end. don't scroll if so
-    cp      (600-32) & 255
-    jr      nz,{+}
-
-    ld      a,h
-    cp      (600-32) / 256
+    ld      hl,finescroll
+    cp      (hl)
     ret     z
 
-+:  ; do actual scroll
+    ld      (hl),a
 
+    and     a                       ; return if not at next char boundary
+    ret     nz
+
+    ld      hl,scrollflags
+    set     7,(hl)                  ; scrollflag.7 = 1 when scrolled a character
+
+    ld      hl,(scrollpos)
     inc     hl
     ld      (scrollpos),hl
-    ld      hl,scrollflags
-    set     7,(hl)                  ; scrollflag.7 = 1 when scrolled
     ret
 
 
@@ -251,18 +198,7 @@ displayocount:
     ret
 
 
-displaylastk:
-    ld      de,TOP_LINE+23
-    ld      a,(LAST_K+1)
-    call    hexout
-    ld      a,(LAST_K)
-    call    hexout
-    ld      de,TOP_LINE+28
-    ld      a,(LAST_K+1)
-    xor     $ff
-    call    hexout
-    ld      a,(LAST_K)
-    xor     $ff
+
 
 hexout:
     push    af
@@ -279,22 +215,6 @@ hexout:
 +:  add     a,$10
     ld      (de),a
     inc     de
-    ret
-
-
-binaryout:
-    ld      b,8
-    ld      c,$80
-
--:  ld      a,l
-    and     c
-    ld      a,16
-    jr      z,{+}
-    inc     a
-+:  ld      (de),a
-    inc     de
-    rrc     c
-    djnz    {-}
     ret
 
 
