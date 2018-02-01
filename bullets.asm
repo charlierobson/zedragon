@@ -251,7 +251,10 @@ _collisioncheck:
     ld      (bulletHitY),a
     ret
 
-+:  set     7,(hl)              ; kill enemy
++:  ld      a,(hl)
+    set     7,(hl)              ; kill enemy
+
+    call    magicminecheck      ; check for secret mines
 
     ld      bc,1
     call    addscore

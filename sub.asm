@@ -291,7 +291,9 @@ chkidx2 = $+5
     ld      a,(iy+0)                ; pixel collision data
     and     a                       ; clears carry
     call    nz,_testcollision        ; test the collision
-    jr      c,_subdead             ; COMMENT THIS FOR INVINCIBILITY
+    .ifndef INVINCIBLE
+    jr      c,_subdead
+    .endif
 
     inc     d
     inc     d
@@ -305,7 +307,9 @@ chkidx2 = $+5
     and     a
 
     ld      a,(iy+_SUBY)            ; only update air if sub not dead/celebrating boss defeat
+    #ifndef INVINCIBLE
     call    z,updateair
+    #endif
 
     ld      a,(airlevel)
     or      a

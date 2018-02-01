@@ -127,3 +127,32 @@ _gobang:
 
     ld      (iy+_COUNTER),0      ; swap to explosion coroutine
     jp      becomeexplosion
+
+
+
+magicminecheck:
+    and     $70
+    cp      NME_STATMINE
+    ret     nz
+
+_cbmm:
+    ld      hl,_magicmines
+    ld      (_mmptr),hl
+    ld      b,6
+
+_mmptr = $+1
+-:  ld      hl,(0)
+    and     a
+    sbc     hl,de
+    jr      z,_isMagic
+    ld      hl,_mmptr+1
+    inc     (hl)
+    djnz    {-}
+    ret
+
+_isMagic:
+    ret
+
+    .align  16
+_magicmines:
+    .word   10, 87, 187, 350, 359, 583
