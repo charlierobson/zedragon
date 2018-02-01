@@ -3,6 +3,8 @@
 
 ;    .inclabels  "datawad.bin.lbl"
 
+; .define INVINCIBLE
+
 #include "datawad.bin.inc"
 
 #include "include/sysvars.asm"
@@ -187,5 +189,9 @@ endhere:
 ; ------------------------------------------------------------
 
 #include "include/zxline1.asm"
+
+    .ifdef INVINCIBLE
+    .warn "INVINCIBILITY IS SET"
+    .endif
 
     .end
