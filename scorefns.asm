@@ -2,7 +2,9 @@
 
 resetscore:
     ld      hl,0
+    ld      a,h
     ld      (score),hl
+    ld      (bonus),a
     ret
 
 

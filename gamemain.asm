@@ -10,10 +10,17 @@ gamemain:
 
     YIELD
 
+    xor     a                       ; zone number
+    ld      (zone),a
+
+    ld      a,4                     ; set initial lives
+    ld      (lives),a
+
     call    installmaincharset          ; (re)install the main character set    
     call    showscoreline
     call    displayscore
     call    displayhi
+    call    showlives
     call    enablegamesound
 
     xor     a
@@ -29,12 +36,6 @@ gamemain:
     ld      hl,dofs                 ; set starting zone
     ld      (iy+_RSPL),l
     ld      (iy+_RSPH),h
-    xor     a                       ; zone number
-    ld      (zone),a
-
-    ld      a,4                     ; set initial lives
-    ld      (lives),a
-    call    showlives
 
     ld      a,(laserframe)          ; can't remember why but reasons
     ld      (laserframe+1),a
@@ -94,7 +95,17 @@ _gameloop:
     YIELD
 
     call    animatecharacters
-    call    displayscore
+
+    ld      a,(bonus)
+    and     a
+    jr      z,{+}
+ 
+    sub     2
+    ld      (bonus),a
+    ld      bc,2
+    call    addscore
+
++:  call    displayscore
     call    checkhi
     call    c,displayhi
 

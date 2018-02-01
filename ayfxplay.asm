@@ -49,6 +49,7 @@ SFX_TORPED3 = 21
 SFX_TT = 22
 SFX_WALL = 23
 SFX_MINEAPP = 24
+SFX_BONUS = 16
 
 ; channel descriptors, 4 bytes per channel:
 ; +0 (2) current address (the channel is free if the high byte =$00)

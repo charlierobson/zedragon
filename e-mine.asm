@@ -145,12 +145,22 @@ _mmptr = $+1
     and     a
     sbc     hl,de
     jr      z,_isMagic
-    ld      hl,_mmptr+1
+    ld      hl,_mmptr
+    inc     (hl)
     inc     (hl)
     djnz    {-}
     ret
 
 _isMagic:
+    push    de
+    ld      hl,(_mmptr)      ; can't find this one again this game
+    ld      (hl),$ff
+    ld      a,(bonus)
+    add     a,100
+    ld      (bonus),a
+    ld      a,SFX_BONUS
+    call    AFXPLAY
+    pop de
     ret
 
     .align  16

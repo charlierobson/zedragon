@@ -81,7 +81,10 @@ lives:
 score:
     .word   0
 zone:
-    .byte   0       ; current zone
+    .byte   0
+bonus:
+    .byte   0
+
 
 ; --- ordering here is for eeprom persistence, don't alter
 hiscore:
